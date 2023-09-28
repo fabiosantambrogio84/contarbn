@@ -2206,8 +2206,8 @@ public class StampaService {
 
     public Map<String, Object> createParameters(){
         Map<String, Object> parameters = new HashMap<>();
-        parameters.put("logo", this.getClass().getResource("/reports/logo.png"));
-        parameters.put("bollino", this.getClass().getResource("/reports/bollino.png"));
+        parameters.put("logo", this.getClass().getResource("/jasper_reports/logo.png"));
+        parameters.put("bollino", this.getClass().getResource("/jasper_reports/bollino.png"));
         return parameters;
     }
 
