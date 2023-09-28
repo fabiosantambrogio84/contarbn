@@ -73,7 +73,7 @@
 				<textElement textAlignment="Center">
 					<font size="12" isBold="true" isItalic="false"/>
 				</textElement>
-				<text><![CDATA[Urbani Giuseppe]]></text>
+				<text><![CDATA[Urbani Elia e Marta]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="250" y="0" width="220" height="20" uuid="b446c6ad-fdd3-43f2-989a-6028d53aa92e"/>

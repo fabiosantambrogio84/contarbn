@@ -126,7 +126,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
 					<font size="12" isBold="true" isItalic="false" isUnderline="false"/>
 				</textElement>
-				<text><![CDATA[Urbani Giuseppe]]></text>
+				<text><![CDATA[Urbani Elia e Marta]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="250" y="0" width="220" height="20" uuid="3960cf9c-8bfc-4ba7-ac7a-b6087857e3b8"/>
@@ -149,7 +149,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
 					<font size="7"/>
 				</textElement>
-				<text><![CDATA[Cod. Fisc. RBNGPP56A14L551I]]></text>
+				<text><![CDATA[Cod. Fisc. ]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="70" y="36" width="124" height="14" uuid="4461cc11-344e-4b43-8364-87b979562532">
@@ -158,7 +158,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
 					<font size="7"/>
 				</textElement>
-				<text><![CDATA[P.Iva 02471520243]]></text>
+				<text><![CDATA[P.Iva 04998580239]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="359" y="36" width="92" height="14" uuid="e6074144-46ca-46e0-b9a8-dc117cceea44">
@@ -185,7 +185,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
 					<font size="7"/>
 				</textElement>
-				<text><![CDATA[Cell: 328 4694654]]></text>
+				<text><![CDATA[Cell:]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="30" y="64" width="170" height="14" uuid="3cbb33ad-5d4d-44d1-8c44-bdbf826ad948">

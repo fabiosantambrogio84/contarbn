@@ -91,7 +91,7 @@
 				<textElement textAlignment="Center">
 					<font size="14" isBold="true" isItalic="true"/>
 				</textElement>
-				<text><![CDATA[Urbani Giuseppe]]></text>
+				<text><![CDATA[Urbani Elia e Marta]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="250" y="0" width="220" height="20" uuid="0ef769e4-26ab-4778-a0aa-e327a05851bd"/>
@@ -110,14 +110,14 @@
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center"/>
-				<text><![CDATA[Cod. Fisc. RBNGPP56A14L551I]]></text>
+				<text><![CDATA[Cod. Fisc.]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="70" y="36" width="124" height="14" uuid="d9458f49-362c-46bc-bced-0c887ee2d944">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center"/>
-				<text><![CDATA[P.Iva 02471520243]]></text>
+				<text><![CDATA[P.Iva 04998580239]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="359" y="36" width="92" height="14" uuid="3ab9160f-462f-45b2-96f4-30d27dbf8050">
@@ -138,7 +138,7 @@
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center"/>
-				<text><![CDATA[Cell: 328 4694654]]></text>
+				<text><![CDATA[Cell:]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="30" y="64" width="170" height="14" uuid="e574f6b4-1de7-4e24-83f5-033d9c18e21e">
@@ -281,7 +281,7 @@
 						</textField>
 						<componentElement>
 							<reportElement x="370" y="0" width="131" height="15" isRemoveLineWhenBlank="true" uuid="bb44faad-16f9-41d0-b04a-9d808595a86c"/>
-							<jr:list>
+							<jr:list printOrder="Vertical">
 								<datasetRun subDataset="FatturaCommerciantiTotaliDataset" uuid="270b93ad-80cc-417a-93ec-9fac2760d5f4">
 									<datasetParameter name="REPORT_DATA_SOURCE">
 										<datasetParameterExpression><![CDATA[$F{fatturaCommercianteTotaliDataSource}]]></datasetParameterExpression>
