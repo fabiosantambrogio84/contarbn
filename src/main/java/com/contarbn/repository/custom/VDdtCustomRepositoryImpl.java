@@ -126,7 +126,7 @@ public class VDdtCustomRepositoryImpl implements VDdtCustomRepository{
     private StringBuilder createQueryAsString(String select, Date dataDa, Date dataA, Integer progressivo, Integer idCliente, String cliente, Integer idAgente, Integer idAutista, Integer idStato, Boolean pagato, Boolean fatturato, Float importo, Integer idTipoPagamento, Integer idArticolo){
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT ").append(select);
-        sb.append(" FROM contafood.v_ddt WHERE 1=1 ");
+        sb.append(" FROM contarbn.v_ddt WHERE 1=1 ");
 
         if(dataDa != null) {
             sb.append(" AND data >= :dataDa ");

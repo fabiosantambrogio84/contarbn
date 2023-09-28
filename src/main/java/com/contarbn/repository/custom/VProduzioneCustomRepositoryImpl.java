@@ -129,7 +129,7 @@ public class VProduzioneCustomRepositoryImpl implements VProduzioneCustomReposit
     private StringBuilder createQueryAsString(String select, Integer codice, String ricetta, String barcodeEan13, String barcodeEan128){
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT ").append(select);
-        sb.append(" FROM contafood.v_produzione WHERE 1=1 ");
+        sb.append(" FROM contarbn.v_produzione WHERE 1=1 ");
 
         if(codice != null) {
             sb.append(" AND codice_produzione = :codice ");

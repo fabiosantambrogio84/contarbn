@@ -116,7 +116,7 @@ public class VDocumentoAcquistoCustomRepositoryImpl implements VDocumentoAcquist
     private StringBuilder createQueryAsString(String select, String fornitore, String numDocumento, String tipoDocumento, Date dataDa, Date dataA, Long idFornitore, Boolean fatturato){
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT ").append(select);
-        sb.append(" FROM contafood.v_documento_acquisto WHERE 1=1 ");
+        sb.append(" FROM contarbn.v_documento_acquisto WHERE 1=1 ");
 
         if(fornitore != null) {
             sb.append(" AND lower(ragione_sociale_fornitore) LIKE concat('%',:fornitore,'%') ");

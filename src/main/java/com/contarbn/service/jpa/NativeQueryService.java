@@ -1,8 +1,7 @@
 package com.contarbn.service.jpa;
 
 import com.contarbn.model.OrdineClienteAggregate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
@@ -14,10 +13,9 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class NativeQueryService {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(NativeQueryService.class);
 
     private static final String ORDINI_CLIENTI_AGGREGATE_QUERY = "select \n" +
             "ordine_cliente_articolo.id_articolo,\n" +
@@ -29,9 +27,9 @@ public class NativeQueryService {
             "group_concat(concat(ordine_cliente.progressivo,'/', ordine_cliente.anno_contabile) separator ',') as codici_ordini_clienti,\n" +
             "group_concat(concat(ordine_cliente.progressivo,'/', ordine_cliente.anno_contabile,': ',ordine_cliente.note) separator ',') as note,\n" +
             "group_concat(ordine_cliente_articolo.id_ddts separator ',') as id_ddts\n" +
-            "from contafood.ordine_cliente_articolo\n" +
-            "join contafood.ordine_cliente on ordine_cliente_articolo.id_ordine_cliente = ordine_cliente.id\n" +
-            "join contafood.articolo on ordine_cliente_articolo.id_articolo = articolo.id\n" +
+            "from contarbn.ordine_cliente_articolo\n" +
+            "join contarbn.ordine_cliente on ordine_cliente_articolo.id_ordine_cliente = ordine_cliente.id\n" +
+            "join contarbn.articolo on ordine_cliente_articolo.id_articolo = articolo.id\n" +
             "where ordine_cliente.id_cliente = ?1 \n" +
             "and ordine_cliente.id_punto_consegna = ?2 \n" +
             "and ordine_cliente.id_stato_ordine <> ?3 \n" +
@@ -49,7 +47,7 @@ public class NativeQueryService {
     private EntityManager entityManager;
 
     public List<OrdineClienteAggregate> getOrdiniClientiAggregate(Integer idCliente, Integer idPuntoConsegna, Date dataConsegna, Integer idStato){
-        LOGGER.info("Performing native query for retrieving 'ordini clienti aggregate' with idCliente '{}', idPuntoConsegna '{}', dataConsegna <= '{}', idStatoNot '{}'", idCliente, idPuntoConsegna, dataConsegna, idStato);
+        log.info("Performing native query for retrieving 'ordini clienti aggregate' with idCliente '{}', idPuntoConsegna '{}', dataConsegna <= '{}', idStatoNot '{}'", idCliente, idPuntoConsegna, dataConsegna, idStato);
         List<OrdineClienteAggregate> ordiniClientiAggregate = new ArrayList<>();
 
         try {
@@ -87,12 +85,12 @@ public class NativeQueryService {
             throw e;
         }
 
-        LOGGER.info("Retrieved {} 'ordini clienti aggregate'", ordiniClientiAggregate.size());
+        log.info("Retrieved {} 'ordini clienti aggregate'", ordiniClientiAggregate.size());
         return ordiniClientiAggregate;
     }
 
     public Integer getAdeNextId(String operation){
-        LOGGER.info("Performing native query for retrieving next progressivo for operation '{}'...", operation);
+        log.info("Performing native query for retrieving next progressivo for operation '{}'...", operation);
         Query query;
         switch(operation){
             case "export":
@@ -116,7 +114,7 @@ public class NativeQueryService {
             e.printStackTrace();
             throw e;
         }
-        LOGGER.info("Result is: {}", result);
+        log.info("Result is: {}", result);
         return result.intValue();
     }
 

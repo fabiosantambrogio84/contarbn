@@ -143,7 +143,7 @@ public class VFatturaCustomRepositoryImpl implements VFatturaCustomRepository{
     private StringBuilder createQueryAsString(String select, Date dataDa, Date dataA, Integer progressivo, Float importo, String idTipoPagamento, String cliente, Integer idAgente, Integer idArticolo, Integer idStato, Integer idTipo){
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT ").append(select);
-        sb.append(" FROM contafood.v_fattura WHERE 1=1 ");
+        sb.append(" FROM contarbn.v_fattura WHERE 1=1 ");
 
         if(dataDa != null) {
             sb.append(" AND data >= :dataDa ");

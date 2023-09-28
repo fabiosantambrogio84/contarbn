@@ -19,7 +19,7 @@ public class VPagamentoCustomRepositoryImpl implements VPagamentoCustomRepositor
     @Override
     public List<VPagamento> findByFilter(String tipologia, Date dataDa, Date dataA, String cliente, String fornitore, Float importo) {
         StringBuilder sb = new StringBuilder();
-        sb.append("SELECT * FROM contafood.v_pagamento WHERE 1=1 ");
+        sb.append("SELECT * FROM contarbn.v_pagamento WHERE 1=1 ");
 
         if(tipologia != null) {
             sb.append(" AND tipologia = :tipologia ");
