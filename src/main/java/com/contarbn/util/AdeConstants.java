@@ -4,9 +4,9 @@ public interface AdeConstants {
 
     String PAESE = "IT";
 
-    String CODICE_FISCALE = "RBNGPP56A14L551I";
+    String CODICE_FISCALE = "";
 
-    String PARTITA_IVA = "02471520243";
+    String PARTITA_IVA = "04998580239";
 
     String FORMATO_TRASMISSIONE = "FPR12";
 
@@ -16,7 +16,7 @@ public interface AdeConstants {
 
     String EMAIL = "INFO@URBANIALIMENTARI.COM";
 
-    String RAGIONE_SOCIALE = "AZIENDA COMMERCIALE URBANI GIUSEPPE";
+    String RAGIONE_SOCIALE = "AZIENDA COMMERCIALE URBANI ELIA E MARTA";
 
     String REGIME_FISCALE = "RF01";
 

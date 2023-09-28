@@ -3,8 +3,8 @@ package com.contarbn.controller;
 import com.contarbn.exception.CannotChangeResourceIdException;
 import com.contarbn.model.*;
 import com.contarbn.service.FornitoreService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.contarbn.util.Constants;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,11 +18,10 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
+@Slf4j
 @RestController
 @RequestMapping(path="/fornitori")
 public class FornitoreController {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(FornitoreController.class);
 
     private final FornitoreService fornitoreService;
 
@@ -35,8 +34,8 @@ public class FornitoreController {
     @CrossOrigin
     public List<Fornitore> getAll(@RequestParam(name = "codiceTipo", required = false) String codiceTipoFornitore,
                                   @RequestParam(name = "attivo", required = false) Boolean active) {
-        LOGGER.info("Performing GET request for retrieving list of 'fornitori'");
-        LOGGER.info("Request params: codiceTipoFornitore {}, attivo {}",codiceTipoFornitore, active);
+        log.info("Performing GET request for retrieving list of 'fornitori'");
+        log.info("Request params: codiceTipoFornitore {}, attivo {}",codiceTipoFornitore, active);
 
         Predicate<Fornitore> isFornitoreTipoFornitoreEquals = fornitore -> {
             if(codiceTipoFornitore != null){
@@ -63,15 +62,15 @@ public class FornitoreController {
     @RequestMapping(method = GET, path = "/{fornitoreId}")
     @CrossOrigin
     public Fornitore getOne(@PathVariable final Long fornitoreId) {
-        LOGGER.info("Performing GET request for retrieving 'fornitore' '{}'", fornitoreId);
+        log.info("Performing GET request for retrieving 'fornitore' '{}'", fornitoreId);
         return fornitoreService.getOne(fornitoreId);
     }
 
     @RequestMapping(method = GET, path = "/{fornitoreId}/articoli")
     @CrossOrigin
     public List<Articolo> getArticoli(@PathVariable final Long fornitoreId, @RequestParam(name = "attivo", required = false) Boolean active) {
-        LOGGER.info("Performing GET request for retrieving 'articoli' of 'fornitore' '{}'", fornitoreId);
-        LOGGER.info("Query parameter 'attivo' equal to '{}'", active);
+        log.info("Performing GET request for retrieving 'articoli' of 'fornitore' '{}'", fornitoreId);
+        log.info("Query parameter 'attivo' equal to '{}'", active);
         if(active != null){
             List<Articolo> articoli = fornitoreService.getOne(fornitoreId).getArticoli();
             return articoli.stream().filter(a -> {
@@ -88,22 +87,22 @@ public class FornitoreController {
     @RequestMapping(method = GET, path = "/default")
     @CrossOrigin
     public Fornitore getByRagioneSociale() {
-        LOGGER.info("Performing GET request for retrieving default 'fornitore' (URBANI GIUSEPPE)");
-        return fornitoreService.getByRagioneSociale("URBANI GIUSEPPE");
+        log.info("Performing GET request for retrieving default 'fornitore' ({})", Constants.DEFAULT_FORNITORE);
+        return fornitoreService.getByRagioneSociale(Constants.DEFAULT_FORNITORE);
     }
 
     @RequestMapping(method = POST)
     @ResponseStatus(CREATED)
     @CrossOrigin
     public Fornitore create(@RequestBody final Fornitore fornitore){
-        LOGGER.info("Performing POST request for creating 'fornitore'");
+        log.info("Performing POST request for creating 'fornitore'");
         return fornitoreService.create(fornitore);
     }
 
     @RequestMapping(method = PUT, path = "/{fornitoreId}")
     @CrossOrigin
     public Fornitore update(@PathVariable final Long fornitoreId, @RequestBody final Fornitore fornitore){
-        LOGGER.info("Performing PUT request for updating 'fornitore' '{}'", fornitoreId);
+        log.info("Performing PUT request for updating 'fornitore' '{}'", fornitoreId);
         if (!Objects.equals(fornitoreId, fornitore.getId())) {
             throw new CannotChangeResourceIdException();
         }
@@ -114,7 +113,7 @@ public class FornitoreController {
     @ResponseStatus(NO_CONTENT)
     @CrossOrigin
     public void delete(@PathVariable final Long fornitoreId){
-        LOGGER.info("Performing DELETE request for deleting 'fornitore' '{}'", fornitoreId);
+        log.info("Performing DELETE request for deleting 'fornitore' '{}'", fornitoreId);
         fornitoreService.delete(fornitoreId);
     }
 }

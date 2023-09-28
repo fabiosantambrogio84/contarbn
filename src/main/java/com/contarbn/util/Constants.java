@@ -7,7 +7,7 @@ public interface Constants {
 
     String DEFAULT_ENCODING = "UTF-8";
 
-    String DEFAULT_FORNITORE = "URBANI GIUSEPPE";
+    String DEFAULT_FORNITORE = "URBANI ELIA E MARTA";
     String DEFAULT_FORNITORE_INITIALS = "UR";
     String DEFAULT_EMAIL = "info@urbanialimentari.com";
 

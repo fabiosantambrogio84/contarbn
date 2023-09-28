@@ -141,7 +141,7 @@ public class EtichettaService {
         String lotto = "221597";
         Double peso = 300D;
         String disposizioniComune = "Verifica le disposizioni del tuo comune";
-        String footer = "Prodotto e confezionato da:<br/> URBANI GIUSEPPE<br/>Via 11 Settembre, 17 SAN GIOVANNI ILARIONE (VR)<br/>TEL. 045/6550993 CEL. 328/4694654 www.urbanialimentari.com";
+        String footer = "Prodotto e confezionato da:<br/> URBANI ELIA E MARTA<br/>Via 11 Settembre, 17 SAN GIOVANNI ILARIONE (VR)<br/>TEL. 045/6550993 CEL. 328/4694654 www.urbanialimentari.com";
 
         EtichettaService etichettaService = new EtichettaService();
 
