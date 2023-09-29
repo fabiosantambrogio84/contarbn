@@ -142,7 +142,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
 					<font size="7"/>
 				</textElement>
-				<text><![CDATA[Cod. Fisc. ]]></text>
+				<text><![CDATA[Cod. Fisc. 04998580239]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="70" y="36" width="124" height="14" uuid="4461cc11-344e-4b43-8364-87b979562532">
@@ -178,7 +178,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
 					<font size="7"/>
 				</textElement>
-				<text><![CDATA[Cell: ]]></text>
+				<text><![CDATA[Cell: 328 4694654]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="30" y="64" width="170" height="14" uuid="3cbb33ad-5d4d-44d1-8c44-bdbf826ad948">
