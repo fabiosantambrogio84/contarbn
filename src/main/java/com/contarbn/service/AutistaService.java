@@ -5,6 +5,7 @@ import com.contarbn.model.Autista;
 import com.contarbn.model.views.VDdtLast;
 import com.contarbn.repository.AutistaRepository;
 import com.contarbn.repository.views.VDdtLastRepository;
+import com.contarbn.util.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,7 @@ public class AutistaService {
                         autista.setPredefinito(true);
                     }
                 } else {
-                    if(autista.getNome().equalsIgnoreCase("giuseppe")){
+                    if(autista.getCognome().equalsIgnoreCase(Constants.DEFAULT_AUTISTA_COGNOME)){
                         autista.setPredefinito(true);
                     }
                 }

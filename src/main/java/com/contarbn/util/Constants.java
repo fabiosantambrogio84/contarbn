@@ -11,6 +11,8 @@ public interface Constants {
     String DEFAULT_FORNITORE_INITIALS = "UR";
     String DEFAULT_EMAIL = "info@urbanialimentari.com";
 
+    String DEFAULT_AUTISTA_COGNOME = "fumaroni";
+
     String ZONE_ID_EUROPE_ROME = "Europe/Rome";
 
     String MEDIA_TYPE_APPLICATION_PDF = "application/pdf";
