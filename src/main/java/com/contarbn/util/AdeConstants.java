@@ -4,7 +4,7 @@ public interface AdeConstants {
 
     String PAESE = "IT";
 
-    String CODICE_FISCALE = "";
+    String CODICE_FISCALE = "04998580239";
 
     String PARTITA_IVA = "04998580239";
 
