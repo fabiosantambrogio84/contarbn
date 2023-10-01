@@ -74,20 +74,6 @@
 				<imageExpression><![CDATA[$P{bollino}]]></imageExpression>
 			</image>
 			<staticText>
-				<reportElement x="90" y="0" width="160" height="20" uuid="f0bf3977-9c59-499a-9fb1-4392cded46ba"/>
-				<textElement textAlignment="Center">
-					<font size="12" isBold="true" isItalic="false" isUnderline="false"/>
-				</textElement>
-				<text><![CDATA[Urbani Elia e Marta]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="250" y="0" width="220" height="20" uuid="71ce7287-a11c-45ea-9ba0-2ab8027b1316"/>
-				<textElement textAlignment="Center">
-					<font size="12" isBold="true" isItalic="false" isUnderline="false"/>
-				</textElement>
-				<text><![CDATA[pasta fresca - gastronomia]]></text>
-			</staticText>
-			<staticText>
 				<reportElement x="110" y="20" width="310" height="14" uuid="43c66832-8236-4f7a-a52f-a27bd0aac0cb"/>
 				<textElement textAlignment="Center">
 					<font size="9"/>
@@ -119,7 +105,7 @@
 				<textElement textAlignment="Center">
 					<font size="9"/>
 				</textElement>
-				<text><![CDATA[REA VR 373577]]></text>
+				<text><![CDATA[REA]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="150" y="50" width="114" height="14" uuid="ec0418d9-13d1-4050-8231-1cda6d1a7a4f">
@@ -164,7 +150,27 @@
 				<textElement textAlignment="Left">
 					<font size="9"/>
 				</textElement>
-				<text><![CDATA[Pec urbanialimentari@legalmail.it]]></text>
+				<text><![CDATA[Pec rbn.snc@legalmail.it]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="60" y="0" width="240" height="20" uuid="be765e7b-e5a9-4259-a834-a26db9f3efab">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="10" isBold="true" isItalic="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[URBANI ALIMENTARI SNC di Urbani Elia e Marta]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="300" y="0" width="176" height="20" uuid="fa5399fa-d8e2-41d0-9232-1ddd7896db5e">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="10" isBold="true" isItalic="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[pasta fresca - gastronomia]]></text>
 			</staticText>
 		</band>
 	</pageHeader>
