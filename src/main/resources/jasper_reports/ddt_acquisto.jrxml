@@ -160,7 +160,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
 					<font size="7"/>
 				</textElement>
-				<text><![CDATA[REA]]></text>
+				<text><![CDATA[REA VR462314]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="150" y="50" width="114" height="14" uuid="3326e1f3-5f01-4d29-aa0c-cf02cd71c586">

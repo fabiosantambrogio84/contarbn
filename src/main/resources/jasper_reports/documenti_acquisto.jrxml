@@ -106,7 +106,7 @@
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center"/>
-				<text><![CDATA[REA]]></text>
+				<text><![CDATA[REA VR462314]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="150" y="50" width="114" height="14" uuid="460e2c13-2ebf-400c-bd22-9b449eb93aa7">

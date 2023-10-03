@@ -188,7 +188,7 @@
 				<textElement textAlignment="Center">
 					<font size="9"/>
 				</textElement>
-				<text><![CDATA[REA]]></text>
+				<text><![CDATA[REA VR462314]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="150" y="50" width="114" height="14" uuid="92adb101-aa97-46e5-9043-56f7730d8616">
