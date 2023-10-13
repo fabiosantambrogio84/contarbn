@@ -69,18 +69,13 @@
 		<band height="85" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<staticText>
-				<reportElement x="20" y="0" width="290" height="20" uuid="3ffdb044-e696-4a36-91ef-e05ce4225795"/>
-				<textElement textAlignment="Center">
+				<reportElement x="0" y="0" width="554" height="20" uuid="3ffdb044-e696-4a36-91ef-e05ce4225795">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" isBold="true" isItalic="false"/>
 				</textElement>
 				<text><![CDATA[URBANI ALIMENTARI SNC di Elia e Marta]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="310" y="0" width="196" height="20" uuid="b446c6ad-fdd3-43f2-989a-6028d53aa92e"/>
-				<textElement textAlignment="Center">
-					<font size="12" isBold="true"/>
-				</textElement>
-				<text><![CDATA[pasta fresca - gastronomia]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="25" width="555" height="30" uuid="bd86fb0b-083e-4044-9711-649afaf9b757"/>

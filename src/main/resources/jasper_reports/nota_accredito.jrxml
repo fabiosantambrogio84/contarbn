@@ -212,24 +212,14 @@
 				<text><![CDATA[Pec rbn.snc@legalmail.it]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="60" y="0" width="284" height="20" uuid="09e10497-0985-4ec1-9e80-5c7d2b526e98">
+				<reportElement x="60" y="0" width="440" height="20" uuid="09e10497-0985-4ec1-9e80-5c7d2b526e98">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
-				<textElement textAlignment="Center" verticalAlignment="Bottom">
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="10" isBold="true" isItalic="false" isUnderline="false"/>
 				</textElement>
 				<text><![CDATA[URBANI ALIMENTARI SNC di Urbani Elia e Marta]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="345" y="0" width="150" height="20" uuid="f1b8de14-1c33-4e32-a6c0-1f8207b0d726">
-					<property name="com.jaspersoft.studio.unit.x" value="px"/>
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-				</reportElement>
-				<textElement textAlignment="Center" verticalAlignment="Bottom">
-					<font size="10" isBold="true" isItalic="false" isUnderline="false"/>
-				</textElement>
-				<text><![CDATA[pasta fresca - gastronomia]]></text>
 			</staticText>
 		</band>
 	</pageHeader>
