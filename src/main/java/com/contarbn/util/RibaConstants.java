@@ -6,17 +6,17 @@ public interface RibaConstants {
 
     String FILENAME_EXTENSION = ".txt";
 
-    String CODICE_SIA = "12L96";
+    String CODICE_SIA = "C2JK0";
 
-    String CODICE_FISCALE = "RBNGPP56A14L551I";
+    String CODICE_FISCALE = "04998580239";
 
     String CODICE_ABI = "02008";
 
-    String CODICE_CAB = "59760";
+    String CODICE_CAB = "59752";
 
-    String CC = "000041279248";
+    String CC = "000106913591";
 
-    String URBANI_ALIMENTARI_NAME = "URBANI ALIMENTARI";
+    String URBANI_ALIMENTARI_NAME = "URBANI ALIM. SNC";
 
     String URBANI_ALIMENTARI_VIA_CIVICO = "Via 11 Settembre, 17";
 

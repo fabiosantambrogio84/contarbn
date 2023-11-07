@@ -72,6 +72,8 @@ public class StampaService {
 
     private final FatturaAccompagnatoriaAcquistoService fatturaAccompagnatoriaAcquistoService;
 
+    private final DittaInfoService dittaInfoService;
+
     @Autowired
     public StampaService(final GiacenzaIngredienteService giacenzaIngredienteService, final DdtService ddtService, final PagamentoService pagamentoService,
                          final AutistaService autistaService,
@@ -86,7 +88,8 @@ public class StampaService {
                          final DocumentoAcquistoService documentoAcquistoService,
                          final DdtAcquistoService ddtAcquistoService,
                          final FatturaAcquistoService fatturaAcquistoService,
-                         final FatturaAccompagnatoriaAcquistoService fatturaAccompagnatoriaAcquistoService){
+                         final FatturaAccompagnatoriaAcquistoService fatturaAccompagnatoriaAcquistoService,
+                         final DittaInfoService dittaInfoService){
         this.giacenzaIngredienteService = giacenzaIngredienteService;
         this.ddtService = ddtService;
         this.pagamentoService = pagamentoService;
@@ -103,9 +106,10 @@ public class StampaService {
         this.ddtAcquistoService = ddtAcquistoService;
         this.fatturaAcquistoService = fatturaAcquistoService;
         this.fatturaAccompagnatoriaAcquistoService = fatturaAccompagnatoriaAcquistoService;
+        this.dittaInfoService = dittaInfoService;
     }
 
-    public List<VGiacenzaIngrediente> getGiacenzeIngredienti(String ids){
+    private List<VGiacenzaIngrediente> getGiacenzeIngredienti(String ids){
         log.info("Retrieving the list of 'giacenze-ingredienti' with id in '{}' for creating pdf file", ids);
 
         List<VGiacenzaIngrediente> giacenzeIngredienti = giacenzaIngredienteService.getAll().stream()
@@ -118,7 +122,7 @@ public class StampaService {
         return giacenzeIngredienti;
     }
 
-    public List<PagamentoDataSource> getPagamenti(String ids){
+    private List<PagamentoDataSource> getPagamenti(String ids){
         log.info("Retrieving the list of 'pagamenti' with id in '{}' for creating pdf file", ids);
 
         List<Pagamento> pagamenti = pagamentoService.getPagamenti().stream()
@@ -248,7 +252,7 @@ public class StampaService {
         return ddtArticoloDataSources;
     }
 
-    public List<DdtDataSource> getDdtDataSources(java.sql.Date dataDa, java.sql.Date dataA, Integer progressivo, Integer idCliente, String cliente, Integer idAgente, Integer idAutista, Integer idStato, Boolean pagato, Boolean fatturato, Float importo, Integer idTipoPagamento, Integer idArticolo){
+    private List<DdtDataSource> getDdtDataSources(java.sql.Date dataDa, java.sql.Date dataA, Integer progressivo, Integer idCliente, String cliente, Integer idAgente, Integer idAutista, Integer idStato, Boolean pagato, Boolean fatturato, Float importo, Integer idTipoPagamento, Integer idArticolo){
         log.info("Retrieving the list of 'ddts' for creating pdf file");
 
         List<DdtDataSource> ddtDataSources = new ArrayList<>();
@@ -276,7 +280,7 @@ public class StampaService {
         return ddtDataSources;
     }
 
-    public List<DocumentoAcquistoDataSource> getDocumentoAcquistoDataSources(String fornitore, String numDocumento, String tipoDocumento, java.sql.Date dataDa, java.sql.Date dataA){
+    private List<DocumentoAcquistoDataSource> getDocumentoAcquistoDataSources(String fornitore, String numDocumento, String tipoDocumento, java.sql.Date dataDa, java.sql.Date dataA){
         log.info("Retrieving the list of 'documento-acquisto' for creating pdf file");
 
         List<DocumentoAcquistoDataSource> documentoAcquistoDataSources = new ArrayList<>();
@@ -365,11 +369,11 @@ public class StampaService {
         return ddtAcquistoArticoloDataSources;
     }
 
-    public Autista getAutista(Long idAutista){
+    private Autista getAutista(Long idAutista){
         return autistaService.getOne(idAutista);
     }
 
-    public List<OrdineAutistaDataSource> getOrdiniAutista(Long idAutista, Date dataConsegnaDa, Date dataConsegnaA){
+    private List<OrdineAutistaDataSource> getOrdiniAutista(Long idAutista, Date dataConsegnaDa, Date dataConsegnaA){
         log.info("Retrieving the list of 'ordini-clienti' of autista '{}', dataConsegnaDa '{}' and  dataConsegnaA '{}' for creating pdf file", idAutista, dataConsegnaDa, dataConsegnaA);
 
         Predicate<OrdineCliente> isOrdineClienteDataConsegnaGreaterOrEquals = ordineCliente -> {
@@ -547,7 +551,7 @@ public class StampaService {
                 .collect(Collectors.toList());
     }
 
-    public List<NotaAccreditoDataSource> getNotaAccreditoDataSources(java.sql.Date dataDa, java.sql.Date dataA, Integer progressivo, Float importo, String cliente, Integer idAgente, Integer idArticolo, Integer idStato){
+    private List<NotaAccreditoDataSource> getNotaAccreditoDataSources(java.sql.Date dataDa, java.sql.Date dataA, Integer progressivo, Float importo, String cliente, Integer idAgente, Integer idArticolo, Integer idStato){
         log.info("Retrieving the list of 'note accredito' for creating pdf file");
 
         List<NotaAccreditoDataSource> notaAccreditoDataSources = new ArrayList<>();
@@ -585,7 +589,55 @@ public class StampaService {
         return notaAccreditoDataSources;
     }
 
-    public List<FatturaDataSource> getFatturaDataSources(java.sql.Date dataDa, java.sql.Date dataA, Integer progressivo, Float importo, String idTipoPagamento, String cliente, Integer idAgente, Integer idArticolo, Integer idStato, Integer idTipo){
+    private DittaInfoDataSource getDittaInfoDataSource(){
+        DittaInfoDataSource dittaInfoDataSource = new DittaInfoDataSource();
+
+        List<DittaInfo> dittaInfos = dittaInfoService.getAll();
+
+        for(DittaInfo dittaInfo : dittaInfos){
+            switch(dittaInfo.getCodice()) {
+                case "REPORT_INTESTAZIONE":
+                    dittaInfoDataSource.setIntestazione(dittaInfo.getValore());
+                    break;
+                case "REPORT_INTESTAZIONE_2":
+                    dittaInfoDataSource.setIntestazione2(dittaInfo.getValore());
+                    break;
+                case "REPORT_INDIRIZZO":
+                    dittaInfoDataSource.setIndirizzo(dittaInfo.getValore());
+                    break;
+                case "PARTITA_IVA":
+                    dittaInfoDataSource.setPartitaIva(dittaInfo.getValore());
+                    break;
+                case "CODICE_FISCALE":
+                    dittaInfoDataSource.setCodiceFiscale(dittaInfo.getValore());
+                    break;
+                case "REA":
+                    dittaInfoDataSource.setRea(dittaInfo.getValore());
+                    break;
+                case "TELEFONO":
+                    dittaInfoDataSource.setTelefono(dittaInfo.getValore());
+                    break;
+                case "CELLULARE":
+                    dittaInfoDataSource.setCellulare(dittaInfo.getValore());
+                    break;
+                case "WEBSITE":
+                    dittaInfoDataSource.setWebsite(dittaInfo.getValore());
+                    break;
+                case "EMAIL":
+                    dittaInfoDataSource.setEmail(dittaInfo.getValore());
+                    break;
+                case "PEC":
+                    dittaInfoDataSource.setPec(dittaInfo.getValore());
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return dittaInfoDataSource;
+    }
+
+    private List<FatturaDataSource> getFatturaDataSources(java.sql.Date dataDa, java.sql.Date dataA, Integer progressivo, Float importo, String idTipoPagamento, String cliente, Integer idAgente, Integer idArticolo, Integer idStato, Integer idTipo){
         log.info("Retrieving the list of 'fatture' for creating pdf file");
 
         List<FatturaDataSource> fatturaDataSources = new ArrayList<>();
@@ -1060,14 +1112,14 @@ public class StampaService {
                 .collect(Collectors.toList());
     }
 
-    public NotaReso getNotaReso(Long idNotaReso){
+    private NotaReso getNotaReso(Long idNotaReso){
         log.info("Retrieving 'nota reso' with id '{}' for creating pdf file", idNotaReso);
         NotaReso notaReso = notaResoService.getOne(idNotaReso);
         log.info("Retrieved 'nota reso' with id '{}'", idNotaReso);
         return notaReso;
     }
 
-    public NotaResoDataSource getNotaResoDataSource(NotaReso notaReso){
+    private NotaResoDataSource getNotaResoDataSource(NotaReso notaReso){
         Fornitore fornitore = notaReso.getFornitore();
         String tipoPagamento = fornitore.getPagamento();
 
@@ -1091,7 +1143,7 @@ public class StampaService {
         return notaResoDataSource;
     }
 
-    public List<NotaResoRigaDataSource> getNotaResoRigheDataSource(NotaReso notaReso){
+    private List<NotaResoRigaDataSource> getNotaResoRigheDataSource(NotaReso notaReso){
         List<NotaResoRigaDataSource> notaResoRigaDataSources = new ArrayList<>();
         if(notaReso.getNotaResoRighe() != null && !notaReso.getNotaResoRighe().isEmpty()){
             notaReso.getNotaResoRighe().forEach(nr -> {
@@ -1123,7 +1175,7 @@ public class StampaService {
         return notaResoRigaDataSources;
     }
 
-    public List<NotaResoTotaleDataSource> getNotaResoTotaliDataSource(NotaReso notaReso){
+    private List<NotaResoTotaleDataSource> getNotaResoTotaliDataSource(NotaReso notaReso){
         List<NotaResoTotaleDataSource> notaResoTotaleDataSources = new ArrayList<>();
         if(notaReso.getNotaResoTotali() != null && !notaReso.getNotaResoTotali().isEmpty()){
             notaReso.getNotaResoTotali().forEach(nr -> {
@@ -1139,14 +1191,14 @@ public class StampaService {
                 .collect(Collectors.toList());
     }
 
-    public RicevutaPrivato getRicevutaPrivato(Long idRicevutaPrivato){
+    private RicevutaPrivato getRicevutaPrivato(Long idRicevutaPrivato){
         log.info("Retrieving 'ricevuta privato' with id '{}' for creating pdf file", idRicevutaPrivato);
         RicevutaPrivato ricevutaPrivato = ricevutaPrivatoService.getOne(idRicevutaPrivato);
         log.info("Retrieved 'ricevuta privato' with id '{}'", idRicevutaPrivato);
         return ricevutaPrivato;
     }
 
-    public RicevutaPrivatoDataSource getRicevutaPrivatoDataSource(RicevutaPrivato ricevutaPrivato){
+    private RicevutaPrivatoDataSource getRicevutaPrivatoDataSource(RicevutaPrivato ricevutaPrivato){
         Cliente cliente = ricevutaPrivato.getCliente();
         TipoPagamento tipoPagamento = cliente.getTipoPagamento();
         Agente agente = cliente.getAgente();
@@ -1182,7 +1234,7 @@ public class StampaService {
         return ricevutaPrivatoDataSource;
     }
 
-    public List<RicevutaPrivatoDataSource> getRicevutaPrivatoDataSources(String ids){
+    private List<RicevutaPrivatoDataSource> getRicevutaPrivatoDataSources(String ids){
         log.info("Retrieving the list of 'ricevute privati' with id in '{}' for creating pdf file", ids);
 
         List<RicevutaPrivatoDataSource> ricevutaPrivatoDataSources = new ArrayList<>();
@@ -1215,7 +1267,7 @@ public class StampaService {
         return ricevutaPrivatoDataSources;
     }
 
-    public List<RicevutaPrivatoArticoloDataSource> getRicevutaPrivatoArticoliDataSource(RicevutaPrivato ricevutaPrivato){
+    private List<RicevutaPrivatoArticoloDataSource> getRicevutaPrivatoArticoliDataSource(RicevutaPrivato ricevutaPrivato){
         List<RicevutaPrivatoArticoloDataSource> ricevutaPrivatoArticoloDataSources = new ArrayList<>();
         if(ricevutaPrivato.getRicevutaPrivatoArticoli() != null && !ricevutaPrivato.getRicevutaPrivatoArticoli().isEmpty()){
             ricevutaPrivato.getRicevutaPrivatoArticoli().forEach(rpa -> {
@@ -1523,6 +1575,40 @@ public class StampaService {
         return JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
     }
 
+    public byte[] generateDdts(java.sql.Date dataDa, java.sql.Date dataA, Integer progressivo, Integer idCliente, String cliente, Integer idAgente, Integer idAutista, Integer idStato, Boolean pagato, Boolean fatturato, Float importo, Integer idTipoPagamento, Integer idArticolo) throws Exception {
+
+        // retrieve the list of Ddt
+        List<DdtDataSource> ddts = getDdtDataSources(dataDa, dataA, progressivo, idCliente, cliente, idAgente, idAutista, idStato, pagato, fatturato, importo, idTipoPagamento, idArticolo);
+
+        // fetching the .jrxml file from the resources folder.
+        final InputStream stream = this.getClass().getResourceAsStream(Constants.JASPER_REPORT_DDTS);
+
+        // create report datasource
+        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(ddts);
+
+        // create report parameters
+        Map<String, Object> parameters = createParameters();
+
+        BigDecimal totaleAcconto = new BigDecimal(0);
+        BigDecimal totale = new BigDecimal(0);
+        BigDecimal totaleDaPagare = new BigDecimal(0);
+
+        for(DdtDataSource ddt: ddts){
+            totaleAcconto = totaleAcconto.add(ddt.getAcconto());
+            totale = totale.add(ddt.getTotale());
+            totaleDaPagare = totaleDaPagare.add(ddt.getTotaleDaPagare());
+        }
+
+        // add data to parameters
+        parameters.put("totaleAcconto", totaleAcconto);
+        parameters.put("totale", totale);
+        parameters.put("totaleDaPagare", totaleDaPagare);
+        parameters.put("ddtsCollection", dataSource);
+
+        // create report
+        return JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
+    }
+
     public byte[] generateSingleDdt(Long[] ddts) throws Exception{
         PDFMergerUtility pdfMergerUtility = new PDFMergerUtility();
 
@@ -1597,6 +1683,38 @@ public class StampaService {
         parameters.put("ddtAcquistoArticoliCollection", ddtAcquistoArticoliCollectionDataSource);
         parameters.put("ddtAcquistoCollection", ddtAcquistoCollectionDataSource);
 
+        return JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
+    }
+
+    public byte[] generateDocumentiAcquistoDistinta(String fornitore, String numDocumento, String tipoDocumento, java.sql.Date dataDa, java.sql.Date dataA) throws Exception {
+
+        // retrieve the list of DocumentiAcquisto
+        List<DocumentoAcquistoDataSource> documentiAcquisto = getDocumentoAcquistoDataSources(fornitore, numDocumento, tipoDocumento, dataDa, dataA);
+
+        // fetching the .jrxml file from the resources folder.
+        final InputStream stream = this.getClass().getResourceAsStream(Constants.JASPER_REPORT_DOCUMENTI_ACQUISTO);
+
+        // create report datasource
+        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(documentiAcquisto);
+
+        BigDecimal totale = new BigDecimal(0);
+        BigDecimal totaleImponibile = new BigDecimal(0);
+        BigDecimal totaleIva = new BigDecimal(0);
+
+        for(DocumentoAcquistoDataSource documentoAcquisto: documentiAcquisto){
+            totale = totale.add(documentoAcquisto.getTotale());
+            totaleImponibile = totaleImponibile.add(documentoAcquisto.getTotaleImponibile());
+            totaleIva = totaleIva.add(documentoAcquisto.getTotaleIva());
+        }
+
+        // create report parameters
+        Map<String, Object> parameters = createParameters();
+        parameters.put("documentiAcquistoCollection", dataSource);
+        parameters.put("totale", totale);
+        parameters.put("totaleImponibile", totaleImponibile);
+        parameters.put("totaleIva", totaleIva);
+
+        // create report
         return JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
     }
 
@@ -1948,94 +2066,35 @@ public class StampaService {
         return JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
     }
 
-    public byte[] generateNotaAccredito(Long idNotaAccredito) throws Exception {
+    public byte[] generateFatture(java.sql.Date dataDa, java.sql.Date dataA, Integer progressivo, Float importo, String idTipoPagamento, String cliente, Integer idAgente, Integer idArticolo, Integer idStato, Integer idTipo) throws Exception {
 
-        // retrieve the NotaAccredito
-        NotaAccredito notaAccredito = getNotaAccredito(idNotaAccredito);
-        Cliente cliente = notaAccredito.getCliente();
-
-        // create data parameters
-        String notaAccreditoTitleParam = notaAccredito.getProgressivo()+"/"+notaAccredito.getAnno()+" del "+simpleDateFormat.format(notaAccredito.getData());
-        String destinatarioParam = "";
-
-        String riferimentoDocumento = "Riferimento "+notaAccredito.getTipoRiferimento();
-        if(!StringUtils.isEmpty(notaAccredito.getDocumentoRiferimento())){
-            riferimentoDocumento += " n. "+notaAccredito.getDocumentoRiferimento();
-        }
-        if(notaAccredito.getDataDocumentoRiferimento() != null){
-            riferimentoDocumento += " del "+simpleDateFormat.format(notaAccredito.getDataDocumentoRiferimento());
-        }
-
-        // create data parameters for Cliente
-        if(cliente != null){
-            StringBuilder sb = new StringBuilder();
-            if(cliente.getPrivato() || cliente.getDittaIndividuale()){
-                sb.append(cliente.getNome()).append(" ").append(cliente.getCognome()).append("\n");
-            } else {
-                sb.append(cliente.getRagioneSociale()).append("\n");
-            }
-
-            if(!StringUtils.isEmpty(cliente.getIndirizzo())){
-                sb.append(cliente.getIndirizzo()).append("\n");
-            }
-            if(!StringUtils.isEmpty(cliente.getCap())){
-                sb.append(cliente.getCap()).append(" ");
-            }
-            if(!StringUtils.isEmpty(cliente.getCitta())){
-                sb.append(cliente.getCitta()).append(" ");
-            }
-            if(!StringUtils.isEmpty(cliente.getProvincia())){
-                sb.append(cliente.getProvincia());
-            }
-
-            destinatarioParam = sb.toString();
-        }
-
-        // create NotaAccreditoDataSource
-        List<NotaAccreditoDataSource> notaAccreditoDataSources = new ArrayList<>();
-        notaAccreditoDataSources.add(getNotaAccreditoDataSource(notaAccredito));
-
-        // create list of NotaAccreditoRigheDataSource from NotaAccreditoRiga
-        List<NotaAccreditoRigaDataSource> notaAccreditoRigaDataSources = getNotaAccreditoRigheDataSource(notaAccredito);
-
-        // create list of NotaAccreditoTotaliDataSource from NotaAccreditoTotale
-        List<NotaAccreditoTotaleDataSource> notaAccreditoTotaleDataSources = getNotaAccreditoTotaliDataSource(notaAccredito);
-
-        BigDecimal totaleImponibile = new BigDecimal(0);
-        BigDecimal totaleIva = new BigDecimal(0);
-
-        for(NotaAccreditoTotaleDataSource notaAccreditoTotale: notaAccreditoTotaleDataSources){
-            totaleImponibile = totaleImponibile.add(notaAccreditoTotale.getTotaleImponibile());
-            totaleIva = totaleIva.add(notaAccreditoTotale.getTotaleIva());
-        }
+        // retrieve the list of Fatture
+        List<FatturaDataSource> fatture = getFatturaDataSources(dataDa, dataA, progressivo, importo, idTipoPagamento, cliente, idAgente, idArticolo, idStato, idTipo);
 
         // fetching the .jrxml file from the resources folder.
-        final InputStream stream = this.getClass().getResourceAsStream(Constants.JASPER_REPORT_NOTA_ACCREDITO);
+        final InputStream stream = this.getClass().getResourceAsStream(Constants.JASPER_REPORT_FATTURE);
 
-        // create report datasource for NotaAccredito
-        JRBeanCollectionDataSource notaAccreditoCollectionDataSource = new JRBeanCollectionDataSource(notaAccreditoDataSources);
-
-        // create report datasource for NotaAccreditoRighe
-        JRBeanCollectionDataSource notaAccreditoRigheCollectionDataSource = new JRBeanCollectionDataSource(notaAccreditoRigaDataSources);
-
-        // create report datasource for NotaAccreditoTotali
-        JRBeanCollectionDataSource notaAccreditoTotaliCollectionDataSource = new JRBeanCollectionDataSource(notaAccreditoTotaleDataSources);
+        // create report datasource
+        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(fatture);
 
         // create report parameters
         Map<String, Object> parameters = createParameters();
 
-        // add data to parameters
-        parameters.put("notaAccreditoTitle", notaAccreditoTitleParam);
-        parameters.put("destinatario", destinatarioParam);
-        parameters.put("riferimentoDocumento", riferimentoDocumento);
-        parameters.put("note", notaAccredito.getNote());
-        parameters.put("totaleImponibile", totaleImponibile);
-        parameters.put("totaleIva", totaleIva);
-        parameters.put("notaAccreditoTotDocumento", Utils.roundPrice(totaleImponibile.add(totaleIva)));
-        parameters.put("notaAccreditoCollection", notaAccreditoCollectionDataSource);
-        parameters.put("notaAccreditoRigheCollection", notaAccreditoRigheCollectionDataSource);
-        parameters.put("notaAccreditoTotaliCollection", notaAccreditoTotaliCollectionDataSource);
+        BigDecimal totaleAcconto = new BigDecimal(0);
+        BigDecimal totale = new BigDecimal(0);
+        BigDecimal totaleDaPagare = new BigDecimal(0);
 
+        for(FatturaDataSource fattura: fatture){
+            totaleAcconto = totaleAcconto.add(fattura.getAcconto());
+            totale = totale.add(fattura.getTotale());
+            totaleDaPagare = totaleDaPagare.add(fattura.getTotaleDaPagare());
+        }
+
+        // add data to parameters
+        parameters.put("totaleAcconto", totaleAcconto);
+        parameters.put("totale", totale);
+        parameters.put("totaleDaPagare", totaleDaPagare);
+        parameters.put("fattureCollection", dataSource);
 
         // create report
         return JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
@@ -2071,31 +2130,22 @@ public class StampaService {
         return JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
     }
 
-    public byte[] generateOrdineFornitore(Long idOrdineFornitore) throws Exception{
+    public byte[] generateGiacenzeIngredienti(String giacenzeIngredientiIds) throws Exception{
 
-        // retrieve the Fattura
-        OrdineFornitore ordineFornitore = getOrdineFornitore(idOrdineFornitore);
-
-        // create data parameters
-        String ordineFornitoreTitleParam = ordineFornitore.getProgressivo()+"/"+ordineFornitore.getAnnoContabile();
-        String ordineFornitoreFooterParam = "San Giovanni Ilarione " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
-
-        // create list of OrdineFornitoreArticoliDataSource
-        List<OrdineFornitoreArticoloDataSource> ordineFornitoreArticoliDataSources = getOrdineFornitoreArticoliDataSource(ordineFornitore);
+        // retrieve the list of GiacenzeIngredienti
+        List<VGiacenzaIngrediente> giacenzeIngredienti = getGiacenzeIngredienti(giacenzeIngredientiIds);
 
         // fetching the .jrxml file from the resources folder.
-        final InputStream stream = this.getClass().getResourceAsStream(Constants.JASPER_REPORT_ORDINE_FORNITORE);
+        final InputStream stream = this.getClass().getResourceAsStream(Constants.JASPER_REPORT_GIACENZE_INGREDIENTI);
 
-        // create report datasource for OrdineFornitoreArticoli
-        JRBeanCollectionDataSource ordineFornitoreArticoliCollectionDataSource = new JRBeanCollectionDataSource(ordineFornitoreArticoliDataSources);
+        // create report datasource
+        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(giacenzeIngredienti);
 
         // create report parameters
         Map<String, Object> parameters = createParameters();
 
         // add data to parameters
-        parameters.put("ordineFornitoreTitle", ordineFornitoreTitleParam);
-        parameters.put("ordineFornitoreFooter", ordineFornitoreFooterParam);
-        parameters.put("ordineFornitoreArticoliCollection", ordineFornitoreArticoliCollectionDataSource);
+        parameters.put("CollectionBeanParam", dataSource);
 
         // create report
         return JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
@@ -2195,6 +2245,435 @@ public class StampaService {
         return JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
     }
 
+    public byte[] generateNotaAccredito(Long idNotaAccredito) throws Exception {
+
+        // retrieve the NotaAccredito
+        NotaAccredito notaAccredito = getNotaAccredito(idNotaAccredito);
+        Cliente cliente = notaAccredito.getCliente();
+
+        // create data parameters
+        String notaAccreditoTitleParam = notaAccredito.getProgressivo()+"/"+notaAccredito.getAnno()+" del "+simpleDateFormat.format(notaAccredito.getData());
+        String destinatarioParam = "";
+
+        String riferimentoDocumento = "Riferimento "+notaAccredito.getTipoRiferimento();
+        if(!StringUtils.isEmpty(notaAccredito.getDocumentoRiferimento())){
+            riferimentoDocumento += " n. "+notaAccredito.getDocumentoRiferimento();
+        }
+        if(notaAccredito.getDataDocumentoRiferimento() != null){
+            riferimentoDocumento += " del "+simpleDateFormat.format(notaAccredito.getDataDocumentoRiferimento());
+        }
+
+        // create data parameters for Cliente
+        if(cliente != null){
+            StringBuilder sb = new StringBuilder();
+            if(cliente.getPrivato() || cliente.getDittaIndividuale()){
+                sb.append(cliente.getNome()).append(" ").append(cliente.getCognome()).append("\n");
+            } else {
+                sb.append(cliente.getRagioneSociale()).append("\n");
+            }
+
+            if(!StringUtils.isEmpty(cliente.getIndirizzo())){
+                sb.append(cliente.getIndirizzo()).append("\n");
+            }
+            if(!StringUtils.isEmpty(cliente.getCap())){
+                sb.append(cliente.getCap()).append(" ");
+            }
+            if(!StringUtils.isEmpty(cliente.getCitta())){
+                sb.append(cliente.getCitta()).append(" ");
+            }
+            if(!StringUtils.isEmpty(cliente.getProvincia())){
+                sb.append(cliente.getProvincia());
+            }
+
+            destinatarioParam = sb.toString();
+        }
+
+        // create NotaAccreditoDataSource
+        List<NotaAccreditoDataSource> notaAccreditoDataSources = new ArrayList<>();
+        notaAccreditoDataSources.add(getNotaAccreditoDataSource(notaAccredito));
+
+        // create list of NotaAccreditoRigheDataSource from NotaAccreditoRiga
+        List<NotaAccreditoRigaDataSource> notaAccreditoRigaDataSources = getNotaAccreditoRigheDataSource(notaAccredito);
+
+        // create list of NotaAccreditoTotaliDataSource from NotaAccreditoTotale
+        List<NotaAccreditoTotaleDataSource> notaAccreditoTotaleDataSources = getNotaAccreditoTotaliDataSource(notaAccredito);
+
+        BigDecimal totaleImponibile = new BigDecimal(0);
+        BigDecimal totaleIva = new BigDecimal(0);
+
+        for(NotaAccreditoTotaleDataSource notaAccreditoTotale: notaAccreditoTotaleDataSources){
+            totaleImponibile = totaleImponibile.add(notaAccreditoTotale.getTotaleImponibile());
+            totaleIva = totaleIva.add(notaAccreditoTotale.getTotaleIva());
+        }
+
+        // fetching the .jrxml file from the resources folder.
+        final InputStream stream = this.getClass().getResourceAsStream(Constants.JASPER_REPORT_NOTA_ACCREDITO);
+
+        // create report datasource for NotaAccredito
+        JRBeanCollectionDataSource notaAccreditoCollectionDataSource = new JRBeanCollectionDataSource(notaAccreditoDataSources);
+
+        // create report datasource for NotaAccreditoRighe
+        JRBeanCollectionDataSource notaAccreditoRigheCollectionDataSource = new JRBeanCollectionDataSource(notaAccreditoRigaDataSources);
+
+        // create report datasource for NotaAccreditoTotali
+        JRBeanCollectionDataSource notaAccreditoTotaliCollectionDataSource = new JRBeanCollectionDataSource(notaAccreditoTotaleDataSources);
+
+        // create report parameters
+        Map<String, Object> parameters = createParameters();
+
+        // add data to parameters
+        parameters.put("notaAccreditoTitle", notaAccreditoTitleParam);
+        parameters.put("destinatario", destinatarioParam);
+        parameters.put("riferimentoDocumento", riferimentoDocumento);
+        parameters.put("note", notaAccredito.getNote());
+        parameters.put("totaleImponibile", totaleImponibile);
+        parameters.put("totaleIva", totaleIva);
+        parameters.put("notaAccreditoTotDocumento", Utils.roundPrice(totaleImponibile.add(totaleIva)));
+        parameters.put("notaAccreditoCollection", notaAccreditoCollectionDataSource);
+        parameters.put("notaAccreditoRigheCollection", notaAccreditoRigheCollectionDataSource);
+        parameters.put("notaAccreditoTotaliCollection", notaAccreditoTotaliCollectionDataSource);
+
+        // create report
+        return JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
+    }
+
+    public byte[] generateNotaReso(Long idNotaReso) throws Exception {
+
+        // retrieve the NotaReso
+        NotaReso notaReso = getNotaReso(idNotaReso);
+        Fornitore fornitore = notaReso.getFornitore();
+
+        // create data parameters
+        String notaResoTitleParam = notaReso.getProgressivo()+"/"+notaReso.getAnno()+" del "+simpleDateFormat.format(notaReso.getData());
+        String destinatarioParam = "";
+
+        // create data parameters for Fornitore
+        if(fornitore != null){
+            StringBuilder sb = new StringBuilder();
+            if(!StringUtils.isEmpty(fornitore.getRagioneSociale())){
+                sb.append(fornitore.getRagioneSociale()).append("\n");
+            }
+            if(!StringUtils.isEmpty(fornitore.getIndirizzo())){
+                sb.append(fornitore.getIndirizzo()).append("\n");
+            }
+            if(!StringUtils.isEmpty(fornitore.getCap())){
+                sb.append(fornitore.getCap()).append(" ");
+            }
+            if(!StringUtils.isEmpty(fornitore.getCitta())){
+                sb.append(fornitore.getCitta()).append(" ");
+            }
+            if(!StringUtils.isEmpty(fornitore.getProvincia())){
+                sb.append(fornitore.getProvincia());
+            }
+
+            destinatarioParam = sb.toString();
+        }
+
+        // create NotaResoDataSource
+        List<NotaResoDataSource> notaResoDataSources = new ArrayList<>();
+        notaResoDataSources.add(getNotaResoDataSource(notaReso));
+
+        // create list of NotaResoRigheDataSource from NotaResoRiga
+        List<NotaResoRigaDataSource> notaResoRigaDataSources = getNotaResoRigheDataSource(notaReso);
+
+        // create list of NotaResoTotaliDataSource from NotaResoTotale
+        List<NotaResoTotaleDataSource> notaResoTotaleDataSources = getNotaResoTotaliDataSource(notaReso);
+
+        BigDecimal totaleImponibile = new BigDecimal(0);
+        BigDecimal totaleIva = new BigDecimal(0);
+
+        for(NotaResoTotaleDataSource notaResoTotale: notaResoTotaleDataSources){
+            totaleImponibile = totaleImponibile.add(notaResoTotale.getTotaleImponibile());
+            totaleIva = totaleIva.add(notaResoTotale.getTotaleIva());
+        }
+
+        // fetching the .jrxml file from the resources folder.
+        final InputStream stream = this.getClass().getResourceAsStream(Constants.JASPER_REPORT_NOTA_RESO);
+
+        // create report datasource for NotaReso
+        JRBeanCollectionDataSource notaResoCollectionDataSource = new JRBeanCollectionDataSource(notaResoDataSources);
+
+        // create report datasource for NotaResoRighe
+        JRBeanCollectionDataSource notaResoRigheCollectionDataSource = new JRBeanCollectionDataSource(notaResoRigaDataSources);
+
+        // create report datasource for NotaResoTotali
+        JRBeanCollectionDataSource notaResoTotaliCollectionDataSource = new JRBeanCollectionDataSource(notaResoTotaleDataSources);
+
+        // create report parameters
+        Map<String, Object> parameters = createParameters();
+
+        // add data to parameters
+        parameters.put("notaResoTitle", notaResoTitleParam);
+        parameters.put("destinatario", destinatarioParam);
+        parameters.put("note", notaReso.getNote());
+        parameters.put("totaleImponibile", totaleImponibile);
+        parameters.put("totaleIva", totaleIva);
+        parameters.put("notaResoTotDocumento", Utils.roundPrice(totaleImponibile.add(totaleIva)));
+        parameters.put("notaResoCollection", notaResoCollectionDataSource);
+        parameters.put("notaResoRigheCollection", notaResoRigheCollectionDataSource);
+        parameters.put("notaResoTotaliCollection", notaResoTotaliCollectionDataSource);
+
+        // create report
+        return JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
+    }
+
+    public byte[] generateNoteAccredito(java.sql.Date dataDa, java.sql.Date dataA, Integer progressivo, Float importo, String cliente, Integer idAgente, Integer idArticolo, Integer idStato) throws Exception {
+
+        // retrieve the list of NoteAccredito
+        List<NotaAccreditoDataSource> noteAccredito = getNotaAccreditoDataSources(dataDa, dataA, progressivo, importo, cliente, idAgente, idArticolo, idStato);
+
+        // fetching the .jrxml file from the resources folder.
+        final InputStream stream = this.getClass().getResourceAsStream(Constants.JASPER_REPORT_NOTE_ACCREDITO);
+
+        // create report datasource
+        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(noteAccredito);
+
+        // create report parameters
+        Map<String, Object> parameters = createParameters();
+
+        BigDecimal totaleAcconto = new BigDecimal(0);
+        BigDecimal totale = new BigDecimal(0);
+        BigDecimal totaleDaPagare = new BigDecimal(0);
+
+        for(NotaAccreditoDataSource notaAccredito: noteAccredito){
+            totaleAcconto = totaleAcconto.add(notaAccredito.getAcconto());
+            totale = totale.add(notaAccredito.getTotale());
+            totaleDaPagare = totaleDaPagare.add(notaAccredito.getTotaleDaPagare());
+        }
+
+        // add data to parameters
+        parameters.put("totaleAcconto", totaleAcconto);
+        parameters.put("totale", totale);
+        parameters.put("totaleDaPagare", totaleDaPagare);
+        parameters.put("noteAccreditoCollection", dataSource);
+
+        // create report
+        return JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
+    }
+
+    public byte[] generateOrdineFornitore(Long idOrdineFornitore) throws Exception{
+
+        // retrieve the Fattura
+        OrdineFornitore ordineFornitore = getOrdineFornitore(idOrdineFornitore);
+
+        // create data parameters
+        String ordineFornitoreTitleParam = ordineFornitore.getProgressivo()+"/"+ordineFornitore.getAnnoContabile();
+        String ordineFornitoreFooterParam = "San Giovanni Ilarione " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
+
+        // create list of OrdineFornitoreArticoliDataSource
+        List<OrdineFornitoreArticoloDataSource> ordineFornitoreArticoliDataSources = getOrdineFornitoreArticoliDataSource(ordineFornitore);
+
+        // fetching the .jrxml file from the resources folder.
+        final InputStream stream = this.getClass().getResourceAsStream(Constants.JASPER_REPORT_ORDINE_FORNITORE);
+
+        // create report datasource for OrdineFornitoreArticoli
+        JRBeanCollectionDataSource ordineFornitoreArticoliCollectionDataSource = new JRBeanCollectionDataSource(ordineFornitoreArticoliDataSources);
+
+        // create report parameters
+        Map<String, Object> parameters = createParameters();
+
+        // add data to parameters
+        parameters.put("ordineFornitoreTitle", ordineFornitoreTitleParam);
+        parameters.put("ordineFornitoreFooter", ordineFornitoreFooterParam);
+        parameters.put("ordineFornitoreArticoliCollection", ordineFornitoreArticoliCollectionDataSource);
+
+        // create report
+        return JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
+    }
+
+    public byte[] generateOrdiniAutisti(Long idAutista, Date dataConsegnaDa, Date dataConsegnaA) throws Exception {
+
+        // retrieve Autista with id 'idAutista'
+        Autista autista = getAutista(idAutista);
+        String autistaLabel = "";
+        if(autista != null){
+            autistaLabel = autista.getNome()+" "+autista.getCognome();
+        }
+
+        // retrieve the list of OrdiniClienti
+        List<OrdineAutistaDataSource> ordineAutistaDataSources = getOrdiniAutista(idAutista, dataConsegnaDa, dataConsegnaA);
+
+        // fetching the .jrxml file from the resources folder.
+        final InputStream stream = this.getClass().getResourceAsStream(Constants.JASPER_REPORT_ORDINI_AUTISTI);
+
+        // create report datasource
+        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(ordineAutistaDataSources);
+
+        // create report parameters
+        Map<String, Object> parameters = createParameters();
+
+        // add data to parameters
+        parameters.put("autista", autistaLabel);
+        parameters.put("dataConsegnaDa", simpleDateFormat.format(dataConsegnaDa));
+        parameters.put("dataConsegnaA", simpleDateFormat.format(dataConsegnaA));
+        parameters.put("ordineAutistaCollection", dataSource);
+
+        // create report
+        return JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
+    }
+
+    public byte[] generatePagamenti(String pagamentiIds) throws Exception {
+
+        // retrieve the list of Pagamenti
+        List<PagamentoDataSource> pagamenti = getPagamenti(pagamentiIds);
+
+        // fetching the .jrxml file from the resources folder.
+        final InputStream stream = this.getClass().getResourceAsStream(Constants.JASPER_REPORT_PAGAMENTI);
+
+        // create report datasource
+        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(pagamenti);
+
+        // create report parameters
+        Map<String, Object> parameters = createParameters();
+
+        // add data to parameters
+        parameters.put("pagamentiCollection", dataSource);
+
+        // create report
+        return JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
+    }
+
+    public byte[] generateRicevutaPrivato(Long idRicevutaPrivato) throws Exception {
+
+        // retrieve the RicevutaPrivato
+        RicevutaPrivato ricevutaPrivato = getRicevutaPrivato(idRicevutaPrivato);
+        PuntoConsegna puntoConsegna = ricevutaPrivato.getPuntoConsegna();
+        Cliente cliente = ricevutaPrivato.getCliente();
+
+        // create RicevutaPrivatoDataSource
+        List<RicevutaPrivatoDataSource> ricevutaPrivatoDataSources = new ArrayList<>();
+        ricevutaPrivatoDataSources.add(getRicevutaPrivatoDataSource(ricevutaPrivato));
+
+        // create data parameters
+        String ricevutaPrivatoTitleParam = ricevutaPrivato.getProgressivo()+"/"+ricevutaPrivato.getAnno()+" del "+simpleDateFormat.format(ricevutaPrivato.getData());
+        String puntoConsegnaParam = "";
+        String destinatarioParam = "";
+
+        // create data parameters for PuntoConsegna
+        if(puntoConsegna != null){
+            StringBuilder sb = new StringBuilder();
+            if(!StringUtils.isEmpty(puntoConsegna.getNome())){
+                sb.append(puntoConsegna.getNome()).append("\n");
+            }
+            if(!StringUtils.isEmpty(puntoConsegna.getIndirizzo())){
+                sb.append(puntoConsegna.getIndirizzo()).append("\n");
+            }
+            if(!StringUtils.isEmpty(puntoConsegna.getCap())){
+                sb.append(puntoConsegna.getCap()).append(" ");
+            }
+            if(!StringUtils.isEmpty(puntoConsegna.getLocalita())){
+                sb.append(puntoConsegna.getLocalita()).append(" ");
+            }
+            if(!StringUtils.isEmpty(puntoConsegna.getProvincia())){
+                sb.append("(").append(Provincia.getByLabel(puntoConsegna.getProvincia()).getSigla()).append(")");
+            }
+
+            puntoConsegnaParam = sb.toString();
+        }
+
+        // create data parameters for Cliente
+        if(cliente != null){
+            StringBuilder sb = new StringBuilder();
+            if(!StringUtils.isEmpty(cliente.getNome())){
+                sb.append(cliente.getNome());
+            }
+            if(!StringUtils.isEmpty(cliente.getCognome())){
+                sb.append(" ").append(cliente.getCognome()).append("\n");
+            }
+            if(!StringUtils.isEmpty(cliente.getIndirizzo())){
+                sb.append(cliente.getIndirizzo()).append("\n");
+            }
+            if(!StringUtils.isEmpty(cliente.getCap())){
+                sb.append(cliente.getCap()).append(" ");
+            }
+            if(!StringUtils.isEmpty(cliente.getCitta())){
+                sb.append(cliente.getCitta()).append(" ");
+            }
+            if(!StringUtils.isEmpty(cliente.getProvincia())){
+                sb.append("(").append(Provincia.getByLabel(cliente.getProvincia()).getSigla()).append(")");
+            }
+
+            destinatarioParam = sb.toString();
+        }
+
+        // create 'ricevutaPrivatoTrasportoDataOra' param
+        String ricevutaPrivatoTrasportoDataOraParam = simpleDateFormat.format(ricevutaPrivato.getDataTrasporto())+" "+ricevutaPrivato.getOraTrasporto();
+
+        // create list of RicevutaPrivatoArticoloDataSource from RicevutaPrivatoArticolo
+        List<RicevutaPrivatoArticoloDataSource> ricevutaPrivatoArticoloDataSources = getRicevutaPrivatoArticoliDataSource(ricevutaPrivato);
+
+        BigDecimal totaleIva = BigDecimal.ZERO;
+        if(!ricevutaPrivatoArticoloDataSources.isEmpty()){
+            totaleIva = ricevutaPrivatoArticoloDataSources.stream().map(RicevutaPrivatoArticoloDataSource::getIvaValore).reduce(BigDecimal.ZERO, BigDecimal::add);
+        }
+
+        // fetching the .jrxml file from the resources folder.
+        final InputStream stream = this.getClass().getResourceAsStream(Constants.JASPER_REPORT_RICEVUTA_PRIVATO);
+
+        // create report datasource for RicevutaPrivato
+        JRBeanCollectionDataSource ricevutaPrivatoCollectionDataSource = new JRBeanCollectionDataSource(ricevutaPrivatoDataSources);
+
+        // create report datasource for RicevutaPrivatoArticoli
+        JRBeanCollectionDataSource ricevutaPrivatoArticoliCollectionDataSource = new JRBeanCollectionDataSource(ricevutaPrivatoArticoloDataSources);
+
+        // create report parameters
+        Map<String, Object> parameters = createParameters();
+
+        // add data to parameters
+        parameters.put("ricevutaPrivatoTitle", ricevutaPrivatoTitleParam);
+        parameters.put("puntoConsegna", puntoConsegnaParam);
+        parameters.put("destinatario", destinatarioParam);
+        parameters.put("note", ricevutaPrivato.getNote());
+        parameters.put("trasportatore", ricevutaPrivato.getTrasportatore());
+        parameters.put("nota", Constants.JASPER_PARAMETER_RICEVUTA_PRIVATO_NOTA);
+        parameters.put("totaleIva", totaleIva);
+        parameters.put("ricevutaPrivatoTrasportoTipo", ricevutaPrivato.getTipoTrasporto());
+        parameters.put("ricevutaPrivatoTrasportoDataOra", ricevutaPrivatoTrasportoDataOraParam);
+        parameters.put("ricevutaPrivatoNumeroColli", ricevutaPrivato.getNumeroColli());
+        parameters.put("ricevutaPrivatoTotImponibile", Utils.roundPrice(ricevutaPrivato.getTotaleImponibile()));
+        parameters.put("ricevutaPrivatoTotIva", Utils.roundPrice(ricevutaPrivato.getTotaleIva()));
+        parameters.put("ricevutaPrivatoTotDocumento", Utils.roundPrice(ricevutaPrivato.getTotale()));
+        parameters.put("ricevutaPrivatoArticoliCollection", ricevutaPrivatoArticoliCollectionDataSource);
+        parameters.put("ricevutaPrivatoCollection", ricevutaPrivatoCollectionDataSource);
+
+        // create report
+        return JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
+    }
+
+    public byte[] generateRicevutePrivati(String ricevutePrivatiIds) throws Exception {
+
+        // retrieve the list of RicevutePrivato
+        List<RicevutaPrivatoDataSource> ricevutePrivato = getRicevutaPrivatoDataSources(ricevutePrivatiIds);
+
+        // fetching the .jrxml file from the resources folder.
+        final InputStream stream = this.getClass().getResourceAsStream(Constants.JASPER_REPORT_RICEVUTE_PRIVATI);
+
+        // create report datasource
+        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(ricevutePrivato);
+
+        // create report parameters
+        Map<String, Object> parameters = createParameters();
+
+        BigDecimal totaleAcconto = new BigDecimal(0);
+        BigDecimal totale = new BigDecimal(0);
+        BigDecimal totaleDaPagare = new BigDecimal(0);
+
+        for(RicevutaPrivatoDataSource ricevutaPrivato: ricevutePrivato){
+            totaleAcconto = totaleAcconto.add(ricevutaPrivato.getAcconto());
+            totale = totale.add(ricevutaPrivato.getTotale());
+            totaleDaPagare = totaleDaPagare.add(ricevutaPrivato.getTotaleDaPagare());
+        }
+
+        // add data to parameters
+        parameters.put("totaleAcconto", totaleAcconto);
+        parameters.put("totale", totale);
+        parameters.put("totaleDaPagare", totaleDaPagare);
+        parameters.put("ricevutePrivatoCollection", dataSource);
+
+        // create report
+        return JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
+    }
+
     public static HttpHeaders createHttpHeaders(String fileName){
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename="+fileName);
@@ -2208,6 +2687,21 @@ public class StampaService {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("logo", this.getClass().getResource("/jasper_reports/logo.png"));
         parameters.put("bollino", this.getClass().getResource("/jasper_reports/bollino.png"));
+
+        DittaInfoDataSource dittaInfoDataSource = getDittaInfoDataSource();
+
+        parameters.put("headerIntestazione", dittaInfoDataSource.getIntestazione());
+        parameters.put("headerIntestazione2", dittaInfoDataSource.getIntestazione2());
+        parameters.put("headerIndirizzo", dittaInfoDataSource.getIndirizzo());
+        parameters.put("headerPartitaIva", "P.Iva "+ dittaInfoDataSource.getPartitaIva());
+        parameters.put("headerCodiceFiscale", "Cod. Fisc. " + dittaInfoDataSource.getCodiceFiscale());
+        parameters.put("headerRea", "REA " + dittaInfoDataSource.getRea());
+        parameters.put("headerTelefono", "Tel: " + dittaInfoDataSource.getTelefono());
+        parameters.put("headerCellulare", "Cell: " + dittaInfoDataSource.getCellulare());
+        parameters.put("headerWebsite", "Website " + dittaInfoDataSource.getWebsite());
+        parameters.put("headerEmail", "E-mail " + dittaInfoDataSource.getEmail());
+        parameters.put("headerPec", "Pec " + dittaInfoDataSource.getPec());
+
         return parameters;
     }
 

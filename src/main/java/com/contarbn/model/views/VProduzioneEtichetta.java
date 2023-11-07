@@ -31,6 +31,12 @@ public class VProduzioneEtichetta {
     @Column(name = "ingredienti")
     private String ingredienti;
 
+    @Column(name = "valori_nutrizionali")
+    private String valoriNutrizionali;
+
+    @Column(name = "conservazione")
+    private String conservazione;
+
     @Override
     public String toString() {
 
@@ -40,6 +46,8 @@ public class VProduzioneEtichetta {
                 ", scadenza: " + scadenza +
                 ", articolo: " + articolo +
                 ", ingredienti: " + ingredienti +
+                ", valoriNutrizionali: " + valoriNutrizionali +
+                ", conservazione: " + conservazione +
                 "}";
     }
 }

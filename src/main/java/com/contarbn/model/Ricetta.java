@@ -56,6 +56,9 @@ public class Ricetta {
     @Column(name = "valori_nutrizionali")
     private String valoriNutrizionali;
 
+    @Column(name = "conservazione")
+    private String conservazione;
+
     @Column(name = "note")
     private String note;
 
@@ -169,6 +172,14 @@ public class Ricetta {
         this.valoriNutrizionali = valoriNutrizionali;
     }
 
+    public String getConservazione() {
+        return conservazione;
+    }
+
+    public void setConservazione(String conservazione) {
+        this.conservazione = conservazione;
+    }
+
     public String getNote() {
         return note;
     }
@@ -211,6 +222,7 @@ public class Ricetta {
         result.append(", preparazione: " + preparazione);
         result.append(", allergeni: " + allergeni);
         result.append(", valoriNutrizionali: " + valoriNutrizionali);
+        result.append(", conservazione: " + conservazione);
         result.append(", note: " + note);
         result.append(", ingredienti: [");
         for(RicettaIngrediente ricettaIngrediente: ricettaIngredienti){

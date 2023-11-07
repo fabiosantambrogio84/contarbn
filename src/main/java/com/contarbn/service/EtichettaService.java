@@ -3,10 +3,12 @@ package com.contarbn.service;
 import com.contarbn.exception.ResourceNotFoundException;
 import com.contarbn.model.Etichetta;
 import com.contarbn.repository.EtichettaRepository;
+import com.contarbn.util.BarcodeUtils;
 import com.contarbn.util.Constants;
 import com.contarbn.util.Utils;
 import com.contarbn.util.enumeration.LabelPlaceholder;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,6 +16,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -38,7 +41,7 @@ public class EtichettaService {
         this.etichettaRepository = etichettaRepository;
     }
 
-    public Map<String, String> generate(Long idProduzione, String articolo, String ingredienti, String ingredienti2, String conservazione, String valoriNutrizionali, Date dataConsumazione, String lotto, Double peso, String disposizioniComune, String footer, MultipartFile barcodeEan13File, MultipartFile barcodeEan128File) throws Exception{
+    public Map<String, String> generate(Long idProduzione, String articolo, String ingredienti, String ingredienti2, String conservazione, String valoriNutrizionali, Date dataConsumazione, String lotto, Double peso, String disposizioniComune, String footer, MultipartFile barcodeEan13File, MultipartFile barcodeEan128File, String barcodeEan13, String barcodeEan128) throws Exception{
 
         final Map<String, String> result = new HashMap<>();
 
@@ -51,8 +54,17 @@ public class EtichettaService {
         template = template.replace(LabelPlaceholder.CONSERVAZIONE.getPlaceholder(), conservazione);
         template = template.replace(LabelPlaceholder.VALORI_NUTRIZIONALI.getPlaceholder(), valoriNutrizionali);
         template = template.replace(LabelPlaceholder.CONSUMAZIONE.getPlaceholder(), createConsumazione(dataConsumazione, lotto, peso));
-        template = template.replace(LabelPlaceholder.BARCODE_EAN_13.getPlaceholder(), createBarcodeImgSrc(barcodeEan13File, 90, 40));
-        template = template.replace(LabelPlaceholder.BARCODE_EAN_128.getPlaceholder(), createBarcodeImgSrc(barcodeEan128File, 180, 50));
+        if(barcodeEan13File != null){
+            template = template.replace(LabelPlaceholder.BARCODE_EAN_13.getPlaceholder(), createBarcodeImgSrc(barcodeEan13File, 90, 40));
+        } else if(!StringUtils.isEmpty(barcodeEan13)){
+            template = template.replace(LabelPlaceholder.BARCODE_EAN_13.getPlaceholder(), createBarcodeImgSrc(barcodeEan13, Constants.BARCODE_EAN13_TYPE));
+        }
+        if(barcodeEan128File != null){
+            template = template.replace(LabelPlaceholder.BARCODE_EAN_128.getPlaceholder(), createBarcodeImgSrc(barcodeEan128File, 180, 50));
+        } else if(!StringUtils.isEmpty(barcodeEan128)){
+            template = template.replace(LabelPlaceholder.BARCODE_EAN_128.getPlaceholder(), createBarcodeImgSrc(barcodeEan128, Constants.BARCODE_EAN128_TYPE));
+        }
+
         template = template.replace(LabelPlaceholder.DISPOSIZIONI_COMUNE.getPlaceholder(), disposizioniComune);
         template = template.replace(LabelPlaceholder.FOOTER.getPlaceholder(), footer);
 
@@ -112,17 +124,32 @@ public class EtichettaService {
 
     private String createBarcodeImgSrc(MultipartFile file, int widthPixels, int heightPixels) throws Exception{
 
-        String imgSrc = "data:image/jpeg;base64,";
-
         BufferedImage originalImage = ImageIO.read(file.getInputStream());
 
         Image resultingImage = originalImage.getScaledInstance(widthPixels, heightPixels, Image.SCALE_DEFAULT);
         BufferedImage outputImage = new BufferedImage(widthPixels, heightPixels, BufferedImage.TYPE_INT_RGB);
         outputImage.getGraphics().drawImage(resultingImage, 0, 0, null);
 
+        return createImgSrc(outputImage);
+    }
+
+    private String createBarcodeImgSrc(String barcode, String eanType) throws Exception{
+
+        BufferedImage image = null;
+        if(Constants.BARCODE_EAN13_TYPE.equals(eanType)){
+            image = BarcodeUtils.generateEAN13BarcodeImage(barcode);
+        } else if(Constants.BARCODE_EAN128_TYPE.equals(eanType)){
+            image = BarcodeUtils.generateEAN128BarcodeImage(barcode);
+        }
+
+        return createImgSrc(image);
+    }
+
+    private String createImgSrc(BufferedImage image) throws IOException {
+        String imgSrc = "data:image/jpeg;base64,";
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-        ImageIO.write(outputImage, "jpg", byteArrayOutputStream);
+        ImageIO.write(image, "jpg", byteArrayOutputStream);
 
         imgSrc += Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray());
 

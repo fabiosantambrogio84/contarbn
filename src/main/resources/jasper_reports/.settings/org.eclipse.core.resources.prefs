@@ -1,4 +1,5 @@
 eclipse.preferences.version=1
+encoding/ddt-TMP.jrxml=UTF-8
 encoding/ddt.jrxml=UTF-8
 encoding/ddt_acquisto.jrxml=UTF-8
 encoding/ddts.jrxml=UTF-8
@@ -10,6 +11,7 @@ encoding/fattura_acquisto.jrxml=UTF-8
 encoding/fatture.jrxml=UTF-8
 encoding/fatture_commercianti.jrxml=UTF-8
 encoding/giacenze_ingredienti.jrxml=UTF-8
+encoding/header.jrxml=UTF-8
 encoding/listino.jrxml=UTF-8
 encoding/nota_accredito.jrxml=UTF-8
 encoding/nota_reso.jrxml=UTF-8

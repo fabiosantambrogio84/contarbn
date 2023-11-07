@@ -1,17 +1,8 @@
 package com.contarbn.controller;
 
-import com.contarbn.model.*;
-import com.contarbn.model.reports.*;
-import com.contarbn.model.views.VGiacenzaIngrediente;
 import com.contarbn.service.StampaService;
 import com.contarbn.util.Constants;
-import com.contarbn.util.Utils;
-import com.contarbn.util.enumeration.Provincia;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.jasperreports.engine.JREmptyDataSource;
-import net.sf.jasperreports.engine.JasperRunManager;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -19,15 +10,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.InputStream;
-import java.math.BigDecimal;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -56,23 +42,8 @@ public class StampaController {
     public ResponseEntity<Resource> printGiacenzeIngredienti(@RequestParam(name = "ids") String ids) throws Exception{
         log.info("Creating pdf for 'giacenze-ingredienti' with ids {}", ids);
 
-        // retrieve the list of GiacenzeIngredienti
-        List<VGiacenzaIngrediente> giacenzeIngredienti = stampaService.getGiacenzeIngredienti(ids);
-
-        // fetching the .jrxml file from the resources folder.
-        final InputStream stream = this.getClass().getResourceAsStream(Constants.JASPER_REPORT_GIACENZE_INGREDIENTI);
-
-        // create report datasource
-        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(giacenzeIngredienti);
-
-        // create report parameters
-        Map<String, Object> parameters = stampaService.createParameters();
-
-        // add data to parameters
-        parameters.put("CollectionBeanParam", dataSource);
-
         // create report
-        byte[] reportBytes = JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
+        byte[] reportBytes = stampaService.generateGiacenzeIngredienti(ids);
 
         ByteArrayResource resource = new ByteArrayResource(reportBytes);
 
@@ -90,23 +61,8 @@ public class StampaController {
     public ResponseEntity<Resource> printPagamenti(@RequestParam(name = "ids") String ids) throws Exception{
         log.info("Creating pdf for 'pagamenti' with ids {}", ids);
 
-        // retrieve the list of Pagamenti
-        List<PagamentoDataSource> pagamenti = stampaService.getPagamenti(ids);
-
-        // fetching the .jrxml file from the resources folder.
-        final InputStream stream = this.getClass().getResourceAsStream(Constants.JASPER_REPORT_PAGAMENTI);
-
-        // create report datasource
-        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(pagamenti);
-
-        // create report parameters
-        Map<String, Object> parameters = stampaService.createParameters();
-
-        // add data to parameters
-        parameters.put("pagamentiCollection", dataSource);
-
         // create report
-        byte[] reportBytes = JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
+        byte[] reportBytes = stampaService.generatePagamenti(ids);
 
         ByteArrayResource resource = new ByteArrayResource(reportBytes);
 
@@ -138,36 +94,8 @@ public class StampaController {
         log.info("Request params: dataDa {}, dataA {}, progressivo {}, importo {}, tipoPagamento {}, cliente {}, agente {}, autista {}, articolo {}, stato {}, pagato {}, idCliente {}, fatturato {}",
                 dataDa, dataA, progressivo, importo, idTipoPagamento, cliente, idAgente, idAutista, idArticolo, idStato, pagato, idCliente, fatturato);
 
-        // retrieve the list of Ddt
-        List<DdtDataSource> ddts = stampaService.getDdtDataSources(dataDa, dataA, progressivo, idCliente, cliente, idAgente, idAutista, idStato, pagato, fatturato, importo, idTipoPagamento, idArticolo);
-
-        // fetching the .jrxml file from the resources folder.
-        final InputStream stream = this.getClass().getResourceAsStream(Constants.JASPER_REPORT_DDTS);
-
-        // create report datasource
-        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(ddts);
-
-        // create report parameters
-        Map<String, Object> parameters = stampaService.createParameters();
-
-        BigDecimal totaleAcconto = new BigDecimal(0);
-        BigDecimal totale = new BigDecimal(0);
-        BigDecimal totaleDaPagare = new BigDecimal(0);
-
-        for(DdtDataSource ddt: ddts){
-            totaleAcconto = totaleAcconto.add(ddt.getAcconto());
-            totale = totale.add(ddt.getTotale());
-            totaleDaPagare = totaleDaPagare.add(ddt.getTotaleDaPagare());
-        }
-
-        // add data to parameters
-        parameters.put("totaleAcconto", totaleAcconto);
-        parameters.put("totale", totale);
-        parameters.put("totaleDaPagare", totaleDaPagare);
-        parameters.put("ddtsCollection", dataSource);
-
         // create report
-        byte[] reportBytes = JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
+        byte[] reportBytes = stampaService.generateDdts(dataDa, dataA, progressivo, idCliente, cliente, idAgente, idAutista, idStato, pagato, fatturato, importo, idTipoPagamento, idArticolo);
 
         ByteArrayResource resource = new ByteArrayResource(reportBytes);
 
@@ -234,34 +162,8 @@ public class StampaController {
         log.info("Creating pdf for list of 'documenti acquisto'");
         log.info("Request params: fornitore{}, numDocumento {}, tipoDocumento{}, dataDa {}, dataA {}", fornitore, numDocumento, tipoDocumento, dataDa, dataA);
 
-        // retrieve the list of DocumentiAcquisto
-        List<DocumentoAcquistoDataSource> documentiAcquisto = stampaService.getDocumentoAcquistoDataSources(fornitore, numDocumento, tipoDocumento, dataDa, dataA);
-
-        // fetching the .jrxml file from the resources folder.
-        final InputStream stream = this.getClass().getResourceAsStream(Constants.JASPER_REPORT_DOCUMENTI_ACQUISTO);
-
-        // create report datasource
-        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(documentiAcquisto);
-
-        BigDecimal totale = new BigDecimal(0);
-        BigDecimal totaleImponibile = new BigDecimal(0);
-        BigDecimal totaleIva = new BigDecimal(0);
-
-        for(DocumentoAcquistoDataSource documentoAcquisto: documentiAcquisto){
-            totale = totale.add(documentoAcquisto.getTotale());
-            totaleImponibile = totaleImponibile.add(documentoAcquisto.getTotaleImponibile());
-            totaleIva = totaleIva.add(documentoAcquisto.getTotaleIva());
-        }
-
-        // create report parameters
-        Map<String, Object> parameters = stampaService.createParameters();
-        parameters.put("documentiAcquistoCollection", dataSource);
-        parameters.put("totale", totale);
-        parameters.put("totaleImponibile", totaleImponibile);
-        parameters.put("totaleIva", totaleIva);
-
         // create report
-        byte[] reportBytes = JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
+        byte[] reportBytes = stampaService.generateDocumentiAcquistoDistinta(fornitore, numDocumento, tipoDocumento, dataDa, dataA);
 
         ByteArrayResource resource = new ByteArrayResource(reportBytes);
 
@@ -301,33 +203,8 @@ public class StampaController {
             @RequestParam(name = "dataConsegnaA") Date dataConsegnaA) throws Exception{
         log.info("Creating pdf for 'ordini-clienti' of 'autista' {}, 'dataConsegnaDa' {} and 'dataConsegnaA' {}", idAutista, dataConsegnaDa, dataConsegnaA);
 
-        // retrieve Autista with id 'idAutista'
-        Autista autista = stampaService.getAutista(idAutista);
-        String autistaLabel = "";
-        if(autista != null){
-            autistaLabel = autista.getNome()+" "+autista.getCognome();
-        }
-
-        // retrieve the list of OrdiniClienti
-        List<OrdineAutistaDataSource> ordineAutistaDataSources = stampaService.getOrdiniAutista(idAutista, dataConsegnaDa, dataConsegnaA);
-
-        // fetching the .jrxml file from the resources folder.
-        final InputStream stream = this.getClass().getResourceAsStream(Constants.JASPER_REPORT_ORDINI_AUTISTI);
-
-        // create report datasource
-        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(ordineAutistaDataSources);
-
-        // create report parameters
-        Map<String, Object> parameters = stampaService.createParameters();
-
-        // add data to parameters
-        parameters.put("autista", autistaLabel);
-        parameters.put("dataConsegnaDa", simpleDateFormat.format(dataConsegnaDa));
-        parameters.put("dataConsegnaA", simpleDateFormat.format(dataConsegnaA));
-        parameters.put("ordineAutistaCollection", dataSource);
-
         // create report
-        byte[] reportBytes = JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
+        byte[] reportBytes = stampaService.generateOrdiniAutisti(idAutista, dataConsegnaDa, dataConsegnaA);
 
         ByteArrayResource resource = new ByteArrayResource(reportBytes);
 
@@ -352,36 +229,8 @@ public class StampaController {
                                                        @RequestParam(name = "stato", required = false) Integer idStato) throws Exception{
         log.info("Creating pdf for list of 'note accredito'");
 
-        // retrieve the list of NoteAccredito
-        List<NotaAccreditoDataSource> noteAccredito = stampaService.getNotaAccreditoDataSources(dataDa, dataA, progressivo, importo, cliente, idAgente, idArticolo, idStato);
-
-        // fetching the .jrxml file from the resources folder.
-        final InputStream stream = this.getClass().getResourceAsStream(Constants.JASPER_REPORT_NOTE_ACCREDITO);
-
-        // create report datasource
-        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(noteAccredito);
-
-        // create report parameters
-        Map<String, Object> parameters = stampaService.createParameters();
-
-        BigDecimal totaleAcconto = new BigDecimal(0);
-        BigDecimal totale = new BigDecimal(0);
-        BigDecimal totaleDaPagare = new BigDecimal(0);
-
-        for(NotaAccreditoDataSource notaAccredito: noteAccredito){
-            totaleAcconto = totaleAcconto.add(notaAccredito.getAcconto());
-            totale = totale.add(notaAccredito.getTotale());
-            totaleDaPagare = totaleDaPagare.add(notaAccredito.getTotaleDaPagare());
-        }
-
-        // add data to parameters
-        parameters.put("totaleAcconto", totaleAcconto);
-        parameters.put("totale", totale);
-        parameters.put("totaleDaPagare", totaleDaPagare);
-        parameters.put("noteAccreditoCollection", dataSource);
-
         // create report
-        byte[] reportBytes = JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
+        byte[] reportBytes = stampaService.generateNoteAccredito(dataDa, dataA, progressivo, importo, cliente, idAgente, idArticolo, idStato);
 
         ByteArrayResource resource = new ByteArrayResource(reportBytes);
 
@@ -429,36 +278,8 @@ public class StampaController {
         log.info("Request params: dataDa {}, dataA {}, progressivo {}, importo {}, tipoPagamento {}, cliente {}, agente {}, articolo {}, stato {}, tipo {}",
                 dataDa, dataA, progressivo, importo, idTipoPagamento, cliente, idAgente, idArticolo, idStato, idTipo);
 
-        // retrieve the list of Fatture
-        List<FatturaDataSource> fatture = stampaService.getFatturaDataSources(dataDa, dataA, progressivo, importo, idTipoPagamento, cliente, idAgente, idArticolo, idStato, idTipo);
-
-        // fetching the .jrxml file from the resources folder.
-        final InputStream stream = this.getClass().getResourceAsStream(Constants.JASPER_REPORT_FATTURE);
-
-        // create report datasource
-        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(fatture);
-
-        // create report parameters
-        Map<String, Object> parameters = stampaService.createParameters();
-
-        BigDecimal totaleAcconto = new BigDecimal(0);
-        BigDecimal totale = new BigDecimal(0);
-        BigDecimal totaleDaPagare = new BigDecimal(0);
-
-        for(FatturaDataSource fattura: fatture){
-            totaleAcconto = totaleAcconto.add(fattura.getAcconto());
-            totale = totale.add(fattura.getTotale());
-            totaleDaPagare = totaleDaPagare.add(fattura.getTotaleDaPagare());
-        }
-
-        // add data to parameters
-        parameters.put("totaleAcconto", totaleAcconto);
-        parameters.put("totale", totale);
-        parameters.put("totaleDaPagare", totaleDaPagare);
-        parameters.put("fattureCollection", dataSource);
-
         // create report
-        byte[] reportBytes = JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
+        byte[] reportBytes = stampaService.generateFatture(dataDa, dataA, progressivo, importo, idTipoPagamento, cliente, idAgente, idArticolo, idStato, idTipo);
 
         ByteArrayResource resource = new ByteArrayResource(reportBytes);
 
@@ -548,82 +369,8 @@ public class StampaController {
     public ResponseEntity<Resource> printNotaReso(@PathVariable final Long idNotaReso) throws Exception{
         log.info("Creating pdf for 'nota reso' with id '{}'", idNotaReso);
 
-        // retrieve the NotaReso
-        NotaReso notaReso = stampaService.getNotaReso(idNotaReso);
-        Fornitore fornitore = notaReso.getFornitore();
-
-        // create data parameters
-        String notaResoTitleParam = notaReso.getProgressivo()+"/"+notaReso.getAnno()+" del "+simpleDateFormat.format(notaReso.getData());
-        String destinatarioParam = "";
-
-        // create data parameters for Fornitore
-        if(fornitore != null){
-            StringBuilder sb = new StringBuilder();
-            if(!StringUtils.isEmpty(fornitore.getRagioneSociale())){
-                sb.append(fornitore.getRagioneSociale()).append("\n");
-            }
-            if(!StringUtils.isEmpty(fornitore.getIndirizzo())){
-                sb.append(fornitore.getIndirizzo()).append("\n");
-            }
-            if(!StringUtils.isEmpty(fornitore.getCap())){
-                sb.append(fornitore.getCap()).append(" ");
-            }
-            if(!StringUtils.isEmpty(fornitore.getCitta())){
-                sb.append(fornitore.getCitta()).append(" ");
-            }
-            if(!StringUtils.isEmpty(fornitore.getProvincia())){
-                sb.append(fornitore.getProvincia());
-            }
-
-            destinatarioParam = sb.toString();
-        }
-
-        // create NotaResoDataSource
-        List<NotaResoDataSource> notaResoDataSources = new ArrayList<>();
-        notaResoDataSources.add(stampaService.getNotaResoDataSource(notaReso));
-
-        // create list of NotaResoRigheDataSource from NotaResoRiga
-        List<NotaResoRigaDataSource> notaResoRigaDataSources = stampaService.getNotaResoRigheDataSource(notaReso);
-
-        // create list of NotaResoTotaliDataSource from NotaResoTotale
-        List<NotaResoTotaleDataSource> notaResoTotaleDataSources = stampaService.getNotaResoTotaliDataSource(notaReso);
-
-        BigDecimal totaleImponibile = new BigDecimal(0);
-        BigDecimal totaleIva = new BigDecimal(0);
-
-        for(NotaResoTotaleDataSource notaResoTotale: notaResoTotaleDataSources){
-            totaleImponibile = totaleImponibile.add(notaResoTotale.getTotaleImponibile());
-            totaleIva = totaleIva.add(notaResoTotale.getTotaleIva());
-        }
-
-        // fetching the .jrxml file from the resources folder.
-        final InputStream stream = this.getClass().getResourceAsStream(Constants.JASPER_REPORT_NOTA_RESO);
-
-        // create report datasource for NotaReso
-        JRBeanCollectionDataSource notaResoCollectionDataSource = new JRBeanCollectionDataSource(notaResoDataSources);
-
-        // create report datasource for NotaResoRighe
-        JRBeanCollectionDataSource notaResoRigheCollectionDataSource = new JRBeanCollectionDataSource(notaResoRigaDataSources);
-
-        // create report datasource for NotaResoTotali
-        JRBeanCollectionDataSource notaResoTotaliCollectionDataSource = new JRBeanCollectionDataSource(notaResoTotaleDataSources);
-
-        // create report parameters
-        Map<String, Object> parameters = stampaService.createParameters();
-
-        // add data to parameters
-        parameters.put("notaResoTitle", notaResoTitleParam);
-        parameters.put("destinatario", destinatarioParam);
-        parameters.put("note", notaReso.getNote());
-        parameters.put("totaleImponibile", totaleImponibile);
-        parameters.put("totaleIva", totaleIva);
-        parameters.put("notaResoTotDocumento", Utils.roundPrice(totaleImponibile.add(totaleIva)));
-        parameters.put("notaResoCollection", notaResoCollectionDataSource);
-        parameters.put("notaResoRigheCollection", notaResoRigheCollectionDataSource);
-        parameters.put("notaResoTotaliCollection", notaResoTotaliCollectionDataSource);
-
         // create report
-        byte[] reportBytes = JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
+        byte[] reportBytes = stampaService.generateNotaReso(idNotaReso);
 
         ByteArrayResource resource = new ByteArrayResource(reportBytes);
 
@@ -641,36 +388,8 @@ public class StampaController {
     public ResponseEntity<Resource> printRicevutePrivati(@RequestParam(name = "ids") String ids) throws Exception{
         log.info("Creating pdf for 'ricevute privati' with ids {}", ids);
 
-        // retrieve the list of RicevutePrivato
-        List<RicevutaPrivatoDataSource> ricevutePrivato = stampaService.getRicevutaPrivatoDataSources(ids);
-
-        // fetching the .jrxml file from the resources folder.
-        final InputStream stream = this.getClass().getResourceAsStream(Constants.JASPER_REPORT_RICEVUTE_PRIVATI);
-
-        // create report datasource
-        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(ricevutePrivato);
-
-        // create report parameters
-        Map<String, Object> parameters = stampaService.createParameters();
-
-        BigDecimal totaleAcconto = new BigDecimal(0);
-        BigDecimal totale = new BigDecimal(0);
-        BigDecimal totaleDaPagare = new BigDecimal(0);
-
-        for(RicevutaPrivatoDataSource ricevutaPrivato: ricevutePrivato){
-            totaleAcconto = totaleAcconto.add(ricevutaPrivato.getAcconto());
-            totale = totale.add(ricevutaPrivato.getTotale());
-            totaleDaPagare = totaleDaPagare.add(ricevutaPrivato.getTotaleDaPagare());
-        }
-
-        // add data to parameters
-        parameters.put("totaleAcconto", totaleAcconto);
-        parameters.put("totale", totale);
-        parameters.put("totaleDaPagare", totaleDaPagare);
-        parameters.put("ricevutePrivatoCollection", dataSource);
-
         // create report
-        byte[] reportBytes = JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
+        byte[] reportBytes = stampaService.generateRicevutePrivati(ids);
 
         ByteArrayResource resource = new ByteArrayResource(reportBytes);
 
@@ -688,109 +407,8 @@ public class StampaController {
     public ResponseEntity<Resource> printRicevutaPrivato(@PathVariable final Long idRicevutaPrivato) throws Exception{
         log.info("Creating pdf for 'ricevuta privato' with id '{}'", idRicevutaPrivato);
 
-        // retrieve the RicevutaPrivato
-        RicevutaPrivato ricevutaPrivato = stampaService.getRicevutaPrivato(idRicevutaPrivato);
-        PuntoConsegna puntoConsegna = ricevutaPrivato.getPuntoConsegna();
-        Cliente cliente = ricevutaPrivato.getCliente();
-
-        // create RicevutaPrivatoDataSource
-        List<RicevutaPrivatoDataSource> ricevutaPrivatoDataSources = new ArrayList<>();
-        ricevutaPrivatoDataSources.add(stampaService.getRicevutaPrivatoDataSource(ricevutaPrivato));
-
-        // create data parameters
-        String ricevutaPrivatoTitleParam = ricevutaPrivato.getProgressivo()+"/"+ricevutaPrivato.getAnno()+" del "+simpleDateFormat.format(ricevutaPrivato.getData());
-        String puntoConsegnaParam = "";
-        String destinatarioParam = "";
-
-        // create data parameters for PuntoConsegna
-        if(puntoConsegna != null){
-            StringBuilder sb = new StringBuilder();
-            if(!StringUtils.isEmpty(puntoConsegna.getNome())){
-                sb.append(puntoConsegna.getNome()).append("\n");
-            }
-            if(!StringUtils.isEmpty(puntoConsegna.getIndirizzo())){
-                sb.append(puntoConsegna.getIndirizzo()).append("\n");
-            }
-            if(!StringUtils.isEmpty(puntoConsegna.getCap())){
-                sb.append(puntoConsegna.getCap()).append(" ");
-            }
-            if(!StringUtils.isEmpty(puntoConsegna.getLocalita())){
-                sb.append(puntoConsegna.getLocalita()).append(" ");
-            }
-            if(!StringUtils.isEmpty(puntoConsegna.getProvincia())){
-                sb.append("(").append(Provincia.getByLabel(puntoConsegna.getProvincia()).getSigla()).append(")");
-            }
-
-            puntoConsegnaParam = sb.toString();
-        }
-
-        // create data parameters for Cliente
-        if(cliente != null){
-            StringBuilder sb = new StringBuilder();
-            if(!StringUtils.isEmpty(cliente.getNome())){
-                sb.append(cliente.getNome());
-            }
-            if(!StringUtils.isEmpty(cliente.getCognome())){
-                sb.append(" ").append(cliente.getCognome()).append("\n");
-            }
-            if(!StringUtils.isEmpty(cliente.getIndirizzo())){
-                sb.append(cliente.getIndirizzo()).append("\n");
-            }
-            if(!StringUtils.isEmpty(cliente.getCap())){
-                sb.append(cliente.getCap()).append(" ");
-            }
-            if(!StringUtils.isEmpty(cliente.getCitta())){
-                sb.append(cliente.getCitta()).append(" ");
-            }
-            if(!StringUtils.isEmpty(cliente.getProvincia())){
-                sb.append("(").append(Provincia.getByLabel(cliente.getProvincia()).getSigla()).append(")");
-            }
-
-            destinatarioParam = sb.toString();
-        }
-
-        // create 'ricevutaPrivatoTrasportoDataOra' param
-        String ricevutaPrivatoTrasportoDataOraParam = simpleDateFormat.format(ricevutaPrivato.getDataTrasporto())+" "+ricevutaPrivato.getOraTrasporto();
-
-        // create list of RicevutaPrivatoArticoloDataSource from RicevutaPrivatoArticolo
-        List<RicevutaPrivatoArticoloDataSource> ricevutaPrivatoArticoloDataSources = stampaService.getRicevutaPrivatoArticoliDataSource(ricevutaPrivato);
-
-        BigDecimal totaleIva = BigDecimal.ZERO;
-        if(!ricevutaPrivatoArticoloDataSources.isEmpty()){
-            totaleIva = ricevutaPrivatoArticoloDataSources.stream().map(RicevutaPrivatoArticoloDataSource::getIvaValore).reduce(BigDecimal.ZERO, BigDecimal::add);
-        }
-
-        // fetching the .jrxml file from the resources folder.
-        final InputStream stream = this.getClass().getResourceAsStream(Constants.JASPER_REPORT_RICEVUTA_PRIVATO);
-
-        // create report datasource for RicevutaPrivato
-        JRBeanCollectionDataSource ricevutaPrivatoCollectionDataSource = new JRBeanCollectionDataSource(ricevutaPrivatoDataSources);
-
-        // create report datasource for RicevutaPrivatoArticoli
-        JRBeanCollectionDataSource ricevutaPrivatoArticoliCollectionDataSource = new JRBeanCollectionDataSource(ricevutaPrivatoArticoloDataSources);
-
-        // create report parameters
-        Map<String, Object> parameters = stampaService.createParameters();
-
-        // add data to parameters
-        parameters.put("ricevutaPrivatoTitle", ricevutaPrivatoTitleParam);
-        parameters.put("puntoConsegna", puntoConsegnaParam);
-        parameters.put("destinatario", destinatarioParam);
-        parameters.put("note", ricevutaPrivato.getNote());
-        parameters.put("trasportatore", ricevutaPrivato.getTrasportatore());
-        parameters.put("nota", Constants.JASPER_PARAMETER_RICEVUTA_PRIVATO_NOTA);
-        parameters.put("totaleIva", totaleIva);
-        parameters.put("ricevutaPrivatoTrasportoTipo", ricevutaPrivato.getTipoTrasporto());
-        parameters.put("ricevutaPrivatoTrasportoDataOra", ricevutaPrivatoTrasportoDataOraParam);
-        parameters.put("ricevutaPrivatoNumeroColli", ricevutaPrivato.getNumeroColli());
-        parameters.put("ricevutaPrivatoTotImponibile", Utils.roundPrice(ricevutaPrivato.getTotaleImponibile()));
-        parameters.put("ricevutaPrivatoTotIva", Utils.roundPrice(ricevutaPrivato.getTotaleIva()));
-        parameters.put("ricevutaPrivatoTotDocumento", Utils.roundPrice(ricevutaPrivato.getTotale()));
-        parameters.put("ricevutaPrivatoArticoliCollection", ricevutaPrivatoArticoliCollectionDataSource);
-        parameters.put("ricevutaPrivatoCollection", ricevutaPrivatoCollectionDataSource);
-
         // create report
-        byte[] reportBytes = JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
+        byte[] reportBytes = stampaService.generateRicevutaPrivato(idRicevutaPrivato);
 
         ByteArrayResource resource = new ByteArrayResource(reportBytes);
 

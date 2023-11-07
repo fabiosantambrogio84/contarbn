@@ -55,4 +55,7 @@ public interface Constants {
 
     List<Character> BARCODE_ALLOWED_CHARS = Arrays.asList('L', 'A', 'M', 'G', 'X');
     String BARCODE_REGEXP = "^.{start}(.{length})";
+
+    String BARCODE_EAN13_TYPE = "EAN13";
+    String BARCODE_EAN128_TYPE = "EAN128";
 }

@@ -6,9 +6,8 @@ import com.contarbn.util.RibaConstants;
 import com.contarbn.util.RibaUtils;
 import com.contarbn.util.Utils;
 import com.contarbn.util.enumeration.Mese;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,10 +18,9 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 
+@Slf4j
 @Service
 public class RibaService {
-
-    private final static Logger LOGGER = LoggerFactory.getLogger(RibaService.class);
 
     private final PagamentoService pagamentoService;
 
@@ -40,7 +38,7 @@ public class RibaService {
     }
 
     public String create(Set<Fattura> fatture){
-        LOGGER.info("Start creation of RiBa file...");
+        log.info("Start creation of RiBa file...");
 
         List<PagamentoFattura> pagamentiFatture = new ArrayList<>();
         List<PagamentoAggregato> pagamentiAggregati = new ArrayList<>();
@@ -55,21 +53,21 @@ public class RibaService {
             int idx = 1;
 
             // create list of Pagamento for fatture
-            LOGGER.info("Creating list of 'Pagamento' for fatture...");
+            log.info("Creating list of 'Pagamento' for fatture...");
             pagamentiFatture = createPagamentiFatture(fatture);
-            LOGGER.info("Successfully created list of 'Pagamento' for fatture");
+            log.info("Successfully created list of 'Pagamento' for fatture");
 
-            LOGGER.info("Creating map of 'Cliente' and list of 'Pagamento' for fatture");
+            log.info("Creating map of 'Cliente' and list of 'Pagamento' for fatture");
             Map<ClienteSimple, Map<Date, List<PagamentoFattura>>> pagamentiFattureByPartitaIva = createMap(pagamentiFatture);
-            LOGGER.info("Successfully created map of 'Cliente' and list of 'Pagamento' for fatture");
+            log.info("Successfully created map of 'Cliente' and list of 'Pagamento' for fatture");
 
-            LOGGER.info("Creating record testa IB...");
+            log.info("Creating record testa IB...");
             sb.append(" ");
             sb.append("IB");
             sb.append(RibaConstants.CODICE_SIA);
             sb.append(RibaConstants.CODICE_ABI);
             sb.append(sdf.format(data_invio));
-            sb.append(String.format("%1$-20s", "URBANI ALIMENTARI"));
+            sb.append(String.format("%1$-20s", RibaConstants.URBANI_ALIMENTARI_NAME));
             sb.append(String.format("%1$6s", "")); // Campo Libero
             sb.append(String.format("%1$59s", "")); // Campo Vuoto - Filler
             sb.append(String.format("%1$7s", "")); // Qualificatore flusso
@@ -78,7 +76,7 @@ public class RibaService {
             sb.append(" "); // Campo Vuoto - Filler
             sb.append(String.format("%1$5s", "")); // Campo non disponibile
             sb.append("\n");
-            LOGGER.info("Successfully created record testa IB");
+            log.info("Successfully created record testa IB");
 
             // create the list of rows to be inserted
             List<RiBaRow> rows = new ArrayList<>();
@@ -206,7 +204,7 @@ public class RibaService {
             rows.sort(Comparator.comparing(RiBaRow::getNumProgressivoFattura));
 
             for (RiBaRow row : rows) {
-                LOGGER.info("Create record...");
+                log.info("Create record...");
 
                 // update total
                 totale += row.getImporto();
@@ -240,7 +238,7 @@ public class RibaService {
                 sb.append("E");
                 sb.append("\n");
 
-                LOGGER.info("Successfully create record 14 for 'fattura' with progressivo '" + fatturaNumProgressivo + "'");
+                log.info("Successfully create record 14 for 'fattura' with progressivo '" + fatturaNumProgressivo + "'");
 
                 // RECORD 20
                 sb.append(" ");
@@ -253,7 +251,7 @@ public class RibaService {
                 sb.append(String.format("%1$14s", "")); // Campo Vuoto - Filler
                 sb.append("\n");
 
-                LOGGER.info("Successfully create record 20 for 'fattura' with progressivo '" + fatturaNumProgressivo + "'");
+                log.info("Successfully create record 20 for 'fattura' with progressivo '" + fatturaNumProgressivo + "'");
 
                 // RECORD 30
                 sb.append(" ");
@@ -267,7 +265,7 @@ public class RibaService {
                     sb.append(String.format("%1$-16s", "")); // Campo Vuoto - Filler
                 }
 
-                LOGGER.info("Successfully created record 30 for 'fattura' with progressivo '" + fatturaNumProgressivo + "'");
+                log.info("Successfully created record 30 for 'fattura' with progressivo '" + fatturaNumProgressivo + "'");
 
                 sb.append(String.format("%1$34s", "")); // Campo Vuoto - Filler
                 sb.append("\n");
@@ -282,7 +280,7 @@ public class RibaService {
                 sb.append(String.format("%1$50s", ""));
                 sb.append("\n");
 
-                LOGGER.info("Successfully created record 40 for 'fattura' with progressivo '" + fatturaNumProgressivo + "'");
+                log.info("Successfully created record 40 for 'fattura' with progressivo '" + fatturaNumProgressivo + "'");
 
                 // RECORD 50
                 sb.append(" ");
@@ -295,7 +293,7 @@ public class RibaService {
                 sb.append(String.format("%1$4s", ""));
                 sb.append("\n");
 
-                LOGGER.info("Successfully created record 50 for 'fattura' with progressivo '" + fatturaNumProgressivo + "'");
+                log.info("Successfully created record 50 for 'fattura' with progressivo '" + fatturaNumProgressivo + "'");
 
                 // RECORD 51
                 sb.append(" ");
@@ -309,7 +307,7 @@ public class RibaService {
                 sb.append(String.format("%1$49s", ""));
                 sb.append("\n");
 
-                LOGGER.info("Successfully created record 51 for 'fattura' with progressivo '" + fatturaNumProgressivo + "'");
+                log.info("Successfully created record 51 for 'fattura' with progressivo '" + fatturaNumProgressivo + "'");
 
                 // RECORD 70
                 sb.append(" ");
@@ -323,13 +321,13 @@ public class RibaService {
                 sb.append(String.format("%1$17s", ""));
                 sb.append("\n");
 
-                LOGGER.info("Successfully created record 70 for 'fattura' with progressivo '" + fatturaNumProgressivo + "'");
+                log.info("Successfully created record 70 for 'fattura' with progressivo '" + fatturaNumProgressivo + "'");
 
                 idx++;
             }
             idx--;
 
-            LOGGER.info("Successfully created record rows");
+            log.info("Successfully created record rows");
 
             // RECORD DI CODA EF
             sb.append(" ");
@@ -349,7 +347,7 @@ public class RibaService {
             sb.append(String.format("%1$5s", "")); // Campo non disponibile
             sb.append("\n");
 
-            LOGGER.info("Successfully created RiBa file");
+            log.info("Successfully created RiBa file");
 
         } catch(Exception e){
             // delete created pagamenti
