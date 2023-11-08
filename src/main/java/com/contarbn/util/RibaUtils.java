@@ -51,6 +51,6 @@ public class RibaUtils {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateTimeFormatter);
         String formattedNow = now.format(formatter);
 
-        return RibaConstants.FILENAME_PREFIX + formattedNow + RibaConstants.FILENAME_EXTENSION;
+        return "export_riba_" + formattedNow + ".txt";
     }
 }

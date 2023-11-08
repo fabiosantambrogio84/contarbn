@@ -2,13 +2,12 @@ package com.contarbn.service;
 
 import com.contarbn.exception.GenericException;
 import com.contarbn.model.*;
-import com.contarbn.util.RibaConstants;
+import com.contarbn.model.beans.DittaInfoSingleton;
 import com.contarbn.util.RibaUtils;
 import com.contarbn.util.Utils;
 import com.contarbn.util.enumeration.Mese;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -30,7 +29,6 @@ public class RibaService {
 
     private final DecimalFormat df = new DecimalFormat();
 
-    @Autowired
     public RibaService(final PagamentoService pagamentoService,
                        final PagamentoAggregatoService pagamentoAggregatoService){
         this.pagamentoService = pagamentoService;
@@ -39,6 +37,8 @@ public class RibaService {
 
     public String create(Set<Fattura> fatture){
         log.info("Start creation of RiBa file...");
+
+        Map<String, DittaInfo> dittaInfoMap = DittaInfoSingleton.get().getDittaInfoMap();
 
         List<PagamentoFattura> pagamentiFatture = new ArrayList<>();
         List<PagamentoAggregato> pagamentiAggregati = new ArrayList<>();
@@ -64,10 +64,10 @@ public class RibaService {
             log.info("Creating record testa IB...");
             sb.append(" ");
             sb.append("IB");
-            sb.append(RibaConstants.CODICE_SIA);
-            sb.append(RibaConstants.CODICE_ABI);
+            sb.append(dittaInfoMap.get("RIBA_CODICE_SIA").getValore());
+            sb.append(dittaInfoMap.get("RIBA_CODICE_ABI").getValore());
             sb.append(sdf.format(data_invio));
-            sb.append(String.format("%1$-20s", RibaConstants.URBANI_ALIMENTARI_NAME));
+            sb.append(String.format("%1$-20s", dittaInfoMap.get("RIBA_NOME_AZIENDA").getValore()));
             sb.append(String.format("%1$6s", "")); // Campo Libero
             sb.append(String.format("%1$59s", "")); // Campo Vuoto - Filler
             sb.append(String.format("%1$7s", "")); // Qualificatore flusso
@@ -224,13 +224,13 @@ public class RibaService {
                 sb.append("30000");
                 sb.append(String.format("%013d", row.getImporto()));
                 sb.append("-");
-                sb.append(RibaConstants.CODICE_ABI);
-                sb.append(RibaConstants.CODICE_CAB);
-                sb.append(String.format("%1$12s", RibaConstants.CC));
+                sb.append(dittaInfoMap.get("RIBA_CODICE_ABI").getValore());
+                sb.append(dittaInfoMap.get("RIBA_CODICE_CAB").getValore());
+                sb.append(String.format("%1$12s", dittaInfoMap.get("RIBA_CONTO_CORRENTE").getValore()));
                 sb.append(String.format("%1$5s", row.getAbiCliente().trim()));
                 sb.append(String.format("%1$5s", row.getCabCliente().trim()));
                 sb.append(String.format("%1$12s", "")); // Campo Vuoto - Filler
-                sb.append(RibaConstants.CODICE_SIA);
+                sb.append(dittaInfoMap.get("RIBA_CODICE_SIA").getValore());
                 sb.append("4");
                 sb.append(String.format("%1$-16s", row.getIdCliente())); // Campo Vuoto - Filler
                 sb.append(" ");
@@ -244,10 +244,10 @@ public class RibaService {
                 sb.append(" ");
                 sb.append("20");
                 sb.append(String.format("%07d", idx));
-                sb.append(String.format("%1$-24s", RibaConstants.URBANI_ALIMENTARI_NAME));
-                sb.append(String.format("%1$-24s", RibaConstants.URBANI_ALIMENTARI_VIA_CIVICO));
-                sb.append(String.format("%1$-24s", RibaConstants.URBANI_ALIMENTARI_CAP_CITTA));
-                sb.append(String.format("%1$-24s", RibaConstants.URBANI_ALIMENTARI_CITTA_PROVINCIA));
+                sb.append(String.format("%1$-24s", dittaInfoMap.get("RIBA_NOME_AZIENDA").getValore()));
+                sb.append(String.format("%1$-24s", dittaInfoMap.get("INDIRIZZO").getValore()+", "+dittaInfoMap.get("CIVICO").getValore()));
+                sb.append(String.format("%1$-24s", dittaInfoMap.get("RIBA_CAP_CITTA").getValore()));
+                sb.append(String.format("%1$-24s", dittaInfoMap.get("RIBA_CITTA_PROVINCIA").getValore()));
                 sb.append(String.format("%1$14s", "")); // Campo Vuoto - Filler
                 sb.append("\n");
 
@@ -289,7 +289,7 @@ public class RibaService {
                 sb.append(String.format("%1$-40s", StringUtils.left(row.getDescrizionePagamento(), 40)));
                 sb.append(String.format("%1$40s", ""));
                 sb.append(String.format("%1$10s", ""));
-                sb.append(String.format("%1$-16s", RibaConstants.CODICE_FISCALE));
+                sb.append(String.format("%1$-16s", dittaInfoMap.get("CODICE_FISCALE").getValore()));
                 sb.append(String.format("%1$4s", ""));
                 sb.append("\n");
 
@@ -300,7 +300,7 @@ public class RibaService {
                 sb.append("51");
                 sb.append(String.format("%07d", idx));
                 sb.append(String.format("%010d", row.getIdPagamento()));
-                sb.append(String.format("%1$20s", RibaConstants.URBANI_ALIMENTARI_NAME));
+                sb.append(String.format("%1$20s", dittaInfoMap.get("RIBA_NOME_AZIENDA").getValore()));
                 sb.append(String.format("%1$15s", ""));
                 sb.append(String.format("%1$10s", ""));
                 sb.append(String.format("%1$6s", ""));
@@ -332,10 +332,10 @@ public class RibaService {
             // RECORD DI CODA EF
             sb.append(" ");
             sb.append("EF");
-            sb.append(RibaConstants.CODICE_SIA);
-            sb.append(RibaConstants.CODICE_ABI);
+            sb.append(dittaInfoMap.get("RIBA_CODICE_SIA").getValore());
+            sb.append(dittaInfoMap.get("RIBA_CODICE_ABI").getValore());
             sb.append(sdf.format(data_invio));
-            sb.append(String.format("%1$-20s", RibaConstants.URBANI_ALIMENTARI_NAME));
+            sb.append(String.format("%1$-20s", dittaInfoMap.get("RIBA_NOME_AZIENDA").getValore()));
             sb.append(String.format("%1$6s", "")); // Campo Libero
             sb.append(String.format("%07d", idx));
             sb.append(String.format("%015d", totale));

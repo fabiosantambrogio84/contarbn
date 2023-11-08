@@ -1,16 +1,18 @@
 package com.contarbn.service;
 
 import com.contarbn.model.*;
+import com.contarbn.model.beans.DittaInfoSingleton;
 import com.contarbn.properties.AdeExportProperties;
 import com.contarbn.service.jpa.NativeQueryService;
-import com.contarbn.util.*;
+import com.contarbn.util.AccountingUtils;
+import com.contarbn.util.Constants;
+import com.contarbn.util.Utils;
+import com.contarbn.util.ZipUtils;
 import com.contarbn.util.enumeration.Provincia;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
@@ -32,20 +34,31 @@ import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+@Slf4j
 @Service
 public class AdeService {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(AdeService.class);
+    private final static String COND_PAGAMENTO_COMPLETO = "TP02";
 
-    private final NativeQueryService nativeQueryService;
-    private final StampaService stampaService;
+    private final static String DEFAULT_CODICE_DESTINATARIO = "0000000";
 
+    private final static String FORMATO_TRASMISSIONE = "FPR12";
+
+    private final static String NATURA_IVA_ZERO = "N2.2";
+
+    private final static String REGIME_FISCALE = "RF01";
+
+    private final static String TIPO_DOCUMENTO = "TD01";
+
+    private final static String TIPO_DOCUMENTO_NOTA_ACCREDITO = "TD04";
 
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     private final String baseDirectory;
 
-    @Autowired
+    private final NativeQueryService nativeQueryService;
+    private final StampaService stampaService;
+
     public AdeService(final NativeQueryService nativeQueryService,
                       final StampaService stampaService,
                       final AdeExportProperties adeExportProperties
@@ -59,13 +72,13 @@ public class AdeService {
 
         Map<String, Object> result;
 
-        LOGGER.info("Start creating ZIP file for fatture...");
+        log.info("Start creating ZIP file for fatture...");
 
         Integer idExport = createFattureXmlFiles(fattureByCliente);
 
         result = ZipUtils.createZipFile(nativeQueryService, baseDirectory, idExport, "export_fatture_elettroniche");
 
-        LOGGER.info("Successfully created ZIP file for fatture");
+        log.info("Successfully created ZIP file for fatture");
 
         return result;
     }
@@ -74,13 +87,13 @@ public class AdeService {
 
         Map<String, Object> result;
 
-        LOGGER.info("Start creating ZIP file for fatture accompagnatorie...");
+        log.info("Start creating ZIP file for fatture accompagnatorie...");
 
         Integer idExport = createFattureAccompagnatorieXmlFiles(fattureAccompagnatorieByCliente);
 
         result = ZipUtils.createZipFile(nativeQueryService, baseDirectory, idExport, "export_fatture_accompagnatorie_elettroniche");
 
-        LOGGER.info("Successfully created ZIP file for fatture accompagnatorie");
+        log.info("Successfully created ZIP file for fatture accompagnatorie");
 
         return result;
     }
@@ -89,19 +102,21 @@ public class AdeService {
 
         Map<String, Object> result;
 
-        LOGGER.info("Start creating ZIP file for note accredito...");
+        log.info("Start creating ZIP file for note accredito...");
 
         Integer idExport = createNoteAccreditoXmlFiles(noteAccreditoByCliente);
 
         result = ZipUtils.createZipFile(nativeQueryService, baseDirectory, idExport, "export_note_accredito_elettroniche");
 
-        LOGGER.info("Successfully created ZIP file for note accredito");
+        log.info("Successfully created ZIP file for note accredito");
 
         return result;
     }
 
     public Map<String, String> createFatturaXmlFile(Fattura fattura) throws Exception{
 
+        Map<String, DittaInfo> dittaInfoMap = DittaInfoSingleton.get().getDittaInfoMap();
+        
         Map<String, String> result = new HashMap<>();
 
         Cliente cliente = fattura.getCliente();
@@ -110,7 +125,7 @@ public class AdeService {
         Integer idProgressivo = nativeQueryService.getAdeNextId("xml_file");
 
         // create xml file name
-        String fileName = AdeConstants.PAESE + AdeConstants.CODICE_FISCALE + "_" + StringUtils.leftPad(String.valueOf(idProgressivo), 5, '0') + ".xml";
+        String fileName = Constants.NAZIONE + dittaInfoMap.get("CODICE_FISCALE").getValore()  + "_" + StringUtils.leftPad(String.valueOf(idProgressivo), 5, '0') + ".xml";
 
         StringWriter stringWriter = new StringWriter();
         XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
@@ -126,10 +141,10 @@ public class AdeService {
         xmlStreamWriter.writeStartElement("FatturaElettronicaHeader");
 
         // create xml node 'DatiTrasmissione'
-        createNodeDatiTrasmissione(xmlStreamWriter, cliente, idProgressivo);
+        createNodeDatiTrasmissione(xmlStreamWriter, cliente, idProgressivo, dittaInfoMap);
 
         // create xml node 'CedentePrestatore'
-        createNodeCedentePrestatore(xmlStreamWriter);
+        createNodeCedentePrestatore(xmlStreamWriter, dittaInfoMap);
 
         // create xml node 'CessionarioCommittente'
         createNodeCessionarioCommittente(xmlStreamWriter, cliente);
@@ -168,6 +183,8 @@ public class AdeService {
 
     public Map<String, String> createFatturaAccompagnatoriaXmlFile(FatturaAccompagnatoria fatturaAccompagnatoria) throws Exception{
 
+        Map<String, DittaInfo> dittaInfoMap = DittaInfoSingleton.get().getDittaInfoMap();
+
         Map<String, String> result = new HashMap<>();
 
         Cliente cliente = fatturaAccompagnatoria.getCliente();
@@ -176,7 +193,7 @@ public class AdeService {
         Integer idProgressivo = nativeQueryService.getAdeNextId("xml_file");
 
         // create xml file name
-        String fileName = AdeConstants.PAESE + AdeConstants.CODICE_FISCALE + "_" + StringUtils.leftPad(String.valueOf(idProgressivo), 5, '0') + ".xml";
+        String fileName = Constants.NAZIONE + dittaInfoMap.get("CODICE_FISCALE").getValore() + "_" + StringUtils.leftPad(String.valueOf(idProgressivo), 5, '0') + ".xml";
 
         StringWriter stringWriter = new StringWriter();
         XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
@@ -192,10 +209,10 @@ public class AdeService {
         xmlStreamWriter.writeStartElement("FatturaElettronicaHeader");
 
         // create xml node 'DatiTrasmissione'
-        createNodeDatiTrasmissione(xmlStreamWriter, cliente, idProgressivo);
+        createNodeDatiTrasmissione(xmlStreamWriter, cliente, idProgressivo, dittaInfoMap);
 
         // create xml node 'CedentePrestatore'
-        createNodeCedentePrestatore(xmlStreamWriter);
+        createNodeCedentePrestatore(xmlStreamWriter, dittaInfoMap);
 
         // create xml node 'CessionarioCommittente'
         createNodeCessionarioCommittente(xmlStreamWriter, cliente);
@@ -234,6 +251,8 @@ public class AdeService {
 
     public Map<String, String> createNotaAccreditoXmlFile(NotaAccredito notaAccredito) throws Exception{
 
+        Map<String, DittaInfo> dittaInfoMap = DittaInfoSingleton.get().getDittaInfoMap();
+
         Map<String, String> result = new HashMap<>();
 
         Cliente cliente = notaAccredito.getCliente();
@@ -242,7 +261,7 @@ public class AdeService {
         Integer idProgressivo = nativeQueryService.getAdeNextId("xml_file");
 
         // create xml file name
-        String fileName = AdeConstants.PAESE + AdeConstants.CODICE_FISCALE + "_" + StringUtils.leftPad(String.valueOf(idProgressivo), 5, '0') + ".xml";
+        String fileName = Constants.NAZIONE + dittaInfoMap.get("CODICE_FISCALE").getValore() + "_" + StringUtils.leftPad(String.valueOf(idProgressivo), 5, '0') + ".xml";
 
         StringWriter stringWriter = new StringWriter();
         XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
@@ -258,10 +277,10 @@ public class AdeService {
         xmlStreamWriter.writeStartElement("FatturaElettronicaHeader");
 
         // create xml node 'DatiTrasmissione'
-        createNodeDatiTrasmissione(xmlStreamWriter, cliente, idProgressivo);
+        createNodeDatiTrasmissione(xmlStreamWriter, cliente, idProgressivo, dittaInfoMap);
 
         // create xml node 'CedentePrestatore'
-        createNodeCedentePrestatore(xmlStreamWriter);
+        createNodeCedentePrestatore(xmlStreamWriter, dittaInfoMap);
 
         // create xml node 'CessionarioCommittente'
         createNodeCessionarioCommittente(xmlStreamWriter, cliente);
@@ -299,7 +318,7 @@ public class AdeService {
     }
 
     private Integer createFattureXmlFiles(Map<Cliente, List<Fattura>> fattureByCliente) throws Exception{
-        LOGGER.info("Start creating xml files for fatture...");
+        log.info("Start creating xml files for fatture...");
         Integer idExport;
 
         try{
@@ -308,10 +327,10 @@ public class AdeService {
             // retrieve id for the exportation
             idExport = nativeQueryService.getAdeNextId("export");
 
-            LOGGER.info("AdeExport: id={}", idExport);
+            log.info("AdeExport: id={}", idExport);
 
             // create, if not exists, the destination folder
-            String destinationPath = baseDirectory + AdeConstants.FILE_SEPARATOR + idExport;
+            String destinationPath = baseDirectory + Constants.FILE_SEPARATOR + idExport;
             Path path = Paths.get(destinationPath);
 
             checkAndCreateDirectory(destinationPath);
@@ -327,7 +346,7 @@ public class AdeService {
 
                             Map<String, String> result =  createFatturaXmlFile(fattura);
 
-                            File file = new File(path.toAbsolutePath() + AdeConstants.FILE_SEPARATOR + result.get("fileName"));
+                            File file = new File(path.toAbsolutePath() + Constants.FILE_SEPARATOR + result.get("fileName"));
                             file.setReadable(true, false);
                             file.setWritable(true, false);
                             try (PrintWriter out = new PrintWriter(file)) {
@@ -340,7 +359,7 @@ public class AdeService {
             }
 
         } catch(Exception e){
-            LOGGER.error("Error creating xml files for fatture");
+            log.error("Error creating xml files for fatture");
             e.printStackTrace();
             throw e;
         }
@@ -348,7 +367,7 @@ public class AdeService {
     }
 
     private Integer createFattureAccompagnatorieXmlFiles(Map<Cliente, List<FatturaAccompagnatoria>> fattureAccompagnatorieByCliente) throws Exception{
-        LOGGER.info("Start creating xml files for fatture accompagnatorie...");
+        log.info("Start creating xml files for fatture accompagnatorie...");
         Integer idExport;
 
         try{
@@ -357,10 +376,10 @@ public class AdeService {
             // retrieve id for the exportation
             idExport = nativeQueryService.getAdeNextId("export");
 
-            LOGGER.info("AdeExport: id={}", idExport);
+            log.info("AdeExport: id={}", idExport);
 
             // create, if not exists, the destination folder
-            String destinationPath = baseDirectory + AdeConstants.FILE_SEPARATOR + idExport;
+            String destinationPath = baseDirectory + Constants.FILE_SEPARATOR + idExport;
             Path path = Paths.get(destinationPath);
 
             checkAndCreateDirectory(destinationPath);
@@ -376,7 +395,7 @@ public class AdeService {
 
                             Map<String, String> result =  createFatturaAccompagnatoriaXmlFile(fatturaAccompagnatoria);
 
-                            File file = new File(path.toAbsolutePath() + AdeConstants.FILE_SEPARATOR + result.get("fileName"));
+                            File file = new File(path.toAbsolutePath() + Constants.FILE_SEPARATOR + result.get("fileName"));
                             file.setReadable(true, false);
                             file.setWritable(true, false);
                             try (PrintWriter out = new PrintWriter(file)) {
@@ -389,7 +408,7 @@ public class AdeService {
             }
 
         } catch(Exception e){
-            LOGGER.error("Error creating xml files for fatture");
+            log.error("Error creating xml files for fatture");
             e.printStackTrace();
             throw e;
         }
@@ -397,7 +416,7 @@ public class AdeService {
     }
 
     private Integer createNoteAccreditoXmlFiles(Map<Cliente, List<NotaAccredito>> noteAccreditoByCliente) throws Exception{
-        LOGGER.info("Start creating xml files for note accredito...");
+        log.info("Start creating xml files for note accredito...");
         Integer idExport;
 
         try{
@@ -406,10 +425,10 @@ public class AdeService {
             // retrieve id for the exportation
             idExport = nativeQueryService.getAdeNextId("export");
 
-            LOGGER.info("AdeExport: id={}", idExport);
+            log.info("AdeExport: id={}", idExport);
 
             // create, if not exists, the destination folder
-            String destinationPath = baseDirectory + AdeConstants.FILE_SEPARATOR + idExport;
+            String destinationPath = baseDirectory + Constants.FILE_SEPARATOR + idExport;
             Path path = Paths.get(destinationPath);
 
             checkAndCreateDirectory(destinationPath);
@@ -425,7 +444,7 @@ public class AdeService {
 
                             Map<String, String> result =  createNotaAccreditoXmlFile(notaAccredito);
 
-                            File file = new File(path.toAbsolutePath() + AdeConstants.FILE_SEPARATOR + result.get("fileName"));
+                            File file = new File(path.toAbsolutePath() + Constants.FILE_SEPARATOR + result.get("fileName"));
                             file.setReadable(true, false);
                             file.setWritable(true, false);
                             try (PrintWriter out = new PrintWriter(file)) {
@@ -438,14 +457,14 @@ public class AdeService {
             }
 
         } catch(Exception e){
-            LOGGER.error("Error creating xml files for fatture");
+            log.error("Error creating xml files for fatture");
             e.printStackTrace();
             throw e;
         }
         return idExport;
     }
 
-    private void createNodeDatiTrasmissione(XMLStreamWriter xmlStreamWriter, Cliente cliente, Integer idProgressivo) throws Exception{
+    private void createNodeDatiTrasmissione(XMLStreamWriter xmlStreamWriter, Cliente cliente, Integer idProgressivo, Map<String, DittaInfo> dittaInfoMap) throws Exception{
         xmlStreamWriter.writeStartElement("DatiTrasmissione");
 
         // create node 'IdTrasmittente' 
@@ -453,12 +472,12 @@ public class AdeService {
 
         // create node 'IdPaese' 
         xmlStreamWriter.writeStartElement("IdPaese");
-        xmlStreamWriter.writeCharacters(AdeConstants.PAESE);
+        xmlStreamWriter.writeCharacters(Constants.NAZIONE);
         xmlStreamWriter.writeEndElement();
 
         // create node 'IdCodice' 
         xmlStreamWriter.writeStartElement("IdCodice");
-        xmlStreamWriter.writeCharacters(AdeConstants.CODICE_FISCALE);
+        xmlStreamWriter.writeCharacters(dittaInfoMap.get("CODICE_FISCALE").getValore());
         xmlStreamWriter.writeEndElement();
 
         // Chiudo il nodo 'IdTrasmittente' 
@@ -472,14 +491,14 @@ public class AdeService {
 
         // create node 'FormatoTrasmissione' 
         xmlStreamWriter.writeStartElement("FormatoTrasmissione");
-        xmlStreamWriter.writeCharacters(AdeConstants.FORMATO_TRASMISSIONE);
+        xmlStreamWriter.writeCharacters(FORMATO_TRASMISSIONE);
         xmlStreamWriter.writeEndElement();
 
         // create node 'CodiceDestinatario' 
         String codiceUnivocoSdi = cliente.getCodiceUnivocoSdi();
         xmlStreamWriter.writeStartElement("CodiceDestinatario");
         if(codiceUnivocoSdi == null || codiceUnivocoSdi.equals("")){
-            codiceUnivocoSdi = AdeConstants.DEFAULT_CODICE_DESTINATARIO;
+            codiceUnivocoSdi = DEFAULT_CODICE_DESTINATARIO;
         }
         xmlStreamWriter.writeCharacters(codiceUnivocoSdi);
         xmlStreamWriter.writeEndElement();
@@ -511,7 +530,7 @@ public class AdeService {
         xmlStreamWriter.writeEndElement();
     }
 
-    private void createNodeCedentePrestatore(XMLStreamWriter xmlStreamWriter) throws Exception{
+    private void createNodeCedentePrestatore(XMLStreamWriter xmlStreamWriter, Map<String, DittaInfo> dittaInfoMap) throws Exception{
         xmlStreamWriter.writeStartElement("CedentePrestatore");
 
         // create node 'DatiAnagrafici' 
@@ -522,12 +541,12 @@ public class AdeService {
 
         // create node 'IdPaese' 
         xmlStreamWriter.writeStartElement("IdPaese");
-        xmlStreamWriter.writeCharacters(AdeConstants.PAESE);
+        xmlStreamWriter.writeCharacters(Constants.NAZIONE);
         xmlStreamWriter.writeEndElement();
 
         // create node 'IdCodice' 
         xmlStreamWriter.writeStartElement("IdCodice");
-        xmlStreamWriter.writeCharacters(AdeConstants.PARTITA_IVA);
+        xmlStreamWriter.writeCharacters(dittaInfoMap.get("PARTITA_IVA").getValore());
         xmlStreamWriter.writeEndElement();
 
         // Chiudo il nodo 'IdFiscaleIVA' 
@@ -535,7 +554,7 @@ public class AdeService {
 
         // create node 'CodiceFiscale' 
         xmlStreamWriter.writeStartElement("CodiceFiscale");
-        xmlStreamWriter.writeCharacters(AdeConstants.CODICE_FISCALE);
+        xmlStreamWriter.writeCharacters(dittaInfoMap.get("CODICE_FISCALE").getValore());
         xmlStreamWriter.writeEndElement();
 
         // create node 'Anagrafica' 
@@ -543,7 +562,7 @@ public class AdeService {
 
         // create node 'Denominazione' 
         xmlStreamWriter.writeStartElement("Denominazione");
-        xmlStreamWriter.writeCharacters(AdeConstants.RAGIONE_SOCIALE);
+        xmlStreamWriter.writeCharacters(dittaInfoMap.get("NOME_AZIENDA").getValore());
         xmlStreamWriter.writeEndElement();
 
         // create node 'Nome' 
@@ -591,7 +610,7 @@ public class AdeService {
 
         // create node 'RegimeFiscale' 
         xmlStreamWriter.writeStartElement("RegimeFiscale");
-        xmlStreamWriter.writeCharacters(AdeConstants.REGIME_FISCALE);
+        xmlStreamWriter.writeCharacters(REGIME_FISCALE);
         xmlStreamWriter.writeEndElement();
 
         // Chiudo il nodo 'DatiAnagrafici' 
@@ -602,32 +621,32 @@ public class AdeService {
 
         // create node 'Indirizzo' 
         xmlStreamWriter.writeStartElement("Indirizzo");
-        xmlStreamWriter.writeCharacters(AdeConstants.SEDE_INDIRIZZO);
+        xmlStreamWriter.writeCharacters(dittaInfoMap.get("INDIRIZZO").getValore().toUpperCase());
         xmlStreamWriter.writeEndElement();
 
         // create node 'NumeroCivico' 
         xmlStreamWriter.writeStartElement("NumeroCivico");
-        xmlStreamWriter.writeCharacters(AdeConstants.SEDE_NUMERO_CIVICO);
+        xmlStreamWriter.writeCharacters(dittaInfoMap.get("CIVICO").getValore());
         xmlStreamWriter.writeEndElement();
 
         // create node 'CAP' 
         xmlStreamWriter.writeStartElement("CAP");
-        xmlStreamWriter.writeCharacters(AdeConstants.SEDE_CAP);
+        xmlStreamWriter.writeCharacters(dittaInfoMap.get("CAP").getValore());
         xmlStreamWriter.writeEndElement();
 
         // create node 'Comune' 
         xmlStreamWriter.writeStartElement("Comune");
-        xmlStreamWriter.writeCharacters(AdeConstants.SEDE_COMUNE);
+        xmlStreamWriter.writeCharacters(dittaInfoMap.get("CITTA").getValore().toUpperCase());
         xmlStreamWriter.writeEndElement();
 
         // create node 'Provincia' 
         xmlStreamWriter.writeStartElement("Provincia");
-        xmlStreamWriter.writeCharacters(AdeConstants.SEDE_PROVINCIA);
+        xmlStreamWriter.writeCharacters(Provincia.getByLabel(dittaInfoMap.get("PROVINCIA").getValore()).getSigla());
         xmlStreamWriter.writeEndElement();
 
         // create node 'Nazione' 
         xmlStreamWriter.writeStartElement("Nazione");
-        xmlStreamWriter.writeCharacters(AdeConstants.SEDE_NAZIONE);
+        xmlStreamWriter.writeCharacters(Constants.NAZIONE);
         xmlStreamWriter.writeEndElement();
 
         // Chiudo il nodo 'Sede' 
@@ -638,12 +657,12 @@ public class AdeService {
 
         // create node 'Telefono' 
         xmlStreamWriter.writeStartElement("Telefono");
-        xmlStreamWriter.writeCharacters(AdeConstants.TELEFONO);
+        xmlStreamWriter.writeCharacters(dittaInfoMap.get("TELEFONO").getValore());
         xmlStreamWriter.writeEndElement();
 
         // create node 'Email' 
         xmlStreamWriter.writeStartElement("Email");
-        xmlStreamWriter.writeCharacters(AdeConstants.EMAIL);
+        xmlStreamWriter.writeCharacters(dittaInfoMap.get("EMAIL").getValore());
         xmlStreamWriter.writeEndElement();
 
         // Chiudo il nodo 'Contatti' 
@@ -665,7 +684,7 @@ public class AdeService {
 
             // create node 'IdPaese' 
             xmlStreamWriter.writeStartElement("IdPaese");
-            xmlStreamWriter.writeCharacters(AdeConstants.PAESE);
+            xmlStreamWriter.writeCharacters(Constants.NAZIONE);
             xmlStreamWriter.writeEndElement();
 
             // create node 'IdCodice' 
@@ -748,7 +767,7 @@ public class AdeService {
 
         // create node 'Nazione' 
         xmlStreamWriter.writeStartElement("Nazione");
-        xmlStreamWriter.writeCharacters(AdeConstants.PAESE);
+        xmlStreamWriter.writeCharacters(Constants.NAZIONE);
         xmlStreamWriter.writeEndElement();
 
         // Chiudo il nodo 'Sede' 
@@ -765,12 +784,12 @@ public class AdeService {
 
         // create node 'TipoDocumento' 
         xmlStreamWriter.writeStartElement("TipoDocumento");
-        xmlStreamWriter.writeCharacters(AdeConstants.TIPO_DOCUMENTO);
+        xmlStreamWriter.writeCharacters(TIPO_DOCUMENTO);
         xmlStreamWriter.writeEndElement();
 
         // create node 'Divisa' 
         xmlStreamWriter.writeStartElement("Divisa");
-        xmlStreamWriter.writeCharacters(AdeConstants.DIVISA);
+        xmlStreamWriter.writeCharacters(Constants.DIVISA);
         xmlStreamWriter.writeEndElement();
 
         // create node 'Data' 
@@ -1058,12 +1077,12 @@ public class AdeService {
 
         // create node 'TipoDocumento'
         xmlStreamWriter.writeStartElement("TipoDocumento");
-        xmlStreamWriter.writeCharacters(AdeConstants.TIPO_DOCUMENTO);
+        xmlStreamWriter.writeCharacters(TIPO_DOCUMENTO);
         xmlStreamWriter.writeEndElement();
 
         // create node 'Divisa'
         xmlStreamWriter.writeStartElement("Divisa");
-        xmlStreamWriter.writeCharacters(AdeConstants.DIVISA);
+        xmlStreamWriter.writeCharacters(Constants.DIVISA);
         xmlStreamWriter.writeEndElement();
 
         // create node 'Data'
@@ -1167,12 +1186,12 @@ public class AdeService {
 
         // create node 'TipoDocumento'
         xmlStreamWriter.writeStartElement("TipoDocumento");
-        xmlStreamWriter.writeCharacters(AdeConstants.TIPO_DOCUMENTO_NOTA_ACCREDITO);
+        xmlStreamWriter.writeCharacters(TIPO_DOCUMENTO_NOTA_ACCREDITO);
         xmlStreamWriter.writeEndElement();
 
         // create node 'Divisa'
         xmlStreamWriter.writeStartElement("Divisa");
-        xmlStreamWriter.writeCharacters(AdeConstants.DIVISA);
+        xmlStreamWriter.writeCharacters(Constants.DIVISA);
         xmlStreamWriter.writeEndElement();
 
         // create node 'Data'
@@ -1420,7 +1439,7 @@ public class AdeService {
                 // if IVA=0 create node 'Natura'
                 if(iva != null && iva.compareTo(BigDecimal.ZERO) == 0){
                     xmlStreamWriter.writeStartElement("Natura");
-                    xmlStreamWriter.writeCharacters(AdeConstants.NATURA_IVA_ZERO);
+                    xmlStreamWriter.writeCharacters(NATURA_IVA_ZERO);
                     xmlStreamWriter.writeEndElement();
                 }
 
@@ -1754,7 +1773,7 @@ public class AdeService {
                 // if IVA=0 create node 'Natura'
                 if(iva != null && iva.compareTo(BigDecimal.ZERO) == 0){
                     xmlStreamWriter.writeStartElement("Natura");
-                    xmlStreamWriter.writeCharacters(AdeConstants.NATURA_IVA_ZERO);
+                    xmlStreamWriter.writeCharacters(NATURA_IVA_ZERO);
                     xmlStreamWriter.writeEndElement();
                 }
 
@@ -1790,7 +1809,7 @@ public class AdeService {
 
         // create node 'CondizioniPagamento' 
         xmlStreamWriter.writeStartElement("CondizioniPagamento");
-        xmlStreamWriter.writeCharacters(AdeConstants.COND_PAGAMENTO_COMPLETO);
+        xmlStreamWriter.writeCharacters(COND_PAGAMENTO_COMPLETO);
         xmlStreamWriter.writeEndElement();
 
         // create node 'DettaglioPagamento' 
@@ -1837,7 +1856,7 @@ public class AdeService {
 
         // create node 'CondizioniPagamento'
         xmlStreamWriter.writeStartElement("CondizioniPagamento");
-        xmlStreamWriter.writeCharacters(AdeConstants.COND_PAGAMENTO_COMPLETO);
+        xmlStreamWriter.writeCharacters(COND_PAGAMENTO_COMPLETO);
         xmlStreamWriter.writeEndElement();
 
         // create node 'DettaglioPagamento'
@@ -1884,7 +1903,7 @@ public class AdeService {
 
         // create node 'CondizioniPagamento'
         xmlStreamWriter.writeStartElement("CondizioniPagamento");
-        xmlStreamWriter.writeCharacters(AdeConstants.COND_PAGAMENTO_COMPLETO);
+        xmlStreamWriter.writeCharacters(COND_PAGAMENTO_COMPLETO);
         xmlStreamWriter.writeEndElement();
 
         // create node 'DettaglioPagamento'
@@ -1974,7 +1993,7 @@ public class AdeService {
 
 
         } catch(Exception e){
-            LOGGER.error("Error creating tag 'Allegati' for 'fattura' "+fattura.getId()+"'", e);
+            log.error("Error creating tag 'Allegati' for 'fattura' "+fattura.getId()+"'", e);
         }
     }
 
@@ -2026,7 +2045,7 @@ public class AdeService {
 
 
         } catch(Exception e){
-            LOGGER.error("Error creating tag 'Allegati' for 'fattura accompagnatoria' "+fatturaAccompagnatoria.getId()+"'", e);
+            log.error("Error creating tag 'Allegati' for 'fattura accompagnatoria' "+fatturaAccompagnatoria.getId()+"'", e);
         }
     }
 
@@ -2078,7 +2097,7 @@ public class AdeService {
 
 
         } catch(Exception e){
-            LOGGER.error("Error creating tag 'Allegati' for 'nota_accredito'' "+notaAccredito.getId()+"'", e);
+            log.error("Error creating tag 'Allegati' for 'nota_accredito'' "+notaAccredito.getId()+"'", e);
         }
     }
 
@@ -2086,7 +2105,7 @@ public class AdeService {
         Path path = Paths.get(directory);
         if(!Files.exists(path)){
             Files.createDirectory(path);
-            LOGGER.info("AdeExport: successfully created folder '{}'", path.toAbsolutePath());
+            log.info("AdeExport: successfully created folder '{}'", path.toAbsolutePath());
         }
     }
 

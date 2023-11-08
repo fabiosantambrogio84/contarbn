@@ -5,6 +5,12 @@ import java.util.List;
 
 public interface Constants {
 
+    List<Character> BARCODE_ALLOWED_CHARS = Arrays.asList('L', 'A', 'M', 'G', 'X');
+    String BARCODE_REGEXP = "^.{start}(.{length})";
+
+    String BARCODE_EAN13_TYPE = "EAN13";
+    String BARCODE_EAN128_TYPE = "EAN128";
+
     String DEFAULT_ENCODING = "UTF-8";
 
     String DEFAULT_FORNITORE = "URBANI ELIA E MARTA";
@@ -13,18 +19,15 @@ public interface Constants {
 
     String DEFAULT_AUTISTA_COGNOME = "fumaroni";
 
-    String ZONE_ID_EUROPE_ROME = "Europe/Rome";
+    String DIVISA = "EUR";
 
-    String MEDIA_TYPE_APPLICATION_PDF = "application/pdf";
-    String MEDIA_TYPE_APPLICATION_XML = "application/xml";
-    String MEDIA_TYPE_APPLICATION_ZIP = "application/zip";
-    String MEDIA_TYPE_APPLICATION_TXT = "application/text";
+    String EMAIL_INVIATA_OK = "Y";
+
+    String FILE_SEPARATOR = "/";
 
     String HTTP_HEADER_PRAGMA_VALUE = "no-cache";
     String HTTP_HEADER_EXPIRES_VALUE = "0";
     String HTTP_HEADER_CACHE_CONTROL_VALUE = "no-cache, no-store, must-revalidate";
-
-    String EMAIL_INVIATA_OK = "Y";
 
     String JASPER_PARAMETER_DDT_NOTA = "Assolve obblighi art.62,comm 1, del D.L. 24.01.12, n.1, convertito, con modificazioni, dalla legge 24.03.12, n.27. Contributo CONAI assolto dove dovuto";
     String JASPER_PARAMETER_FATTURA_NOTA = "Assolve obblighi art.62,comm 1, del D.L. 24.01.12, n.1, convertito, con modificazioni, dalla legge 24.03.12, n.27. Contributo CONAI assolto dove dovuto";
@@ -50,12 +53,18 @@ public interface Constants {
     String JASPER_REPORT_FATTURE_COMMERCIANTI = "/jasper_reports/fatture_commercianti.jasper";
     String JASPER_REPORT_ORDINE_FORNITORE = "/jasper_reports/ordine_fornitore.jasper";
     String JASPER_REPORT_LISTINO = "/jasper_reports/listino.jasper";
+    String JASPER_REPORT_LOGO_IMAGE_PATH = "/jasper_reports/logo.png";
+    String JASPER_REPORT_BOLLINO_IMAGE_PATH = "/jasper_reports/bollino.png";
+    String JASPER_REPORT_HEADER_SUBREPORT_PATH = "/jasper_reports/header.jasper";
 
     String LABEL_TEMPLATE = "/label_generation/template.html";
 
-    List<Character> BARCODE_ALLOWED_CHARS = Arrays.asList('L', 'A', 'M', 'G', 'X');
-    String BARCODE_REGEXP = "^.{start}(.{length})";
+    String MEDIA_TYPE_APPLICATION_PDF = "application/pdf";
+    String MEDIA_TYPE_APPLICATION_XML = "application/xml";
+    String MEDIA_TYPE_APPLICATION_ZIP = "application/zip";
+    String MEDIA_TYPE_APPLICATION_TXT = "application/text";
 
-    String BARCODE_EAN13_TYPE = "EAN13";
-    String BARCODE_EAN128_TYPE = "EAN128";
+    String NAZIONE = "IT";
+
+    String ZONE_ID_EUROPE_ROME = "Europe/Rome";
 }

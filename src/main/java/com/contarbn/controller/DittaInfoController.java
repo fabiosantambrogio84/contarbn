@@ -2,11 +2,13 @@ package com.contarbn.controller;
 
 import com.contarbn.exception.CannotChangeResourceIdException;
 import com.contarbn.model.DittaInfo;
+import com.contarbn.model.beans.DittaInfoSingleton;
 import com.contarbn.service.DittaInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -27,8 +29,14 @@ public class DittaInfoController {
     @CrossOrigin
     public List<DittaInfo> getAll() {
         log.info("Performing GET request for retrieving list of 'ditta-info'");
-
         return dittaInfoService.getAll();
+    }
+
+    @RequestMapping(method = GET, path = "/map")
+    @CrossOrigin
+    public Map<String, DittaInfo> getMap() {
+        log.info("Performing GET request for retrieving the map of 'ditta-info'");
+        return DittaInfoSingleton.get().getDittaInfoMap();
     }
 
     @RequestMapping(method = GET, path = "/{dittaInfoId}")

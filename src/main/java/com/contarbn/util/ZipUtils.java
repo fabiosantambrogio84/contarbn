@@ -1,5 +1,7 @@
 package com.contarbn.util;
 
+import com.contarbn.model.DittaInfo;
+import com.contarbn.model.beans.DittaInfoSingleton;
 import com.contarbn.service.jpa.NativeQueryService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -19,17 +21,20 @@ import java.util.zip.ZipOutputStream;
 @Slf4j
 public class ZipUtils {
 
+    private static final long MAX_ZIP_FILE_SIZE = 5000000;
+
     public static Map<String, Object> createZipFile(NativeQueryService nativeQueryService, String baseDirectory, Integer idExport, String fileNamePrefix) throws Exception{
+
+        Map<String, DittaInfo> dittaInfoMap = DittaInfoSingleton.get().getDittaInfoMap();
 
         Map<String, Object> result = new HashMap<>();
         String resultFilePath = "";
         String resultFileName = "";
         byte[] zipFile;
 
-        String destinationPath = baseDirectory + AdeConstants.FILE_SEPARATOR + idExport;
+        String destinationPath = baseDirectory + Constants.FILE_SEPARATOR + idExport;
         Path path = Paths.get(destinationPath);
 
-        long maxSize = AdeConstants.MAX_ZIP_FILE_SIZE;
         long currentSize = 0;
         int index = 1;
 
@@ -41,7 +46,7 @@ public class ZipUtils {
             for (Path file: directoryStream) {
                 long fileSize = file.toFile().length();
 
-                if((currentSize + fileSize) < maxSize){
+                if((currentSize + fileSize) < MAX_ZIP_FILE_SIZE){
                     currentSize = currentSize + fileSize;
 
                     List<Path> filesByIndex = filesGrouped.getOrDefault(index, new ArrayList<>());
@@ -72,12 +77,12 @@ public class ZipUtils {
                 Integer progressivoZip = nativeQueryService.getAdeNextId("zip_file");
 
                 // create zip file name
-                String fileName = AdeConstants.PAESE + AdeConstants.CODICE_FISCALE + "_" + StringUtils.leftPad(String.valueOf(progressivoZip), 5, '0')+".zip";
+                String fileName = Constants.NAZIONE + dittaInfoMap.get("CODICE_FISCALE").getValore() + "_" + StringUtils.leftPad(String.valueOf(progressivoZip), 5, '0')+".zip";
 
                 // retrieve the list of xml file to insert into zip file
                 List<Path> filesToZip = entry.getValue();
 
-                try(FileOutputStream fos = new FileOutputStream(path.toAbsolutePath() + AdeConstants.FILE_SEPARATOR + fileName);
+                try(FileOutputStream fos = new FileOutputStream(path.toAbsolutePath() + Constants.FILE_SEPARATOR + fileName);
                     ZipOutputStream zipOut = new ZipOutputStream(fos)){
 
                     for(Path fileToZip : filesToZip){
@@ -108,7 +113,7 @@ public class ZipUtils {
             sdf.applyPattern("yyyyMMdd_HHmmss");
 
             resultFileName = fileNamePrefix+"_"+sdf.format(new Date(System.currentTimeMillis()))+".zip";
-            resultFilePath = path.toAbsolutePath() + AdeConstants.FILE_SEPARATOR + resultFileName;
+            resultFilePath = path.toAbsolutePath() + Constants.FILE_SEPARATOR + resultFileName;
 
             try(FileOutputStream fos = new FileOutputStream(resultFilePath);
                 ZipOutputStream zipOut = new ZipOutputStream(fos);

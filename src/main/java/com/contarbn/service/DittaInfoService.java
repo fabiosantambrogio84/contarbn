@@ -2,9 +2,9 @@ package com.contarbn.service;
 
 import com.contarbn.exception.ResourceNotFoundException;
 import com.contarbn.model.DittaInfo;
+import com.contarbn.model.beans.DittaInfoSingleton;
 import com.contarbn.repository.DittaInfoRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -18,7 +18,6 @@ public class DittaInfoService {
 
     private final DittaInfoRepository dittaInfoRepository;
 
-    @Autowired
     public DittaInfoService(final DittaInfoRepository dittaInfoRepository){
         this.dittaInfoRepository = dittaInfoRepository;
     }
@@ -48,6 +47,8 @@ public class DittaInfoService {
         dittaInfo.setDataInserimento(currentDittaInfo.getDataInserimento());
         dittaInfo.setDataAggiornamento(Timestamp.from(ZonedDateTime.now().toInstant()));
         DittaInfo updatedDittaInfo = dittaInfoRepository.save(dittaInfo);
+
+        DittaInfoSingleton.get().addDittaInfo(updatedDittaInfo.getCodice(), updatedDittaInfo);
 
         log.info("Updated 'ditta-info' '{}'", updatedDittaInfo);
         return updatedDittaInfo;

@@ -44,7 +44,7 @@ INSERT INTO contarbn.ditta_info (id, codice, dato, descrizione, valore, deletabl
 VALUES(11, 'WEBSITE', 'Website', 'Website', 'www.urbanialimentari.com', b'0', now(), now());
 
 INSERT INTO contarbn.ditta_info (id, codice, dato, descrizione, valore, deletable, data_inserimento, data_aggiornamento)
-VALUES(12, 'EMAIL', 'Email', 'Email', 'info@urbanialimentari.comm', b'0', now(), now());
+VALUES(12, 'EMAIL', 'Email', 'Email', 'info@urbanialimentari.com', b'0', now(), now());
 
 INSERT INTO contarbn.ditta_info (id, codice, dato, descrizione, valore, deletable, data_inserimento, data_aggiornamento)
 VALUES(13, 'PEC', 'Pec', 'Pec', 'rbn.snc@legalmail.it', b'0', now(), now());

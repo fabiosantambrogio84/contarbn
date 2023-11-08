@@ -1,6 +1,7 @@
 package com.contarbn.service;
 
 import com.contarbn.model.*;
+import com.contarbn.model.beans.DittaInfoSingleton;
 import com.contarbn.model.reports.*;
 import com.contarbn.model.views.VDdt;
 import com.contarbn.model.views.VDocumentoAcquisto;
@@ -17,7 +18,6 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
@@ -74,7 +74,6 @@ public class StampaService {
 
     private final DittaInfoService dittaInfoService;
 
-    @Autowired
     public StampaService(final GiacenzaIngredienteService giacenzaIngredienteService, final DdtService ddtService, final PagamentoService pagamentoService,
                          final AutistaService autistaService,
                          final OrdineClienteService ordineClienteService,
@@ -587,54 +586,6 @@ public class StampaService {
 
         log.info("Retrieved {} 'note accredito'", notaAccreditoDataSources.size());
         return notaAccreditoDataSources;
-    }
-
-    private DittaInfoDataSource getDittaInfoDataSource(){
-        DittaInfoDataSource dittaInfoDataSource = new DittaInfoDataSource();
-
-        List<DittaInfo> dittaInfos = dittaInfoService.getAll();
-
-        for(DittaInfo dittaInfo : dittaInfos){
-            switch(dittaInfo.getCodice()) {
-                case "REPORT_INTESTAZIONE":
-                    dittaInfoDataSource.setIntestazione(dittaInfo.getValore());
-                    break;
-                case "REPORT_INTESTAZIONE_2":
-                    dittaInfoDataSource.setIntestazione2(dittaInfo.getValore());
-                    break;
-                case "REPORT_INDIRIZZO":
-                    dittaInfoDataSource.setIndirizzo(dittaInfo.getValore());
-                    break;
-                case "PARTITA_IVA":
-                    dittaInfoDataSource.setPartitaIva(dittaInfo.getValore());
-                    break;
-                case "CODICE_FISCALE":
-                    dittaInfoDataSource.setCodiceFiscale(dittaInfo.getValore());
-                    break;
-                case "REA":
-                    dittaInfoDataSource.setRea(dittaInfo.getValore());
-                    break;
-                case "TELEFONO":
-                    dittaInfoDataSource.setTelefono(dittaInfo.getValore());
-                    break;
-                case "CELLULARE":
-                    dittaInfoDataSource.setCellulare(dittaInfo.getValore());
-                    break;
-                case "WEBSITE":
-                    dittaInfoDataSource.setWebsite(dittaInfo.getValore());
-                    break;
-                case "EMAIL":
-                    dittaInfoDataSource.setEmail(dittaInfo.getValore());
-                    break;
-                case "PEC":
-                    dittaInfoDataSource.setPec(dittaInfo.getValore());
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        return dittaInfoDataSource;
     }
 
     private List<FatturaDataSource> getFatturaDataSources(java.sql.Date dataDa, java.sql.Date dataA, Integer progressivo, Float importo, String idTipoPagamento, String cliente, Integer idAgente, Integer idArticolo, Integer idStato, Integer idTipo){
@@ -2684,23 +2635,24 @@ public class StampaService {
     }
 
     public Map<String, Object> createParameters(){
+
+        Map<String, DittaInfo> dittaInfoMap = DittaInfoSingleton.get().getDittaInfoMap();
+
         Map<String, Object> parameters = new HashMap<>();
-        parameters.put("logo", this.getClass().getResource("/jasper_reports/logo.png"));
-        parameters.put("bollino", this.getClass().getResource("/jasper_reports/bollino.png"));
-
-        DittaInfoDataSource dittaInfoDataSource = getDittaInfoDataSource();
-
-        parameters.put("headerIntestazione", dittaInfoDataSource.getIntestazione());
-        parameters.put("headerIntestazione2", dittaInfoDataSource.getIntestazione2());
-        parameters.put("headerIndirizzo", dittaInfoDataSource.getIndirizzo());
-        parameters.put("headerPartitaIva", "P.Iva "+ dittaInfoDataSource.getPartitaIva());
-        parameters.put("headerCodiceFiscale", "Cod. Fisc. " + dittaInfoDataSource.getCodiceFiscale());
-        parameters.put("headerRea", "REA " + dittaInfoDataSource.getRea());
-        parameters.put("headerTelefono", "Tel: " + dittaInfoDataSource.getTelefono());
-        parameters.put("headerCellulare", "Cell: " + dittaInfoDataSource.getCellulare());
-        parameters.put("headerWebsite", "Website " + dittaInfoDataSource.getWebsite());
-        parameters.put("headerEmail", "E-mail " + dittaInfoDataSource.getEmail());
-        parameters.put("headerPec", "Pec " + dittaInfoDataSource.getPec());
+        parameters.put("logo", this.getClass().getResource(Constants.JASPER_REPORT_LOGO_IMAGE_PATH));
+        parameters.put("bollino", this.getClass().getResource(Constants.JASPER_REPORT_BOLLINO_IMAGE_PATH));
+        parameters.put("headerSubReportPath", this.getClass().getResource(Constants.JASPER_REPORT_HEADER_SUBREPORT_PATH).toString());
+        parameters.put("headerIntestazione", dittaInfoMap.get("PDF_INTESTAZIONE").getValore());
+        parameters.put("headerIntestazione2", dittaInfoMap.get("PDF_INTESTAZIONE_2").getValore());
+        parameters.put("headerIndirizzo", dittaInfoMap.get("PDF_INDIRIZZO").getValore());
+        parameters.put("headerPartitaIva", "P.Iva "+ dittaInfoMap.get("PARTITA_IVA").getValore());
+        parameters.put("headerCodiceFiscale", "Cod. Fisc. " + dittaInfoMap.get("CODICE_FISCALE").getValore());
+        parameters.put("headerRea", "REA " + dittaInfoMap.get("REA").getValore());
+        parameters.put("headerTelefono", "Tel: " + dittaInfoMap.get("TELEFONO").getValore());
+        parameters.put("headerCellulare", "Cell: " + dittaInfoMap.get("CELLULARE").getValore());
+        parameters.put("headerWebsite", "Website " + dittaInfoMap.get("WEBSITE").getValore());
+        parameters.put("headerEmail", "E-mail " + dittaInfoMap.get("EMAIL").getValore());
+        parameters.put("headerPec", "Pec " + dittaInfoMap.get("PEC").getValore());
 
         return parameters;
     }
