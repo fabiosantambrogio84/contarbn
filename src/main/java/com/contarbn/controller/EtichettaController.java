@@ -40,10 +40,11 @@ public class EtichettaController {
                         @RequestParam(value = "barcodeEan13File", required = false) MultipartFile barcodeEan13File,
                         @RequestParam(value = "barcodeEan128File", required = false) MultipartFile barcodeEan128File,
                         @RequestParam(value = "barcodeEan13", required = false) String barcodeEan13,
-                        @RequestParam(value = "barcodeEan128", required = false) String barcodeEan128) throws Exception{
+                        @RequestParam(value = "barcodeEan128", required = false) String barcodeEan128,
+                        @RequestParam(value = "bollinoFile", required = false) MultipartFile bollinoFile) throws Exception{
         log.info("Performing POST request for generating 'etichetta'");
 
-        Map<String, String> result = etichettaService.generate(idProduzione, articolo, ingredienti, ingredienti2, conservazione, valoriNutrizionali, dataConsumazione, lotto, peso, disposizioniComune, footer, barcodeEan13File, barcodeEan128File, barcodeEan13, barcodeEan128);
+        Map<String, String> result = etichettaService.generate(idProduzione, articolo, ingredienti, ingredienti2, conservazione, valoriNutrizionali, dataConsumazione, lotto, peso, disposizioniComune, footer, barcodeEan13File, barcodeEan128File, barcodeEan13, barcodeEan128, bollinoFile);
 
         log.info("Successfully generated 'etichetta'");
 

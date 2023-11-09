@@ -37,6 +37,12 @@ public class VProduzioneEtichetta {
     @Column(name = "conservazione")
     private String conservazione;
 
+    @Column(name = "barcode_ean_13")
+    private String barcodeEan13;
+
+    @Column(name = "barcode_ean_128")
+    private String barcodeEan128;
+
     @Override
     public String toString() {
 
@@ -48,6 +54,8 @@ public class VProduzioneEtichetta {
                 ", ingredienti: " + ingredienti +
                 ", valoriNutrizionali: " + valoriNutrizionali +
                 ", conservazione: " + conservazione +
+                ", barcodeEan13: " + barcodeEan13 +
+                ", barcodeEan128: " + barcodeEan128 +
                 "}";
     }
 }

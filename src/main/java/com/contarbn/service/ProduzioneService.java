@@ -139,8 +139,10 @@ public class ProduzioneService {
             createdProduzione.setLotto(lotto);
         }
         final String createdLotto = createdProduzione.getLotto();
+        final Double quantitaTotale = createdProduzione.getProduzioneIngredienti().stream().mapToDouble(ProduzioneIngrediente::getQuantita).sum();
 
         createdProduzione.getProduzioneIngredienti().stream().forEach(pi -> {
+            pi.setPercentuale(Utils.computePercentuale(pi.getQuantita(), quantitaTotale.floatValue()));
             pi.getId().setProduzioneId(produzioneId);
             pi.getId().setUuid(UUID.randomUUID().toString());
 

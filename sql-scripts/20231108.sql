@@ -71,3 +71,85 @@ VALUES(23, 'RIBA_CAP_CITTA', 'RiBa cap citta', 'RiBa cap citta', '37035 S. Giova
 
 INSERT INTO contarbn.ditta_info (id, codice, dato, descrizione, valore, deletable, data_inserimento, data_aggiornamento)
 VALUES(24, 'RIBA_CITTA_PROVINCIA', 'RiBa citta provincia', 'RiBa citta provincia', 'Ilarione (VR)', b'0', now(), now());
+
+-- #######################################################################################################################
+alter table contarbn.produzione_ingrediente add `percentuale` decimal(10,3) DEFAULT NULL;
+
+create or replace view contarbn.v_produzione_etichetta_sub as
+select
+    produzione.id,
+    produzione.lotto,
+    produzione.scadenza,
+    produzione.barcode_ean_13,
+    produzione.barcode_ean_128,
+    ricetta.nome as articolo,
+    ricetta.valori_nutrizionali,
+    ricetta.conservazione,
+    ingrediente.descrizione,
+    produzione_ingrediente.percentuale,
+    case
+        when produzione_ingrediente.percentuale is null then
+            ingrediente.descrizione
+        else
+            concat(ingrediente.descrizione, ' ', produzione_ingrediente.percentuale, '%')
+        end as ingrediente_descrizione
+from contarbn.produzione
+         join contarbn.ricetta on
+    ((produzione.id_ricetta = ricetta.id))
+         left join contarbn.produzione_ingrediente on
+    ((produzione.id = produzione_ingrediente.id_produzione))
+         left join contarbn.ingrediente on
+    ((produzione_ingrediente.id_ingrediente = ingrediente.id));
+
+create or replace view contarbn.v_produzione_etichetta as
+select
+    pe.id,
+    pe.lotto,
+    pe.scadenza,
+    pe.barcode_ean_13,
+    pe.barcode_ean_128,
+    pe.articolo,
+    group_concat(distinct pe.ingrediente_descrizione order by pe.percentuale desc, pe.descrizione asc separator ',') as `ingredienti`,
+    pe.valori_nutrizionali,
+    pe.conservazione
+from contarbn.v_produzione_etichetta_sub as pe
+group by
+    pe.id,
+    pe.lotto,
+    pe.scadenza,
+    pe.barcode_ean_13,
+    pe.barcode_ean_128,
+    pe.articolo,
+    pe.valori_nutrizionali,
+    pe.conservazione
+;
+
+UPDATE contarbn.produzione_ingrediente pi2
+INNER JOIN (
+    select
+        t2.*,
+        round((t2.quantita*100/t2.quantita_totale),2) as percentuale
+    from(
+        select
+            pi3.id_produzione,
+            pi3.id_ingrediente,
+            pi3.uuid,
+            pi3.quantita,
+            t.quantita_totale
+        from contarbn.produzione_ingrediente pi3
+        join (
+            select
+                pi2.id_produzione,
+                SUM(pi2.quantita) as quantita_totale
+            from contarbn.produzione_ingrediente pi2
+            group by
+                pi2.id_produzione
+        ) t on
+            pi3.id_produzione = t.id_produzione
+    ) t2
+) t ON
+    pi2.id_produzione = t.id_produzione and
+    pi2.id_ingrediente = t.id_ingrediente and
+    pi2.uuid = t.uuid
+SET pi2.percentuale = t.percentuale
+;

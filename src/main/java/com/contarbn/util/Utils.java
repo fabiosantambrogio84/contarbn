@@ -2,6 +2,7 @@ package com.contarbn.util;
 
 import com.contarbn.model.beans.SortOrder;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.CharSet;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -9,8 +10,12 @@ import java.io.File;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 @Slf4j
 public class Utils {
@@ -89,19 +94,9 @@ public class Utils {
         return result.toString("UTF-8");
     }
 
-    /*
-    public static void main(String[] args) {
-        Map<String, String> requestParams = new HashMap<>();
-        requestParams.put("order[0][column]","0");
-        requestParams.put("order[0][dir]","desc");
-        requestParams.put("order[1][column]","2");
-        requestParams.put("order[1][dir]","desc");
-        requestParams.put("columns[0][name]","anno_contabile");
-        requestParams.put("columns[2][name]","progressivo");
+    public static float computePercentuale(Float quantita, Float quantitaTotale){
+        float percentualeNotRounded = (quantita*100)/quantitaTotale;
+        return (float)Math.round(percentualeNotRounded*100)/100;
+    }
 
-        List<SortOrder> sortOrders = Utils.getSortOrders(requestParams);
-        for(SortOrder sortOrder : sortOrders){
-            System.out.println(sortOrder.getColumnName()+" - "+sortOrder.getDirection());
-        }
-    }*/
 }

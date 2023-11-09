@@ -11,7 +11,8 @@ public enum LabelPlaceholder {
     BARCODE_EAN_13("${barcodeEan13}"),
     BARCODE_EAN_128("${barcodeEan128}"),
     DISPOSIZIONI_COMUNE("${disposizioniComune}"),
-    FOOTER("${footer}");
+    FOOTER("${footer}"),
+    BOLLINO("${bollino}");
 
     private String placeholder;
 

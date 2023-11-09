@@ -10,7 +10,7 @@ import java.sql.Date;
 @Table(name = "produzione_ingrediente")
 public class ProduzioneIngrediente implements Serializable {
 
-    private static final long serialVersionUID = -6513863375941482733L;
+    private static final long serialVersionUID = -5540878346737336488L;
 
     @EmbeddedId
     ProduzioneIngredienteKey id;
@@ -35,6 +35,9 @@ public class ProduzioneIngrediente implements Serializable {
 
     @Column(name = "quantita")
     private Float quantita;
+
+    @Column(name = "percentuale")
+    private Float percentuale;
 
     public ProduzioneIngredienteKey getId() {
         return id;
@@ -84,18 +87,24 @@ public class ProduzioneIngrediente implements Serializable {
         this.quantita = quantita;
     }
 
+    public Float getPercentuale() {
+        return percentuale;
+    }
+
+    public void setPercentuale(Float percentuale) {
+        this.percentuale = percentuale;
+    }
+
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder();
 
-        result.append("{");
-        result.append("produzioneId: " + id.produzioneId);
-        result.append(", ingredienteId: " + id.ingredienteId);
-        result.append(", lotto: " + lotto);
-        result.append(", scadenza: " + scadenza);
-        result.append(", quantita: " + quantita);
-        result.append("}");
-
-        return result.toString();
+        return "{" +
+                "produzioneId: " + id.produzioneId +
+                ", ingredienteId: " + id.ingredienteId +
+                ", lotto: " + lotto +
+                ", scadenza: " + scadenza +
+                ", quantita: " + quantita +
+                ", percentuale: " + percentuale +
+                "}";
     }
 }
