@@ -85,8 +85,6 @@
 		<field name="pagamento" class="java.lang.String"/>
 		<field name="agente" class="java.lang.String"/>
 	</subDataset>
-	<parameter name="logo" class="java.net.URL" isForPrompting="false"/>
-	<parameter name="bollino" class="java.net.URL" isForPrompting="false"/>
 	<parameter name="ricevutaPrivatoTitle" class="java.lang.String"/>
 	<parameter name="puntoConsegna" class="java.lang.String"/>
 	<parameter name="destinatario" class="java.lang.String"/>
@@ -102,6 +100,20 @@
 	<parameter name="note" class="java.lang.String"/>
 	<parameter name="trasportatore" class="java.lang.String"/>
 	<parameter name="totaleIva" class="java.math.BigDecimal" isForPrompting="false"/>
+	<parameter name="logo" class="java.net.URL" isForPrompting="false"/>
+	<parameter name="bollino" class="java.net.URL" isForPrompting="false"/>
+	<parameter name="headerIntestazione" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="headerIntestazione2" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="headerIndirizzo" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="headerPartitaIva" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="headerCodiceFiscale" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="headerRea" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="headerTelefono" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="headerCellulare" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="headerWebsite" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="headerEmail" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="headerPec" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="headerSubReportPath" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
@@ -110,103 +122,53 @@
 	</background>
 	<pageHeader>
 		<band height="78" splitType="Stretch">
-			<image>
-				<reportElement x="0" y="0" width="50" height="50" uuid="bb69aea0-5bb8-4d20-87d4-704c4ac37b1f"/>
-				<imageExpression><![CDATA[$P{logo}]]></imageExpression>
-			</image>
-			<image>
-				<reportElement x="504" y="0" width="50" height="40" uuid="595dc3b5-150a-408b-8458-93801329340d"/>
-				<imageExpression><![CDATA[$P{bollino}]]></imageExpression>
-			</image>
-			<staticText>
-				<reportElement x="110" y="20" width="310" height="14" uuid="2c2a24e9-c6da-4477-9b96-6f9383a66d98"/>
-				<textElement textAlignment="Center">
-					<font size="9"/>
-				</textElement>
-				<text><![CDATA[37035 SAN GIOVANNI ILARIONE / VR - Via 11 Settembre, 17]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="195" y="36" width="164" height="14" uuid="afe523ea-c3db-45c1-ae10-d04e2be00110">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement textAlignment="Center">
-					<font size="9"/>
-				</textElement>
-				<text><![CDATA[Cod. Fisc. 04998580239]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="70" y="36" width="124" height="14" uuid="4461cc11-344e-4b43-8364-87b979562532">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement textAlignment="Center">
-					<font size="9"/>
-				</textElement>
-				<text><![CDATA[P.Iva 04998580239]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="359" y="36" width="92" height="14" uuid="e6074144-46ca-46e0-b9a8-dc117cceea44">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement textAlignment="Center">
-					<font size="9"/>
-				</textElement>
-				<text><![CDATA[REA VR462414]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="150" y="50" width="114" height="14" uuid="3326e1f3-5f01-4d29-aa0c-cf02cd71c586">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement textAlignment="Center">
-					<font size="9"/>
-				</textElement>
-				<text><![CDATA[Tel: 045 6550993]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="264" y="50" width="118" height="14" uuid="98bb01d5-94bb-4591-94da-789ab8459c87">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement textAlignment="Center">
-					<font size="9"/>
-				</textElement>
-				<text><![CDATA[Cell: 328 4694654]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="30" y="64" width="170" height="14" uuid="3cbb33ad-5d4d-44d1-8c44-bdbf826ad948">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement textAlignment="Left">
-					<font size="9"/>
-				</textElement>
-				<text><![CDATA[Website www.urbanialimentari.com]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="200" y="64" width="168" height="14" uuid="2ada7831-088e-49f3-b89f-0180c2b2fc6d">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement textAlignment="Left">
-					<font size="9"/>
-				</textElement>
-				<text><![CDATA[E-mail info@urbanialimentari.com]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="369" y="64" width="164" height="14" uuid="539a830a-e622-449f-8c7d-925724b1f3cd">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement textAlignment="Left">
-					<font size="9"/>
-				</textElement>
-				<text><![CDATA[Pec rbn.snc@legalmail.it]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="60" y="0" width="440" height="20" uuid="adaafda8-ac2a-4e0e-9a00-9e4f7c54eea8">
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					<property name="com.jaspersoft.studio.unit.x" value="px"/>
-				</reportElement>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="10" isBold="true" isItalic="false" isUnderline="false"/>
-				</textElement>
-				<text><![CDATA[URBANI ALIMENTARI SNC di Urbani Elia e Marta]]></text>
-			</staticText>
+			<subreport>
+				<reportElement x="0" y="0" width="555" height="78" uuid="c8b5dd75-cfc2-4e3d-8ec7-8debb1329bec"/>
+				<subreportParameter name="logo">
+					<subreportParameterExpression><![CDATA[$P{logo}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="bollino">
+					<subreportParameterExpression><![CDATA[$P{bollino}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="headerIntestazione">
+					<subreportParameterExpression><![CDATA[$P{headerIntestazione}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="headerIntestazione2">
+					<subreportParameterExpression><![CDATA[$P{headerIntestazione2}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="headerIndirizzo">
+					<subreportParameterExpression><![CDATA[$P{headerIndirizzo}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="headerPartitaIva">
+					<subreportParameterExpression><![CDATA[$P{headerPartitaIva}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="headerCodiceFiscale">
+					<subreportParameterExpression><![CDATA[$P{headerCodiceFiscale}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="headerRea">
+					<subreportParameterExpression><![CDATA[$P{headerRea}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="headerTelefono">
+					<subreportParameterExpression><![CDATA[$P{headerTelefono}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="headerCellulare">
+					<subreportParameterExpression><![CDATA[$P{headerCellulare}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="headerWebsite">
+					<subreportParameterExpression><![CDATA[$P{headerWebsite}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="headerEmail">
+					<subreportParameterExpression><![CDATA[$P{headerEmail}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="headerPec">
+					<subreportParameterExpression><![CDATA[$P{headerPec}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="headerSubReportPath">
+					<subreportParameterExpression><![CDATA[$P{headerSubReportPath}]]></subreportParameterExpression>
+				</subreportParameter>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.JREmptyDataSource()]]></dataSourceExpression>
+				<subreportExpression><![CDATA[$P{headerSubReportPath}]]></subreportExpression>
+			</subreport>
 		</band>
 	</pageHeader>
 	<detail>

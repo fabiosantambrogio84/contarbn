@@ -72,8 +72,6 @@ public class StampaService {
 
     private final FatturaAccompagnatoriaAcquistoService fatturaAccompagnatoriaAcquistoService;
 
-    private final DittaInfoService dittaInfoService;
-
     public StampaService(final GiacenzaIngredienteService giacenzaIngredienteService, final DdtService ddtService, final PagamentoService pagamentoService,
                          final AutistaService autistaService,
                          final OrdineClienteService ordineClienteService,
@@ -87,8 +85,7 @@ public class StampaService {
                          final DocumentoAcquistoService documentoAcquistoService,
                          final DdtAcquistoService ddtAcquistoService,
                          final FatturaAcquistoService fatturaAcquistoService,
-                         final FatturaAccompagnatoriaAcquistoService fatturaAccompagnatoriaAcquistoService,
-                         final DittaInfoService dittaInfoService){
+                         final FatturaAccompagnatoriaAcquistoService fatturaAccompagnatoriaAcquistoService){
         this.giacenzaIngredienteService = giacenzaIngredienteService;
         this.ddtService = ddtService;
         this.pagamentoService = pagamentoService;
@@ -105,7 +102,6 @@ public class StampaService {
         this.ddtAcquistoService = ddtAcquistoService;
         this.fatturaAcquistoService = fatturaAcquistoService;
         this.fatturaAccompagnatoriaAcquistoService = fatturaAccompagnatoriaAcquistoService;
-        this.dittaInfoService = dittaInfoService;
     }
 
     private List<VGiacenzaIngrediente> getGiacenzeIngredienti(String ids){

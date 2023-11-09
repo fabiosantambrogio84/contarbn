@@ -1,5 +1,4 @@
 eclipse.preferences.version=1
-encoding/ddt-TMP.jrxml=UTF-8
 encoding/ddt.jrxml=UTF-8
 encoding/ddt_acquisto.jrxml=UTF-8
 encoding/ddts.jrxml=UTF-8
@@ -21,3 +20,5 @@ encoding/ordini_autisti.jrxml=UTF-8
 encoding/pagamenti.jrxml=UTF-8
 encoding/ricevuta_privato.jrxml=UTF-8
 encoding/ricevute_privati.jrxml=UTF-8
+encoding/test_1.jrxml=UTF-8
+encoding/test_1_header.jrxml=UTF-8
