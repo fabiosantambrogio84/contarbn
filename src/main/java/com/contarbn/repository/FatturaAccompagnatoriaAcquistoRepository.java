@@ -1,7 +1,6 @@
 package com.contarbn.repository;
 
 import com.contarbn.model.FatturaAccompagnatoriaAcquisto;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;
@@ -16,8 +15,4 @@ public interface FatturaAccompagnatoriaAcquistoRepository extends CrudRepository
 
     Optional<FatturaAccompagnatoriaAcquisto> findByFornitoreIdAndNumeroAndIdNot(Long idFornitore, String numero, Long idFatturaAccompagnatoriaAcquisto);
 
-    @Query(nativeQuery = true,
-            value = "select faa.numero from fattura_accom_acquisto faa where faa.anno = ?1 order by faa.numero desc limit 1 for update"
-    )
-    Integer getLastNumeroByAnnoContabile(Integer anno);
 }

@@ -43,7 +43,7 @@ public class RicercaLottoService {
 
     public Set<VProduzioneConfezione> getProduzioniConfezioniByLotto(String lotto){
         LOGGER.info("Retrieving the list of 'produzioni-confezioni' filtered by 'lotto' '{}'", lotto);
-        Set<VProduzioneConfezione> produzioniConfezioni = vProduzioneConfezioneRepository.findAllByLottoConfezione(lotto);
+        Set<VProduzioneConfezione> produzioniConfezioni = vProduzioneConfezioneRepository.findAllByLotto(lotto);
         LOGGER.info("Retrieved {} 'produzioni-confezioni'", produzioniConfezioni.size());
         return produzioniConfezioni;
     }

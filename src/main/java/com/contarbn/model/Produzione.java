@@ -67,12 +67,6 @@ public class Produzione {
     @Column(name = "scopo")
     private String scopo;
 
-    @Column(name = "film_chiusura")
-    private String filmChiusura;
-
-    @Column(name = "lotto_film_chiusura")
-    private String lottoFilmChiusura;
-
     @Column(name = "barcode_ean_13")
     private String barcodeEan13;
 
@@ -113,8 +107,6 @@ public class Produzione {
         result.append(", quantitaTotale: ").append(quantitaTotale);
         result.append(", numeroConfezioni: ").append(numeroConfezioni);
         result.append(", scopo: ").append(scopo);
-        result.append(", filmChiusura: ").append(filmChiusura);
-        result.append(", lottoFilmChiusura: ").append(lottoFilmChiusura);
         result.append(", barcodeEan13: ").append(barcodeEan13);
         result.append(", barcodeEan128: ").append(barcodeEan128);
         result.append(", dataInserimento: ").append(dataInserimento);

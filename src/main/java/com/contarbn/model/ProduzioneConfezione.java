@@ -37,6 +37,9 @@ public class ProduzioneConfezione implements Serializable {
     @Column(name = "lotto_produzione")
     private String lottoProduzione;
 
+    @Column(name = "lotto_film_chiusura")
+    private String lottoFilmChiusura;
+
     @Column(name = "num_confezioni_prodotte")
     private Integer numConfezioniProdotte;
 
@@ -57,6 +60,7 @@ public class ProduzioneConfezione implements Serializable {
                 ", numConfezioni: " + numConfezioni +
                 ", lotto: " + lotto +
                 ", lottoProduzione: " + lottoProduzione +
+                ", lottoFilmChiusura: " + lottoFilmChiusura +
                 ", numConfezioniProdotte: " + numConfezioniProdotte +
                 ", articolo: " + articolo +
                 ", ingrediente: " + ingrediente +
