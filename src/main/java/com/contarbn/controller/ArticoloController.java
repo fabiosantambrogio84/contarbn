@@ -4,13 +4,15 @@ import com.contarbn.exception.CannotChangeResourceIdException;
 import com.contarbn.model.*;
 import com.contarbn.repository.ClienteArticoloRepository;
 import com.contarbn.service.ArticoloService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -18,11 +20,10 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
+@Slf4j
 @RestController
 @RequestMapping(path="/articoli")
 public class ArticoloController {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(ArticoloController.class);
 
     private final ArticoloService articoloService;
 
@@ -38,19 +39,17 @@ public class ArticoloController {
     @RequestMapping(method = GET)
     @CrossOrigin
     public List<Articolo> getAll(@RequestParam(name = "attivo", required = false) Boolean active,
-                                @RequestParam(name = "idFornitore", required = false) Integer idFornitore,
-                                @RequestParam(name = "barcode", required = false) String barcode,
-                                @RequestParam(name = "idCliente", required = false) Integer idCliente) {
-        LOGGER.info("Performing GET request for retrieving list of 'articoli'");
-        LOGGER.info("Query parameter: 'attivo' '{}', 'idFornitore' '{}', 'barcode' '{}', 'idCliente' '{}'", active, idFornitore, barcode, idCliente);
+                                 @RequestParam(name = "idFornitore", required = false) Integer idFornitore,
+                                 @RequestParam(name = "barcode", required = false) String barcode,
+                                 @RequestParam(name = "idCliente", required = false) Integer idCliente) {
+        log.info("Performing GET request for retrieving list of 'articoli'");
+        log.info("Query parameter: 'attivo' '{}', 'idFornitore' '{}', 'barcode' '{}', 'idCliente' '{}'", active, idFornitore, barcode, idCliente);
 
         Predicate<Articolo> isArticoloIdFornitoreEquals = articolo -> {
             if(idFornitore != null){
                 Fornitore articoloFornitore = articolo.getFornitore();
                 if(articoloFornitore != null){
-                    if(articoloFornitore.getId().equals(Long.valueOf(idFornitore))){
-                        return true;
-                    }
+                    return articoloFornitore.getId().equals(Long.valueOf(idFornitore));
                 }
                 return false;
             }
@@ -64,12 +63,12 @@ public class ArticoloController {
             if(idCliente != null){
                 Set<ClienteArticolo> clienteArticoli = clienteArticoloRepository.findByClienteId(idCliente.longValue());
                 if(clienteArticoli != null && !clienteArticoli.isEmpty()){
-                    articoli = clienteArticoli.stream().map(ca -> ca.getArticolo()).collect(Collectors.toSet());
+                    articoli = clienteArticoli.stream().map(ClienteArticolo::getArticolo).collect(Collectors.toSet());
                 } else {
-                    articoli = articoloService.getAllByAttivo(true);
+                    articoli = articoloService.getAllByAttivoOrderByCodiceAsc(true);
                 }
             } else if(active != null){
-                articoli = articoloService.getAllByAttivo(active);
+                articoli = articoloService.getAllByAttivoOrderByCodiceAsc(active);
             } else {
                 articoli = articoloService.getAll();
             }
@@ -80,22 +79,29 @@ public class ArticoloController {
     @RequestMapping(method = GET, path = "/{articoloId}")
     @CrossOrigin
     public Articolo getOne(@PathVariable final Long articoloId) {
-        LOGGER.info("Performing GET request for retrieving 'articolo' '{}'", articoloId);
+        log.info("Performing GET request for retrieving 'articolo' '{}'", articoloId);
         return articoloService.getOne(articoloId);
+    }
+
+    @RequestMapping(method = GET, path = "/codice/{codice}/like")
+    @CrossOrigin
+    public List<Articolo> getByCodiceLike(@PathVariable final String codice) {
+        log.info("Performing GET request for retrieving 'articolo' with codice like '{}'", codice);
+        return articoloService.getByCodiceLike(codice);
     }
 
     @RequestMapping(method = POST)
     @ResponseStatus(CREATED)
     @CrossOrigin
     public Articolo create(@RequestBody final Articolo articolo){
-        LOGGER.info("Performing POST request for creating 'articolo'");
+        log.info("Performing POST request for creating 'articolo'");
         return articoloService.create(articolo);
     }
 
     @RequestMapping(method = PUT, path = "/{articoloId}")
     @CrossOrigin
     public Articolo update(@PathVariable final Long articoloId, @RequestBody final Articolo articolo){
-        LOGGER.info("Performing PUT request for updating 'articolo' '{}'", articoloId);
+        log.info("Performing PUT request for updating 'articolo' '{}'", articoloId);
         if (!Objects.equals(articoloId, articolo.getId())) {
             throw new CannotChangeResourceIdException();
         }
@@ -106,21 +112,21 @@ public class ArticoloController {
     @ResponseStatus(NO_CONTENT)
     @CrossOrigin
     public void delete(@PathVariable final Long articoloId){
-        LOGGER.info("Performing DELETE request for deleting 'articolo' '{}'", articoloId);
+        log.info("Performing DELETE request for deleting 'articolo' '{}'", articoloId);
         articoloService.delete(articoloId);
     }
 
     @RequestMapping(method = GET, path = "/{articoloId}/immagini")
     @CrossOrigin
     public List<ArticoloImmagine> getArticoloImmagini(@PathVariable final Long articoloId) {
-        LOGGER.info("Performing GET request for retrieving 'articoloImmagini' of 'articolo' '{}'", articoloId);
+        log.info("Performing GET request for retrieving 'articoloImmagini' of 'articolo' '{}'", articoloId);
         return articoloService.getArticoloImmagini(articoloId);
     }
 
     @RequestMapping(method = GET, path = "/{articoloId}/listini-prezzi")
     @CrossOrigin
     public List<ListinoPrezzo> getArticoloListiniPrezzi(@PathVariable final Long articoloId) {
-        LOGGER.info("Performing GET request for retrieving 'listiniPrezzi' of 'articolo' '{}'", articoloId);
+        log.info("Performing GET request for retrieving 'listiniPrezzi' of 'articolo' '{}'", articoloId);
         return articoloService.getArticoloListiniPrezzi(articoloId);
     }
 }

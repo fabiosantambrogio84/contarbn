@@ -2,13 +2,19 @@ package com.contarbn.util;
 
 import com.contarbn.exception.BarcodeGenerationException;
 import com.contarbn.exception.BarcodeMaskParsingException;
+import com.contarbn.model.Articolo;
+import com.contarbn.model.Produzione;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.krysalis.barcode4j.ChecksumMode;
+import org.krysalis.barcode4j.HumanReadablePlacement;
 import org.krysalis.barcode4j.impl.code128.EAN128Bean;
 import org.krysalis.barcode4j.impl.upcean.EAN13Bean;
 import org.krysalis.barcode4j.output.bitmap.BitmapCanvasProvider;
 
 import java.awt.image.BufferedImage;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 
 @Slf4j
 public class BarcodeUtils {
@@ -87,6 +93,18 @@ public class BarcodeUtils {
         return dataScadenzaRegexp;
     }
 
+    public static String createBarcodeEan128(Produzione produzione){
+        String barcodeEan128 = null;
+
+        if(produzione != null && produzione.getScadenza() != null && StringUtils.isNotEmpty(produzione.getLotto()) && StringUtils.isNotEmpty(produzione.getBarcodeEan13()) && produzione.getQuantitaPredefinitaArticolo() != null){
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ddMMyyyy");
+            barcodeEan128 = produzione.getBarcodeEan13()+" "+produzione.getLotto()+" "+simpleDateFormat.format(produzione.getScadenza())+" "+produzione.getQuantitaPredefinitaArticolo();
+            barcodeEan128 = barcodeEan128.replace(".",",");
+        }
+
+        return barcodeEan128;
+    }
+
     public static BufferedImage generateEAN13BarcodeImage(String barcodeText) {
         try{
             EAN13Bean ean13Bean = new EAN13Bean();
@@ -117,6 +135,7 @@ public class BarcodeUtils {
             ean128Bean.setBarHeight(6.5d);
             ean128Bean.setModuleWidth(0.2d);
             ean128Bean.setFontSize(1.5d);
+            ean128Bean.setMsgPosition(HumanReadablePlacement.HRP_BOTTOM);
             ean128Bean.setChecksumMode(ChecksumMode.CP_ADD);
 
             ean128Bean.generateBarcode(canvas, barcodeText);
@@ -131,5 +150,6 @@ public class BarcodeUtils {
     private static BitmapCanvasProvider getBitmapCanvasProvider(int resolution){
         return new BitmapCanvasProvider(resolution, BufferedImage.TYPE_BYTE_GRAY, false, 0);
     }
+
 
 }

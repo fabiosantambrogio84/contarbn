@@ -9,6 +9,7 @@ import com.contarbn.repository.ProduzioneRepository;
 import com.contarbn.repository.RicettaRepository;
 import com.contarbn.repository.views.VProduzioneEtichettaRepository;
 import com.contarbn.repository.views.VProduzioneRepository;
+import com.contarbn.util.BarcodeUtils;
 import com.contarbn.util.Constants;
 import com.contarbn.util.LottoUtils;
 import com.contarbn.util.Utils;
@@ -139,10 +140,10 @@ public class ProduzioneService {
             createdProduzione.setLotto(lotto);
         }
         final String createdLotto = createdProduzione.getLotto();
-        final Double quantitaTotale = createdProduzione.getProduzioneIngredienti().stream().mapToDouble(ProduzioneIngrediente::getQuantita).sum();
+        final double quantitaTotale = createdProduzione.getProduzioneIngredienti().stream().mapToDouble(ProduzioneIngrediente::getQuantita).sum();
 
         createdProduzione.getProduzioneIngredienti().stream().forEach(pi -> {
-            pi.setPercentuale(Utils.computePercentuale(pi.getQuantita(), quantitaTotale.floatValue()));
+            pi.setPercentuale(Utils.computePercentuale(pi.getQuantita(), (float) quantitaTotale));
             pi.getId().setProduzioneId(produzioneId);
             pi.getId().setUuid(UUID.randomUUID().toString());
 
@@ -187,7 +188,13 @@ public class ProduzioneService {
         Integer numeroConfezioni = createdProduzione.getProduzioneConfezioni().stream().mapToInt(ProduzioneConfezione::getNumConfezioni).sum();
 
         createdProduzione.setNumeroConfezioni(numeroConfezioni);
-        createdProduzione = produzioneRepository.save(produzione);
+
+        String barcodeEan128 = BarcodeUtils.createBarcodeEan128(createdProduzione);
+        if(StringUtils.isNotEmpty(barcodeEan128)){
+            createdProduzione.setBarcodeEan128(barcodeEan128);
+        }
+
+        createdProduzione = produzioneRepository.save(createdProduzione);
 
         log.info("Created 'produzione' '{}'", createdProduzione);
         return createdProduzione;

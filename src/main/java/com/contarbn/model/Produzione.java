@@ -87,6 +87,12 @@ public class Produzione {
     @JsonIgnoreProperties("produzione")
     private Set<ProduzioneConfezione> produzioneConfezioni = new HashSet<>();
 
+    @Transient
+    private Integer idArticolo;
+
+    @Transient
+    private Float quantitaPredefinitaArticolo;
+
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
@@ -111,6 +117,8 @@ public class Produzione {
         result.append(", barcodeEan128: ").append(barcodeEan128);
         result.append(", dataInserimento: ").append(dataInserimento);
         result.append(", dataAggiornamento: ").append(dataAggiornamento);
+        result.append(", idArticolo: ").append(idArticolo);
+        result.append(", quantitaPredefinitaArticolo: ").append(quantitaPredefinitaArticolo);
         result.append(", ingredienti: [");
         for(ProduzioneIngrediente produzioneIngrediente: produzioneIngredienti){
             result.append("{");
