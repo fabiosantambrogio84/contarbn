@@ -43,6 +43,9 @@ public class VProduzioneConfezione {
     @Column(name = "lotto_confezione")
     private String lottoConfezione;
 
+    @Column(name = "lotto_confezione_2")
+    private String lottoConfezione2;
+
     @Column(name = "lotto_film_chiusura")
     private String lottoFilmChiusura;
 
@@ -92,6 +95,7 @@ public class VProduzioneConfezione {
                 ", numConfezioni: " + numConfezioni +
                 ", numConfezioniProdotte: " + numConfezioniProdotte +
                 ", lottoConfezione: " + lottoConfezione +
+                ", lottoConfezione2: " + lottoConfezione2 +
                 ", tipoConfezione: " + tipoConfezione +
                 ", lottoProduzione: " + lottoProduzione +
                 ", lottoFilmChiusura: " + lottoFilmChiusura +

@@ -12,7 +12,7 @@ public interface VProduzioneConfezioneRepository extends CrudRepository<VProduzi
     Set<VProduzioneConfezione> findAll();
 
     @Query(nativeQuery = true,
-            value = "select * from v_produzione_confezione vpf where vpf.lotto_confezione = ?1 or vpf.lotto_film_chiusura = ?1"
+            value = "select * from v_produzione_confezione vpf where vpf.lotto_confezione = ?1 or vpf.lotto_confezione_2 = ?1 or vpf.lotto_film_chiusura = ?1"
     )
     Set<VProduzioneConfezione> findAllByLotto(String lotto);
 
