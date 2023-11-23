@@ -119,8 +119,8 @@ public class EtichettaService {
                 "<br/>Lotto: " +
                 lotto +
                 "<br/>Peso: " +
-                peso +
-                "g";
+                String.valueOf(peso).replace('.',',') +
+                "Kg";
     }
 
     private String createBarcodeImgSrc(MultipartFile file, int widthPixels, int heightPixels) throws Exception{

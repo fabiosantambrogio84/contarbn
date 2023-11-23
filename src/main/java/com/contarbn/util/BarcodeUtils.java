@@ -2,18 +2,16 @@ package com.contarbn.util;
 
 import com.contarbn.exception.BarcodeGenerationException;
 import com.contarbn.exception.BarcodeMaskParsingException;
-import com.contarbn.model.Articolo;
 import com.contarbn.model.Produzione;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.krysalis.barcode4j.ChecksumMode;
 import org.krysalis.barcode4j.HumanReadablePlacement;
-import org.krysalis.barcode4j.impl.code128.EAN128Bean;
+import org.krysalis.barcode4j.impl.code128.Code128Bean;
 import org.krysalis.barcode4j.impl.upcean.EAN13Bean;
 import org.krysalis.barcode4j.output.bitmap.BitmapCanvasProvider;
 
 import java.awt.image.BufferedImage;
-import java.sql.Date;
 import java.text.SimpleDateFormat;
 
 @Slf4j
@@ -98,7 +96,10 @@ public class BarcodeUtils {
 
         if(produzione != null && produzione.getScadenza() != null && StringUtils.isNotEmpty(produzione.getLotto()) && StringUtils.isNotEmpty(produzione.getBarcodeEan13()) && produzione.getQuantitaPredefinitaArticolo() != null){
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ddMMyyyy");
-            barcodeEan128 = produzione.getBarcodeEan13()+" "+produzione.getLotto()+" "+simpleDateFormat.format(produzione.getScadenza())+" "+produzione.getQuantitaPredefinitaArticolo();
+            barcodeEan128 = " "+produzione.getBarcodeEan13()
+                    +" "+produzione.getLotto()
+                    +" "+simpleDateFormat.format(produzione.getScadenza())
+                    +" "+produzione.getQuantitaPredefinitaArticolo();
             barcodeEan128 = barcodeEan128.replace(".",",");
         }
 
@@ -125,7 +126,8 @@ public class BarcodeUtils {
         }
     }
 
-    public static BufferedImage generateEAN128BarcodeImage(String barcodeText) {
+    /*
+    public static BufferedImage generateGS1128BarcodeImage(String barcodeText) {
 
         try{
             EAN128Bean ean128Bean = new EAN128Bean();
@@ -146,10 +148,33 @@ public class BarcodeUtils {
             throw new BarcodeGenerationException("Errore nella generazione del barcode EAN128");
         }
     }
+    */
+
+    public static BufferedImage generateEAN128BarcodeImage(String barcodeText) {
+
+        try{
+            Code128Bean code128Bean = new Code128Bean();
+
+            BitmapCanvasProvider canvas = getBitmapCanvasProvider(150);
+
+            code128Bean.setHeight(13.5d);
+            code128Bean.setBarHeight(6.35d);
+            //code128Bean.setModuleWidth(0.075d);
+            code128Bean.setModuleWidth(0.1d);
+            //code128Bean.setFontSize(1.498d);
+            code128Bean.setFontSize(1.5d);
+            code128Bean.setMsgPosition(HumanReadablePlacement.HRP_BOTTOM);
+
+            code128Bean.generateBarcode(canvas, barcodeText);
+
+            return canvas.getBufferedImage();
+        } catch(Exception e){
+            log.error("Errore nella generazione del barcode EAN128", e);
+            throw new BarcodeGenerationException("Errore nella generazione del barcode EAN128");
+        }
+    }
 
     private static BitmapCanvasProvider getBitmapCanvasProvider(int resolution){
         return new BitmapCanvasProvider(resolution, BufferedImage.TYPE_BYTE_GRAY, false, 0);
     }
-
-
 }
