@@ -2,6 +2,7 @@ package com.contarbn.util;
 
 import com.contarbn.exception.BarcodeGenerationException;
 import com.contarbn.exception.BarcodeMaskParsingException;
+import com.contarbn.model.Articolo;
 import com.contarbn.model.Produzione;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -94,12 +95,12 @@ public class BarcodeUtils {
     public static String createBarcodeEan128(Produzione produzione){
         String barcodeEan128 = null;
 
-        if(produzione != null && produzione.getScadenza() != null && StringUtils.isNotEmpty(produzione.getLotto()) && StringUtils.isNotEmpty(produzione.getBarcodeEan13()) && produzione.getQuantitaPredefinitaArticolo() != null){
+        if(produzione != null && produzione.getScadenza() != null && StringUtils.isNotEmpty(produzione.getLotto()) && StringUtils.isNotEmpty(produzione.getBarcodeEan13()) && produzione.getArticolo().getQuantitaPredefinita() != null){
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ddMMyyyy");
             barcodeEan128 = " "+produzione.getBarcodeEan13()
                     +" "+produzione.getLotto()
                     +" "+simpleDateFormat.format(produzione.getScadenza())
-                    +" "+produzione.getQuantitaPredefinitaArticolo();
+                    +" "+produzione.getArticolo().getQuantitaPredefinita();
             barcodeEan128 = barcodeEan128.replace(".",",");
         }
 

@@ -37,6 +37,10 @@ public class Produzione {
     @JoinColumn(name="id_categoria")
     private CategoriaRicetta categoria;
 
+    @ManyToOne
+    @JoinColumn(name="id_articolo")
+    private Articolo articolo;
+
     @Column(name = "lotto")
     private String lotto;
 
@@ -87,12 +91,6 @@ public class Produzione {
     @JsonIgnoreProperties("produzione")
     private Set<ProduzioneConfezione> produzioneConfezioni = new HashSet<>();
 
-    @Transient
-    private Integer idArticolo;
-
-    @Transient
-    private Float quantitaPredefinitaArticolo;
-
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
@@ -104,6 +102,7 @@ public class Produzione {
         result.append(", tipologia: ").append(tipologia);
         result.append(", ricetta: ").append(ricetta);
         result.append(", categoria: ").append(categoria);
+        result.append(", articolo: ").append(articolo);
         result.append(", lotto: ").append(lotto);
         result.append(", lottoAnno: ").append(lottoAnno);
         result.append(", lottoGiorno: ").append(lottoGiorno);
@@ -117,8 +116,6 @@ public class Produzione {
         result.append(", barcodeEan128: ").append(barcodeEan128);
         result.append(", dataInserimento: ").append(dataInserimento);
         result.append(", dataAggiornamento: ").append(dataAggiornamento);
-        result.append(", idArticolo: ").append(idArticolo);
-        result.append(", quantitaPredefinitaArticolo: ").append(quantitaPredefinitaArticolo);
         result.append(", ingredienti: [");
         for(ProduzioneIngrediente produzioneIngrediente: produzioneIngredienti){
             result.append("{");

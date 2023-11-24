@@ -1,5 +1,6 @@
 package com.contarbn;
 
+import com.contarbn.model.Articolo;
 import com.contarbn.model.Produzione;
 import com.contarbn.util.BarcodeUtils;
 
@@ -39,11 +40,14 @@ public class BarcodeTest {
     public static void main(String[] args) throws Exception{
         String barcodeEan13 = "2200067020005";
 
+        Articolo articolo = new Articolo();
+        articolo.setQuantitaPredefinita(2.123f);
+
         Produzione produzione = new Produzione();
         produzione.setBarcodeEan13(barcodeEan13);
         produzione.setLotto("232153");
         produzione.setScadenza(Date.valueOf("2023-11-27"));
-        produzione.setQuantitaPredefinitaArticolo(2.123f);
+        produzione.setArticolo(articolo);
 
         BarcodeTest barcodeTest = new BarcodeTest();
 
