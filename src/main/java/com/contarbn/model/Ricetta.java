@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@EqualsAndHashCode(exclude = {"ricettaIngredienti", "produzioni"})
+@EqualsAndHashCode(exclude = {"ricettaIngredienti", "produzioni", "ricettaAllergeni"})
 @Entity
 @Table(name = "ricetta")
 public class Ricetta {
@@ -65,6 +65,10 @@ public class Ricetta {
     @OneToMany(mappedBy = "ricetta")
     @JsonIgnoreProperties("ricetta")
     private Set<RicettaIngrediente> ricettaIngredienti = new HashSet<>();
+
+    @OneToMany(mappedBy = "ricetta")
+    @JsonIgnoreProperties("ricetta")
+    private Set<RicettaAllergene> ricettaAllergeni = new HashSet<>();
 
     @OneToMany(mappedBy = "ricetta")
     @JsonIgnore
@@ -196,6 +200,14 @@ public class Ricetta {
         this.ricettaIngredienti = ricettaIngredienti;
     }
 
+    public Set<RicettaAllergene> getRicettaAllergeni() {
+        return ricettaAllergeni;
+    }
+
+    public void setRicettaAllergeni(Set<RicettaAllergene> ricettaAllergeni) {
+        this.ricettaAllergeni = ricettaAllergeni;
+    }
+
     public List<Produzione> getProduzioni() {
         return produzioni;
     }
@@ -231,6 +243,12 @@ public class Ricetta {
             result.append("}");
         }
         result.append("]");
+        result.append(", allergeni: [");
+        for(RicettaAllergene ricettaAllergene: ricettaAllergeni){
+            result.append("{");
+            result.append(ricettaAllergene.toString());
+            result.append("}");
+        }
         result.append("}");
 
         return result.toString();

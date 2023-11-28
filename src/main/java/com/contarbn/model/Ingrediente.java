@@ -1,6 +1,7 @@
 package com.contarbn.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
@@ -9,7 +10,7 @@ import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
 
-@EqualsAndHashCode(exclude = "ricettaIngredienti")
+@EqualsAndHashCode(exclude = {"ricettaIngredienti", "ingredienteAllergeni"})
 @Entity
 @Table(name = "ingrediente")
 public class Ingrediente {
@@ -51,6 +52,10 @@ public class Ingrediente {
     @OneToMany(mappedBy = "ingrediente")
     @JsonIgnore
     Set<RicettaIngrediente> ricettaIngredienti = new HashSet<>();
+
+    @OneToMany(mappedBy = "ingrediente")
+    @JsonIgnoreProperties("ingrediente")
+    private Set<IngredienteAllergene> ingredienteAllergeni = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -138,6 +143,14 @@ public class Ingrediente {
 
     public void setRicettaIngredienti(Set<RicettaIngrediente> ricettaIngredienti) {
         this.ricettaIngredienti = ricettaIngredienti;
+    }
+
+    public Set<IngredienteAllergene> getIngredienteAllergeni() {
+        return ingredienteAllergeni;
+    }
+
+    public void setIngredienteAllergeni(Set<IngredienteAllergene> ingredienteAllergeni) {
+        this.ingredienteAllergeni = ingredienteAllergeni;
     }
 
     @Override

@@ -2,91 +2,102 @@ package com.contarbn.service;
 
 import com.contarbn.exception.ResourceNotFoundException;
 import com.contarbn.model.Ingrediente;
+import com.contarbn.model.IngredienteAllergene;
 import com.contarbn.repository.GiacenzaIngredienteRepository;
 import com.contarbn.repository.IngredienteRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+@Slf4j
 @Service
 public class IngredienteService {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(IngredienteService.class);
-
     private final IngredienteRepository ingredienteRepository;
     private final GiacenzaIngredienteRepository giacenzaIngredienteRepository;
+    private final IngredienteAllergeneService ingredienteAllergeneService;
 
-    @Autowired
     public IngredienteService(final IngredienteRepository ingredienteRepository,
-                              final GiacenzaIngredienteRepository giacenzaIngredienteRepository){
+                              final GiacenzaIngredienteRepository giacenzaIngredienteRepository,
+                              final IngredienteAllergeneService ingredienteAllergeneService){
         this.ingredienteRepository = ingredienteRepository;
         this.giacenzaIngredienteRepository = giacenzaIngredienteRepository;
+        this.ingredienteAllergeneService = ingredienteAllergeneService;
     }
 
     public Set<Ingrediente> getAll(){
-        LOGGER.info("Retrieving the list of 'ingredienti'");
+        log.info("Retrieving the list of 'ingredienti'");
         Set<Ingrediente> ingredienti = ingredienteRepository.findAll();
-        LOGGER.info("Retrieved {} 'ingredienti'", ingredienti.size());
+        log.info("Retrieved {} 'ingredienti'", ingredienti.size());
         return ingredienti;
     }
 
     public Ingrediente getOne(Long ingredienteId){
-        LOGGER.info("Retrieving 'ingrediente' '{}'", ingredienteId);
+        log.info("Retrieving 'ingrediente' '{}'", ingredienteId);
         Ingrediente ingrediente = ingredienteRepository.findById(ingredienteId).orElseThrow(ResourceNotFoundException::new);
-        LOGGER.info("Retrieved 'ingrediente' '{}'", ingrediente);
+        log.info("Retrieved 'ingrediente' '{}'", ingrediente);
         return ingrediente;
     }
 
     public Optional<Ingrediente> getByCodice(String codice){
-        LOGGER.info("Retrieving 'ingrediente' with codice '{}'", codice);
+        log.info("Retrieving 'ingrediente' with codice '{}'", codice);
         Optional<Ingrediente> ingrediente = ingredienteRepository.findByCodice(codice);
         if(ingrediente.isPresent()){
-            LOGGER.info("Retrieved 'ingrediente' '{}'", ingrediente.get());
+            log.info("Retrieved 'ingrediente' '{}'", ingrediente.get());
         } else {
-            LOGGER.info("'ingrediente' with codice '{}' not existing", codice);
+            log.info("'ingrediente' with codice '{}' not existing", codice);
         }
         return ingrediente;
     }
 
+    @Transactional
     public Ingrediente create(Ingrediente ingrediente){
-        LOGGER.info("Creating 'ingrediente'");
+        log.info("Creating 'ingrediente'");
         ingrediente.setDataInserimento(Timestamp.from(ZonedDateTime.now().toInstant()));
         Ingrediente createdIngrediente = ingredienteRepository.save(ingrediente);
-        LOGGER.info("Created 'ingrediente' '{}'", createdIngrediente);
+        createdIngrediente.getIngredienteAllergeni().forEach(ia -> {
+            ia.getId().setIngredienteId(createdIngrediente.getId());
+            ingredienteAllergeneService.create(ia);
+        });
+        log.info("Created 'ingrediente' '{}'", createdIngrediente);
         return createdIngrediente;
     }
 
+    @Transactional
     public Ingrediente update(Ingrediente ingrediente){
-        LOGGER.info("Updating 'ingrediente'");
+        log.info("Updating 'ingrediente'");
+        Set<IngredienteAllergene> ingredienteAllergeni = ingrediente.getIngredienteAllergeni();
+        ingrediente.setIngredienteAllergeni(new HashSet<>());
+        ingredienteAllergeneService.deleteByIngredienteId(ingrediente.getId());
+
         Ingrediente ingredienteCurrent = ingredienteRepository.findById(ingrediente.getId()).orElseThrow(ResourceNotFoundException::new);
         ingrediente.setDataInserimento(ingredienteCurrent.getDataInserimento());
-
         Ingrediente updatedIngrediente = ingredienteRepository.save(ingrediente);
-        LOGGER.info("Updated 'ingrediente' '{}'", updatedIngrediente);
+
+        ingredienteAllergeni.forEach(ia -> {
+            ia.getId().setIngredienteId(updatedIngrediente.getId());
+            ingredienteAllergeneService.create(ia);
+        });
+
+        log.info("Updated 'ingrediente' '{}'", updatedIngrediente);
         return updatedIngrediente;
     }
 
-    /*public void emptyAllByFornitoreId(Long idFornitore){
-        List<Ingrediente> ingredienti = ingredienteRepository.findByFornitoreId(idFornitore);
-        for(Ingrediente ingrediente : ingredienti){
-            ingrediente.setFornitore(null);
-            update(ingrediente);
-        }
-    }*/
-
+    @Transactional
     public void delete(Long ingredienteId){
-        LOGGER.info("Deleting 'giacenze' for 'ingrediente' '{}'", ingredienteId);
+        log.info("Deleting 'giacenze' for 'ingrediente' '{}'", ingredienteId);
         giacenzaIngredienteRepository.deleteByIngredienteId(ingredienteId);
-        LOGGER.info("Deleted 'giacenze' for 'ingrediente' '{}'", ingredienteId);
+        log.info("Deleted 'giacenze' for 'ingrediente' '{}'", ingredienteId);
 
-        LOGGER.info("Deleting 'ingrediente' '{}'", ingredienteId);
+        log.info("Deleting 'ingrediente' '{}'", ingredienteId);
+        ingredienteAllergeneService.deleteByIngredienteId(ingredienteId);
         ingredienteRepository.deleteById(ingredienteId);
-        LOGGER.info("Deleted 'ingrediente' '{}'", ingredienteId);
+        log.info("Deleted 'ingrediente' '{}'", ingredienteId);
     }
 }

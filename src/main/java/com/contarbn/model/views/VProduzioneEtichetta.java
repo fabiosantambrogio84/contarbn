@@ -31,6 +31,9 @@ public class VProduzioneEtichetta {
     @Column(name = "ingredienti")
     private String ingredienti;
 
+    @Column(name = "ingredienti_2")
+    private String ingredienti2;
+
     @Column(name = "valori_nutrizionali")
     private String valoriNutrizionali;
 
@@ -52,6 +55,7 @@ public class VProduzioneEtichetta {
                 ", scadenza: " + scadenza +
                 ", articolo: " + articolo +
                 ", ingredienti: " + ingredienti +
+                ", ingredienti2: " + ingredienti2 +
                 ", valoriNutrizionali: " + valoriNutrizionali +
                 ", conservazione: " + conservazione +
                 ", barcodeEan13: " + barcodeEan13 +
