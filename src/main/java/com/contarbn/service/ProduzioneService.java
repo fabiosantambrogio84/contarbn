@@ -123,11 +123,12 @@ public class ProduzioneService {
         Long idRicetta = createdProduzione.getRicetta().getId();
 
         if(produzione.getScopo().equalsIgnoreCase("vendita")){
-            LocalDate today = LocalDate.now();
-            Integer anno = today.getYear();
+            LocalDate localDate = dataProduzione != null ? dataProduzione.toLocalDate() : LocalDate.now();
+            Integer anno = localDate.getYear();
+
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("uu");
-            String yearTwoDigits = dateTimeFormatter.format(today);
-            Integer giorno = today.getDayOfYear();
+            String yearTwoDigits = dateTimeFormatter.format(localDate);
+            Integer giorno = localDate.getDayOfYear();
             Integer codice = produzioneRepository.findNextCodiceByLottoAnno(anno).orElse(1);
             String lotto = LottoUtils.createLottoProduzione(yearTwoDigits, codice);
 

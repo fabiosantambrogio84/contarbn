@@ -8,8 +8,7 @@ import com.contarbn.model.views.VDdt;
 import com.contarbn.service.DdtService;
 import com.contarbn.util.ResponseUtils;
 import com.contarbn.util.Utils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,12 +22,11 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
+@Slf4j
 @SuppressWarnings({"unused"})
 @RestController
 @RequestMapping(path="/ddts")
 public class DdtController {
-
-    private final static Logger LOGGER = LoggerFactory.getLogger(DdtController.class);
 
     private final DdtService ddtService;
 
@@ -40,7 +38,7 @@ public class DdtController {
     @RequestMapping(method = GET)
     @CrossOrigin
     public Set<Ddt> getAll() {
-        LOGGER.info("Performing GET request for retrieving list of 'ddts'");
+        log.info("Performing GET request for retrieving list of 'ddts'");
 
         return ddtService.getAll();
     }
@@ -48,8 +46,8 @@ public class DdtController {
     @RequestMapping(method = GET, path = "/search-lotto")
     @CrossOrigin
     public Set<DdtRicercaLotto> getAllByLotto(@RequestParam(name = "lotto") String lotto) {
-        LOGGER.info("Performing GET request for retrieving list of 'ddts'");
-        LOGGER.info("Request params: lotto {}", lotto);
+        log.info("Performing GET request for retrieving list of 'ddts'");
+        log.info("Request params: lotto {}", lotto);
 
         return ddtService.getAllByLotto(lotto);
     }
@@ -73,8 +71,8 @@ public class DdtController {
                              @RequestParam(name = "idCliente", required = false) Integer idCliente,
                              @RequestParam(name = "fatturato", required = false) Boolean fatturato,
                              @RequestParam Map<String,String> allRequestParams) {
-        LOGGER.info("Performing GET request for searching list of 'ddts'");
-        LOGGER.info("Request params: draw {}, start {}, length {}, dataDa {}, dataA {}, progressivo {}, importo {}, tipoPagamento {}, cliente {}, agente {}, autista {}, articolo {}, stato {}, pagato {}, idCliente {}, fatturato {}",
+        log.info("Performing GET request for searching list of 'ddts'");
+        log.info("Request params: draw {}, start {}, length {}, dataDa {}, dataA {}, progressivo {}, importo {}, tipoPagamento {}, cliente {}, agente {}, autista {}, articolo {}, stato {}, pagato {}, idCliente {}, fatturato {}",
                 draw, start, length, dataDa, dataA, progressivo, importo, idTipoPagamento, cliente, idAgente, idAutista, idArticolo, idStato, pagato, idCliente, fatturato);
 
         List<VDdt> data = ddtService.getAllByFilters(draw, start, length, Utils.getSortOrders(allRequestParams), dataDa, dataA, progressivo, idCliente, cliente, idAgente, idAutista, idStato, pagato, fatturato, importo, idTipoPagamento, idArticolo);
@@ -86,21 +84,21 @@ public class DdtController {
     @RequestMapping(method = GET, path = "/{ddtId}")
     @CrossOrigin
     public Ddt getOne(@PathVariable final Long ddtId) {
-        LOGGER.info("Performing GET request for retrieving 'ddt' '{}'", ddtId);
+        log.info("Performing GET request for retrieving 'ddt' '{}'", ddtId);
         return ddtService.getOne(ddtId);
     }
 
     @RequestMapping(method = GET, path = "/progressivo")
     @CrossOrigin
     public Map<String, Integer> getAnnoContabileAndProgressivo() {
-        LOGGER.info("Performing GET request for retrieving 'annoContabile' and 'progressivo' for a new ddt");
+        log.info("Performing GET request for retrieving 'annoContabile' and 'progressivo' for a new ddt");
         return ddtService.getAnnoContabileAndProgressivo();
     }
 
     @RequestMapping(method = GET, path = "/progressivi-duplicates")
     @CrossOrigin
     public Map<String, String> getProgressiviDuplicates() {
-        LOGGER.info("Performing GET request for retrieving list of 'ddt.progressivo' duplicates");
+        log.info("Performing GET request for retrieving list of 'ddt.progressivo' duplicates");
         return ddtService.getProgressiviDuplicates();
     }
 
@@ -108,14 +106,14 @@ public class DdtController {
     @ResponseStatus(CREATED)
     @CrossOrigin
     public Ddt create(@RequestBody final Ddt ddt){
-        LOGGER.info("Performing POST request for creating 'ddt'");
+        log.info("Performing POST request for creating 'ddt'");
         return ddtService.create(ddt);
     }
 
     @RequestMapping(method = PUT, path = "/{ddtId}")
     @CrossOrigin
     public Ddt update(@PathVariable final Long ddtId, @RequestBody final Ddt ddt){
-        LOGGER.info("Performing PUT request for updating 'ddt' '{}'", ddtId);
+        log.info("Performing PUT request for updating 'ddt' '{}'", ddtId);
         if (!Objects.equals(ddtId, ddt.getId())) {
             throw new CannotChangeResourceIdException();
         }
@@ -125,7 +123,7 @@ public class DdtController {
     @RequestMapping(method = PATCH, path = "/{ddtId}")
     @CrossOrigin
     public Ddt patch(@PathVariable final Long ddtId, @RequestBody final Map<String,Object> patchDdt){
-        LOGGER.info("Performing PATCH request for updating 'ddt' '{}'", ddtId);
+        log.info("Performing PATCH request for updating 'ddt' '{}'", ddtId);
         Long id = Long.valueOf((Integer) patchDdt.get("id"));
         if (!Objects.equals(ddtId, id)) {
             throw new CannotChangeResourceIdException();
@@ -138,8 +136,8 @@ public class DdtController {
     @CrossOrigin
     public void delete(@PathVariable final Long ddtId,
                        @RequestParam(name = "modificaGiacenze", required = false) Boolean modificaGiacenze){
-        LOGGER.info("Performing DELETE request for deleting 'ddt' '{}'", ddtId);
-        LOGGER.info("Request params: modificaGiacenze={}", modificaGiacenze);
+        log.info("Performing DELETE request for deleting 'ddt' '{}'", ddtId);
+        log.info("Request params: modificaGiacenze={}", modificaGiacenze);
         ddtService.delete(ddtId, (modificaGiacenze != null ? modificaGiacenze : Boolean.FALSE));
     }
 
