@@ -4,8 +4,7 @@ import com.contarbn.exception.CannotChangeResourceIdException;
 import com.contarbn.model.Fornitore;
 import com.contarbn.model.Ingrediente;
 import com.contarbn.service.IngredienteService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,11 +19,10 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
+@Slf4j
 @RestController
 @RequestMapping(path="/ingredienti")
 public class IngredienteController {
-
-    private final static Logger LOGGER = LoggerFactory.getLogger(IngredienteController.class);
 
     private final IngredienteService ingredienteService;
 
@@ -37,8 +35,8 @@ public class IngredienteController {
     @CrossOrigin
     public List<Ingrediente> getAll(@RequestParam(name = "attivo", required = false) Boolean active,
                                     @RequestParam(name = "idFornitore", required = false) Integer idFornitore) {
-        LOGGER.info("Performing GET request for retrieving list of 'ingredienti'");
-        LOGGER.info("Query parameter: 'attivo' '{}', 'idFornitore' '{}'", active, idFornitore);
+        log.info("Performing GET request for retrieving list of 'ingredienti'");
+        log.info("Query parameter: 'attivo' '{}', 'idFornitore' '{}'", active, idFornitore);
 
         Predicate<Ingrediente> isIngredienteActiveEquals = ingrediente -> {
             if(active != null){
@@ -67,7 +65,7 @@ public class IngredienteController {
     @RequestMapping(method = GET, path = "/{ingredienteId}")
     @CrossOrigin
     public Ingrediente getOne(@PathVariable final Long ingredienteId) {
-        LOGGER.info("Performing GET request for retrieving 'ingrediente' '{}'", ingredienteId);
+        log.info("Performing GET request for retrieving 'ingrediente' '{}'", ingredienteId);
         return ingredienteService.getOne(ingredienteId);
     }
 
@@ -75,14 +73,14 @@ public class IngredienteController {
     @ResponseStatus(CREATED)
     @CrossOrigin
     public Ingrediente create(@RequestBody final Ingrediente ingrediente){
-        LOGGER.info("Performing POST request for creating 'ingrediente'");
+        log.info("Performing POST request for creating 'ingrediente'");
         return ingredienteService.create(ingrediente);
     }
 
     @RequestMapping(method = PUT, path = "/{ingredienteId}")
     @CrossOrigin
     public Ingrediente update(@PathVariable final Long ingredienteId, @RequestBody final Ingrediente ingrediente){
-        LOGGER.info("Performing PUT request for updating 'ingrediente' '{}'", ingredienteId);
+        log.info("Performing PUT request for updating 'ingrediente' '{}'", ingredienteId);
         if (!Objects.equals(ingredienteId, ingrediente.getId())) {
             throw new CannotChangeResourceIdException();
         }
@@ -93,7 +91,7 @@ public class IngredienteController {
     @ResponseStatus(NO_CONTENT)
     @CrossOrigin
     public void delete(@PathVariable final Long ingredienteId){
-        LOGGER.info("Performing DELETE request for deleting 'ingrediente' '{}'", ingredienteId);
+        log.info("Performing DELETE request for deleting 'ingrediente' '{}'", ingredienteId);
         ingredienteService.delete(ingredienteId);
     }
 }

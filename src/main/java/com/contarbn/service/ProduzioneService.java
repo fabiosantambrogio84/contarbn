@@ -91,7 +91,7 @@ public class ProduzioneService {
     public Integer getCountByFilters(Integer codice, String ricetta, String barcodeEan13, String barcodeEan128){
         log.info("Retrieving the count of 'produzioni' filtered by request parameters");
         Integer count = vProduzioneRepository.countByFilters(codice, ricetta, barcodeEan13, barcodeEan128);
-        log.info("Retrieved {} 'ddts'", count);
+        log.info("Retrieved {} 'produzioni'", count);
         return count;
     }
 

@@ -2,7 +2,7 @@ package com.contarbn.util;
 
 import com.contarbn.model.beans.SortOrder;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.CharSet;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -10,15 +10,21 @@ import java.io.File;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 @Slf4j
 public class Utils {
+
+    public static List<Integer> getActiveValues(Boolean active){
+        List<Integer> activeValues;
+        if(active != null){
+            activeValues = Collections.singletonList(BooleanUtils.toInteger(active));
+        } else {
+            activeValues = Constants.ACTIVE_VALUES;
+        }
+        return activeValues;
+    }
 
     public static boolean stringContainsOnlyCertainCharacters(String input){
         for (int i = 0; i < input.length(); i++) {

@@ -5,6 +5,8 @@ import java.util.List;
 
 public interface Constants {
 
+    List<Integer> ACTIVE_VALUES = Arrays.asList(0,1);
+
     List<Character> BARCODE_ALLOWED_CHARS = Arrays.asList('L', 'A', 'M', 'G', 'X');
     String BARCODE_REGEXP = "^.{start}(.{length})";
 
@@ -30,9 +32,11 @@ public interface Constants {
     String HTTP_HEADER_CACHE_CONTROL_VALUE = "no-cache, no-store, must-revalidate";
 
     String JASPER_PARAMETER_DDT_NOTA = "Assolve obblighi art.62,comm 1, del D.L. 24.01.12, n.1, convertito, con modificazioni, dalla legge 24.03.12, n.27. Contributo CONAI assolto dove dovuto";
+    String JASPER_PARAMETER_DISPOSIZIONI_COMUNE_NOTA = "Verifica le disposizioni del tuo comune.";
     String JASPER_PARAMETER_FATTURA_NOTA = "Assolve obblighi art.62,comm 1, del D.L. 24.01.12, n.1, convertito, con modificazioni, dalla legge 24.03.12, n.27. Contributo CONAI assolto dove dovuto";
     String JASPER_PARAMETER_FATTURA_ACCOMPAGNATORIA_NOTA = "Assolve obblighi art.62,comm 1, del D.L. 24.01.12, n.1, convertito, con modificazioni, dalla legge 24.03.12, n.27. Contributo CONAI assolto dove dovuto";
     String JASPER_PARAMETER_RICEVUTA_PRIVATO_NOTA = "Assolve obblighi art.62,comm 1, del D.L. 24.01.12, n.1, convertito, con modificazioni, dalla legge 24.03.12, n.27. Contributo CONAI assolto dove dovuto";
+    String JASPER_PARAMETER_SCHEDA_TECNICA_NOTA = "Il presente documento è di proprietà della ditta URBANI ALIMENTARI SNC e non può essere riprodotto o divulgato a terzi senza autorizzazione scritta dall'azienda produttrice. Il presente documento può subire modifiche o aggiornamenti, è pertanto compito degli utenti dello stesso, accertarsi di essere in possesso di una copia aggiornata.";
     String JASPER_REPORT_GIACENZE_INGREDIENTI = "/jasper_reports/giacenze_ingredienti.jasper";
     String JASPER_REPORT_DDTS = "/jasper_reports/ddts.jasper";
     String JASPER_REPORT_DDT = "/jasper_reports/ddt.jasper";
@@ -53,6 +57,7 @@ public interface Constants {
     String JASPER_REPORT_FATTURE_COMMERCIANTI = "/jasper_reports/fatture_commercianti.jasper";
     String JASPER_REPORT_ORDINE_FORNITORE = "/jasper_reports/ordine_fornitore.jasper";
     String JASPER_REPORT_LISTINO = "/jasper_reports/listino.jasper";
+    String JASPER_REPORT_SCHEDA_TECNICA = "/jasper_reports/scheda_tecnica.jasper";
     String JASPER_REPORT_LOGO_IMAGE_PATH = "/jasper_reports/logo.png";
     String JASPER_REPORT_BOLLINO_IMAGE_PATH = "/jasper_reports/bollino.png";
     String JASPER_REPORT_HEADER_SUBREPORT_PATH = "/jasper_reports/header.jasper";

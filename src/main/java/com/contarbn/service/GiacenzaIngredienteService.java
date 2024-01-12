@@ -4,13 +4,14 @@ import com.contarbn.exception.ResourceNotFoundException;
 import com.contarbn.model.GiacenzaIngrediente;
 import com.contarbn.model.Ingrediente;
 import com.contarbn.model.Movimentazione;
+import com.contarbn.model.beans.SortOrder;
+import com.contarbn.model.views.VGiacenzaArticolo;
 import com.contarbn.model.views.VGiacenzaIngrediente;
 import com.contarbn.repository.GiacenzaIngredienteRepository;
 import com.contarbn.repository.views.VGiacenzaIngredienteRepository;
 import com.contarbn.util.enumeration.Resource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -19,44 +20,47 @@ import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.*;
 
+@Slf4j
+@RequiredArgsConstructor
 @Service
 public class GiacenzaIngredienteService {
-
-    private final static Logger LOGGER = LoggerFactory.getLogger(GiacenzaIngredienteService.class);
 
     private final GiacenzaIngredienteRepository giacenzaIngredienteRepository;
     private final VGiacenzaIngredienteRepository vGiacenzaIngredienteRepository;
     private final MovimentazioneService movimentazioneService;
     private final MovimentazioneManualeIngredienteService movimentazioneManualeIngredienteService;
 
-    @Autowired
-    public GiacenzaIngredienteService(final GiacenzaIngredienteRepository giacenzaIngredienteRepository,
-                                      final VGiacenzaIngredienteRepository vGiacenzaIngredienteRepository,
-                                      final MovimentazioneService movimentazioneService,
-                                      final MovimentazioneManualeIngredienteService movimentazioneManualeIngredienteService){
-        this.giacenzaIngredienteRepository = giacenzaIngredienteRepository;
-        this.vGiacenzaIngredienteRepository = vGiacenzaIngredienteRepository;
-        this.movimentazioneService = movimentazioneService;
-        this.movimentazioneManualeIngredienteService = movimentazioneManualeIngredienteService;
-    }
-
     public Set<VGiacenzaIngrediente> getAll(){
-        LOGGER.info("Retrieving the list of 'giacenze ingrediente'");
+        log.info("Retrieving the list of 'giacenze ingrediente'");
         Set<VGiacenzaIngrediente> giacenze = vGiacenzaIngredienteRepository.findAll();
-        LOGGER.info("Retrieved {} 'giacenze ingrediente'", giacenze.size());
+        log.info("Retrieved {} 'giacenze ingrediente'", giacenze.size());
         return giacenze;
     }
 
     public Set<GiacenzaIngrediente> getAllNotAggregate(){
-        LOGGER.info("Retrieving the list of 'giacenze ingrediente'");
+        log.info("Retrieving the list of 'giacenze ingrediente'");
         Set<GiacenzaIngrediente> giacenze = giacenzaIngredienteRepository.findAll();
-        LOGGER.info("Retrieved {} 'giacenze ingrediente'", giacenze.size());
+        log.info("Retrieved {} 'giacenze ingrediente'", giacenze.size());
         return giacenze;
+    }
+
+    public List<VGiacenzaIngrediente> getAllByFilters(Integer draw, Integer start, Integer length, List<SortOrder> sortOrders, String ingrediente, Boolean attivo, Integer idFornitore, String lotto, Date scadenza, Boolean scaduto){
+        log.info("Retrieving the list of 'giacenze ingrediente' filtered by request parameters");
+        List<VGiacenzaIngrediente> giacenze = vGiacenzaIngredienteRepository.findByFilters(draw, start, length, sortOrders, ingrediente, attivo, idFornitore, lotto, scadenza, scaduto);
+        log.info("Retrieved {} 'giacenze ingrediente'", giacenze.size());
+        return giacenze;
+    }
+
+    public Integer getCountByFilters(String articolo, Boolean attivo, Integer idFornitore, String lotto, Date scadenza, Boolean scaduto){
+        log.info("Retrieving the count of 'giacenze ingrediente' filtered by request parameters");
+        Integer count = vGiacenzaIngredienteRepository.countByFilters(articolo, attivo, idFornitore, lotto, scadenza, scaduto);
+        log.info("Retrieved {} 'giacenze ingrediente'", count);
+        return count;
     }
 
     @Transactional
     public GiacenzaIngrediente create(GiacenzaIngrediente giacenzaIngrediente){
-        LOGGER.info("Creating 'giacenza ingrediente'");
+        log.info("Creating 'giacenza ingrediente'");
 
         // create movimentazione manuale ingrediente
         movimentazioneManualeIngredienteService.create(giacenzaIngrediente);
@@ -66,26 +70,26 @@ public class GiacenzaIngredienteService {
         //giacenzaIngrediente.setDataInserimento(Timestamp.from(ZonedDateTime.now().toInstant()));
         //GiacenzaIngrediente createdGiacenzaIngrediente = giacenzaIngredienteRepository.save(giacenzaIngrediente);
 
-        LOGGER.info("Created 'giacenza ingrediente' '{}'", giacenzaIngrediente);
+        log.info("Created 'giacenza ingrediente' '{}'", giacenzaIngrediente);
         return giacenzaIngrediente;
     }
 
     public void delete(Long idGiacenza){
-        LOGGER.info("Deleting 'giacenza ingrediente' '{}'", idGiacenza);
+        log.info("Deleting 'giacenza ingrediente' '{}'", idGiacenza);
         giacenzaIngredienteRepository.deleteById(idGiacenza);
-        LOGGER.info("Deleted 'giacenza ingrediente' '{}'", idGiacenza);
+        log.info("Deleted 'giacenza ingrediente' '{}'", idGiacenza);
     }
 
     @Transactional
     public void bulkDelete(List<Long> idIngredienti){
-        LOGGER.info("Bulk deleting all the specified 'giacenze ingrediente' by 'idFornitore' (number of elements to delete: {})", idIngredienti.size());
+        log.info("Bulk deleting all the specified 'giacenze ingrediente' by 'idFornitore' (number of elements to delete: {})", idIngredienti.size());
         movimentazioneManualeIngredienteService.deleteByIngredienteIdIn(idIngredienti);
         giacenzaIngredienteRepository.deleteByIngredienteIdIn(idIngredienti);
-        LOGGER.info("Bulk deleted all the specified 'giacenze ingrediente");
+        log.info("Bulk deleted all the specified 'giacenze ingrediente");
     }
 
     public Map<String, Object> getOne(Long idIngrediente){
-        LOGGER.info("Retrieving 'giacenza ingrediente' of ingrediente {}", idIngrediente);
+        log.info("Retrieving 'giacenza ingrediente' of ingrediente {}", idIngrediente);
 
         HashMap<String, Object> result = new HashMap<>();
 
@@ -107,15 +111,15 @@ public class GiacenzaIngredienteService {
         result.put("udm", giacenzaIngrediente.getUdm());
         result.put("movimentazioni", movimentazioni);
 
-        LOGGER.info("Retrieved 'giacenza ingrediente' of ingrediente {}", idIngrediente);
+        log.info("Retrieved 'giacenza ingrediente' of ingrediente {}", idIngrediente);
         return result;
     }
 
     public void computeGiacenza(Long idIngrediente, String lotto, Date scadenza, Float quantita, Resource resource){
-        LOGGER.info("Compute 'giacenza ingrediente' for idIngrediente '{}', lotto '{}',scadenza '{}',quantita '{}'",
+        log.info("Compute 'giacenza ingrediente' for idIngrediente '{}', lotto '{}',scadenza '{}',quantita '{}'",
                 idIngrediente, lotto, scadenza, quantita);
 
-        LOGGER.info("Retrieving 'giacenza ingrediente' of ingrediente '{}' and lotto '{}'", idIngrediente, lotto);
+        log.info("Retrieving 'giacenza ingrediente' of ingrediente '{}' and lotto '{}'", idIngrediente, lotto);
         Optional<GiacenzaIngrediente> giacenzaOptional = Optional.empty();
         GiacenzaIngrediente giacenzaIngrediente;
         Set<GiacenzaIngrediente> giacenze = giacenzaIngredienteRepository.findByIngredienteIdAndLotto(idIngrediente, lotto);
@@ -128,14 +132,14 @@ public class GiacenzaIngredienteService {
         }
         if(giacenzaOptional.isPresent()){
             giacenzaIngrediente = giacenzaOptional.get();
-            LOGGER.info("Retrieved 'giacenza ingrediente' {}", giacenzaIngrediente);
+            log.info("Retrieved 'giacenza ingrediente' {}", giacenzaIngrediente);
 
             Set<Movimentazione> movimentazioni = movimentazioneService.getMovimentazioniIngrediente(giacenzaIngrediente);
             Float quantitaInput;
             Float quantitaOutput;
             float newQuantita;
 
-            LOGGER.info("Computing input and output quantities");
+            log.info("Computing input and output quantities");
 
             if(movimentazioni != null && !movimentazioni.isEmpty()){
                 // 'movimentazioni' in input
@@ -167,10 +171,10 @@ public class GiacenzaIngredienteService {
             giacenzaIngrediente.setIngrediente(ingrediente);
 
             giacenzaIngrediente = giacenzaIngredienteRepository.save(giacenzaIngrediente);
-            LOGGER.info("Updated 'giacenza ingrediente' {}", giacenzaIngrediente);
+            log.info("Updated 'giacenza ingrediente' {}", giacenzaIngrediente);
 
         } else {
-            LOGGER.info("Creating a new 'giacenza ingrediente'");
+            log.info("Creating a new 'giacenza ingrediente'");
             float newQuantita = 0f;
             if(quantita != null){
                 newQuantita = quantita;
@@ -188,7 +192,7 @@ public class GiacenzaIngredienteService {
             giacenzaIngrediente.setQuantita(newQuantita);
             giacenzaIngrediente.setDataInserimento(Timestamp.from(ZonedDateTime.now().toInstant()));
             giacenzaIngrediente = giacenzaIngredienteRepository.save(giacenzaIngrediente);
-            LOGGER.info("Created a new 'giacenza ingrediente' {}", giacenzaIngrediente);
+            log.info("Created a new 'giacenza ingrediente' {}", giacenzaIngrediente);
         }
 
     }

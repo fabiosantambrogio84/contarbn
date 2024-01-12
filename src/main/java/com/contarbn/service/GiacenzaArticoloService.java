@@ -4,61 +4,59 @@ import com.contarbn.exception.ResourceNotFoundException;
 import com.contarbn.model.Articolo;
 import com.contarbn.model.GiacenzaArticolo;
 import com.contarbn.model.Movimentazione;
+import com.contarbn.model.beans.SortOrder;
 import com.contarbn.model.views.VGiacenzaArticolo;
 import com.contarbn.repository.GiacenzaArticoloRepository;
 import com.contarbn.repository.views.VGiacenzaArticoloRepository;
 import com.contarbn.util.enumeration.Resource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
+@RequiredArgsConstructor
 @Service
 public class GiacenzaArticoloService {
-
-    private final static Logger LOGGER = LoggerFactory.getLogger(GiacenzaArticoloService.class);
 
     private final GiacenzaArticoloRepository giacenzaArticoloRepository;
     private final VGiacenzaArticoloRepository vGiacenzaArticoloRepository;
     private final MovimentazioneService movimentazioneService;
     private final MovimentazioneManualeArticoloService movimentazioneManualeArticoloService;
 
-    @Autowired
-    public GiacenzaArticoloService(final GiacenzaArticoloRepository giacenzaArticoloRepository,
-                                   final VGiacenzaArticoloRepository vGiacenzaArticoloRepository,
-                                   final MovimentazioneService movimentazioneService,
-                                   final MovimentazioneManualeArticoloService movimentazioneManualeArticoloService){
-        this.giacenzaArticoloRepository = giacenzaArticoloRepository;
-        this.vGiacenzaArticoloRepository = vGiacenzaArticoloRepository;
-        this.movimentazioneService = movimentazioneService;
-        this.movimentazioneManualeArticoloService = movimentazioneManualeArticoloService;
-    }
-
-    public Set<VGiacenzaArticolo> getAll(){
-        LOGGER.info("Retrieving the list of 'giacenze articolo'");
-        Set<VGiacenzaArticolo> giacenze = vGiacenzaArticoloRepository.findAll();
-        LOGGER.info("Retrieved {} 'giacenze articolo'", giacenze.size());
+    public List<VGiacenzaArticolo> getAllByFilters(Integer draw, Integer start, Integer length, List<SortOrder> sortOrders, String articolo, Boolean attivo, Integer idFornitore, String lotto, Date scadenza, Boolean scaduto){
+        log.info("Retrieving the list of 'giacenze articolo' filtered by request parameters");
+        List<VGiacenzaArticolo> giacenze = vGiacenzaArticoloRepository.findByFilters(draw, start, length, sortOrders, articolo, attivo, idFornitore, lotto, scadenza, scaduto);
+        log.info("Retrieved {} 'giacenze articolo'", giacenze.size());
         return giacenze;
     }
 
+    public Integer getCountByFilters(String articolo, Boolean attivo, Integer idFornitore, String lotto, Date scadenza, Boolean scaduto){
+        log.info("Retrieving the count of 'giacenze articolo' filtered by request parameters");
+        Integer count = vGiacenzaArticoloRepository.countByFilters(articolo, attivo, idFornitore, lotto, scadenza, scaduto);
+        log.info("Retrieved {} 'giacenze articolo'", count);
+        return count;
+    }
+
     public Set<GiacenzaArticolo> getAllNotAggregate(){
-        LOGGER.info("Retrieving the list of 'giacenze articolo'");
+        log.info("Retrieving the list of 'giacenze articolo'");
         Set<GiacenzaArticolo> giacenze = giacenzaArticoloRepository.findAll();
-        LOGGER.info("Retrieved {} 'giacenze articolo'", giacenze.size());
+        log.info("Retrieved {} 'giacenze articolo'", giacenze.size());
         return giacenze;
     }
 
     public List<GiacenzaArticolo> getNotAggregateByArticolo(Long idArticolo){
-        LOGGER.info("Retrieving the list of 'giacenze articolo' of articolo with id {}", idArticolo);
+        log.info("Retrieving the list of 'giacenze articolo' of articolo with id {}", idArticolo);
         Set<GiacenzaArticolo> giacenze = giacenzaArticoloRepository.findByArticoloId(idArticolo);
-        LOGGER.info("Retrieved {} 'giacenze articolo'", giacenze.size());
+        giacenze.forEach(this::setScaduto);
+        log.info("Retrieved {} 'giacenze articolo'", giacenze.size());
         return giacenze.stream()
                 .sorted(Comparator.comparing(GiacenzaArticolo::getLotto).thenComparing(GiacenzaArticolo::getScadenza, Comparator.nullsLast(Comparator.naturalOrder())))
                 .collect(Collectors.toList());
@@ -66,7 +64,7 @@ public class GiacenzaArticoloService {
 
     @Transactional
     public GiacenzaArticolo create(GiacenzaArticolo giacenzaArticolo){
-        LOGGER.info("Creating 'giacenza articolo'");
+        log.info("Creating 'giacenza articolo'");
 
         // create movimentazione manuale articolo
         movimentazioneManualeArticoloService.create(giacenzaArticolo);
@@ -76,38 +74,38 @@ public class GiacenzaArticoloService {
         //giacenzaArticolo.setDataInserimento(Timestamp.from(ZonedDateTime.now().toInstant()));
         //GiacenzaArticolo createdGiacenzaArticolo = giacenzaArticoloRepository.save(giacenzaArticolo);
 
-        LOGGER.info("Created 'giacenza articolo' '{}'", giacenzaArticolo);
+        log.info("Created 'giacenza articolo' '{}'", giacenzaArticolo);
         return giacenzaArticolo;
     }
 
     @Transactional
     public List<GiacenzaArticolo> updateBulk(List<GiacenzaArticolo> giacenzeArticolo){
-        LOGGER.info("Updating bulk 'giacenza articolo'");
+        log.info("Updating bulk 'giacenza articolo'");
 
         giacenzeArticolo.forEach(ga -> ga.setDataAggiornamento(Timestamp.from(ZonedDateTime.now().toInstant())));
 
         giacenzaArticoloRepository.saveAll(giacenzeArticolo);
 
-        LOGGER.info("Updated bulk 'giacenza articolo'");
+        log.info("Updated bulk 'giacenza articolo'");
         return giacenzeArticolo;
     }
 
     public void delete(Long idGiacenza){
-        LOGGER.info("Deleting 'giacenza articolo' '{}'", idGiacenza);
+        log.info("Deleting 'giacenza articolo' '{}'", idGiacenza);
         giacenzaArticoloRepository.deleteById(idGiacenza);
-        LOGGER.info("Deleted 'giacenza articolo' '{}'", idGiacenza);
+        log.info("Deleted 'giacenza articolo' '{}'", idGiacenza);
     }
 
     @Transactional
     public void bulkDelete(List<Long> idArticoli){
-        LOGGER.info("Bulk deleting all the 'giacenze articolo' by 'idArticolo' (number of elements to delete: {})", idArticoli.size());
+        log.info("Bulk deleting all the 'giacenze articolo' by 'idArticolo' (number of elements to delete: {})", idArticoli.size());
         movimentazioneManualeArticoloService.deleteByArticoloIdIn(idArticoli);
         giacenzaArticoloRepository.deleteByArticoloIdIn(idArticoli);
-        LOGGER.info("Bulk deleted all the specified 'giacenze articolo");
+        log.info("Bulk deleted all the specified 'giacenze articolo");
     }
 
     public Map<String, Object> getOne(Long idArticolo){
-        LOGGER.info("Retrieving 'giacenza articolo' of articolo {}", idArticolo);
+        log.info("Retrieving 'giacenza articolo' of articolo {}", idArticolo);
 
         HashMap<String, Object> result = new HashMap<>();
 
@@ -128,15 +126,15 @@ public class GiacenzaArticoloService {
         result.put("quantita", giacenzaArticolo.getQuantita());
         result.put("movimentazioni", movimentazioni);
 
-        LOGGER.info("Retrieved 'giacenza articolo' of 'articolo' {}", idArticolo);
+        log.info("Retrieved 'giacenza articolo' of 'articolo' {}", idArticolo);
         return result;
     }
 
     public void computeGiacenza(Long idArticolo, String lotto, Date scadenza, Float quantita, Resource resource){
-        LOGGER.info("Compute 'giacenza articolo' for idArticolo '{}', lotto '{}',scadenza '{}',quantita '{}'",
+        log.info("Compute 'giacenza articolo' for idArticolo '{}', lotto '{}',scadenza '{}',quantita '{}'",
                 idArticolo, lotto, scadenza, quantita);
 
-        LOGGER.info("Retrieving 'giacenza articolo' of articolo '{}' and lotto '{}'", idArticolo, lotto);
+        log.info("Retrieving 'giacenza articolo' of articolo '{}' and lotto '{}'", idArticolo, lotto);
         Optional<GiacenzaArticolo> giacenzaOptional = Optional.empty();
         GiacenzaArticolo giacenzaArticolo;
         Set<GiacenzaArticolo> giacenze = giacenzaArticoloRepository.findByArticoloIdAndLotto(idArticolo, lotto);
@@ -149,14 +147,14 @@ public class GiacenzaArticoloService {
         }
         if(giacenzaOptional.isPresent()){
             giacenzaArticolo = giacenzaOptional.get();
-            LOGGER.info("Retrieved 'giacenza articolo' {}", giacenzaArticolo);
+            log.info("Retrieved 'giacenza articolo' {}", giacenzaArticolo);
 
             Set<Movimentazione> movimentazioni = movimentazioneService.getMovimentazioniArticolo(giacenzaArticolo);
             Float quantitaInput;
             Float quantitaOutput;
             float newQuantita;
 
-            LOGGER.info("Computing input and output quantities");
+            log.info("Computing input and output quantities");
 
             if(movimentazioni != null && !movimentazioni.isEmpty()){
                 // 'movimentazioni' in input
@@ -196,10 +194,10 @@ public class GiacenzaArticoloService {
             giacenzaArticolo.setArticolo(articolo);
 
             giacenzaArticolo = giacenzaArticoloRepository.save(giacenzaArticolo);
-            LOGGER.info("Updated 'giacenza articolo' {}", giacenzaArticolo);
+            log.info("Updated 'giacenza articolo' {}", giacenzaArticolo);
 
         } else {
-            LOGGER.info("Creating a new 'giacenza articolo'");
+            log.info("Creating a new 'giacenza articolo'");
             float newQuantita = 0f;
             if(quantita != null){
                 newQuantita = quantita;
@@ -217,8 +215,23 @@ public class GiacenzaArticoloService {
             giacenzaArticolo.setQuantita(newQuantita);
             giacenzaArticolo.setDataInserimento(Timestamp.from(ZonedDateTime.now().toInstant()));
             giacenzaArticolo = giacenzaArticoloRepository.save(giacenzaArticolo);
-            LOGGER.info("Created a new 'giacenza articolo' {}", giacenzaArticolo);
+            log.info("Created a new 'giacenza articolo' {}", giacenzaArticolo);
         }
 
+    }
+
+    private void setScaduto(GiacenzaArticolo giacenzaArticolo){
+        int scaduto = 0;
+        Articolo articolo = giacenzaArticolo.getArticolo();
+        if(articolo != null){
+            Integer scadenzaGiorni = articolo.getScadenzaGiorni();
+            if(scadenzaGiorni != null && giacenzaArticolo.getScadenza() != null){
+                LocalDate scadenza = giacenzaArticolo.getScadenza().toLocalDate().minusDays(scadenzaGiorni);
+                if(LocalDate.now().equals(scadenza) || LocalDate.now().isAfter(scadenza)){
+                    scaduto = 1;
+                }
+            }
+        }
+        giacenzaArticolo.setScaduto(scaduto);
     }
 }

@@ -8,6 +8,7 @@ import com.contarbn.repository.ArticoloRepository;
 import com.contarbn.repository.ClienteArticoloRepository;
 import com.contarbn.repository.GiacenzaArticoloRepository;
 import com.contarbn.util.BarcodeUtils;
+import com.contarbn.util.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,8 +98,8 @@ public class ArticoloService {
         return articolo;
     }
 
-    public List<Articolo> getByCodiceLike(String codice){
-        return articoloRepository.findByCodiceLike(codice + "%");
+    public List<Articolo> getByCodiceLike(String codice, Boolean active){
+        return articoloRepository.findByCodiceLike(codice + "%", Utils.getActiveValues(active));
     }
 
     public Articolo create(Articolo articolo){

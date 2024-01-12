@@ -85,9 +85,10 @@ public class ArticoloController {
 
     @RequestMapping(method = GET, path = "/codice/{codice}/like")
     @CrossOrigin
-    public List<Articolo> getByCodiceLike(@PathVariable final String codice) {
-        log.info("Performing GET request for retrieving 'articolo' with codice like '{}'", codice);
-        return articoloService.getByCodiceLike(codice);
+    public List<Articolo> getByCodiceLike(@PathVariable final String codice,
+                                          @RequestParam(name = "attivo", required = false) Boolean active) {
+        log.info("Performing GET request for retrieving 'articolo' with codice like '{}' and active '{}'", codice, active);
+        return articoloService.getByCodiceLike(codice, active);
     }
 
     @RequestMapping(method = POST)

@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @Data
 @EqualsAndHashCode()
 @Entity
-@Table(name = "v_giacenza_articolo")
+@Table(name = "v_giacenza_articolo_agg")
 public class VGiacenzaArticolo {
 
     @Id
@@ -34,15 +34,6 @@ public class VGiacenzaArticolo {
     @Column(name = "quantita_kg")
     private Float quantitaKg;
 
-    @Column(name = "id_giacenze")
-    private String idGiacenze;
-
-    @Column(name = "lotto_giacenze")
-    private String lottoGiacenze;
-
-    @Column(name = "scadenza_giacenze")
-    private String scadenzaGiacenze;
-
     @Column(name = "attivo")
     private Boolean attivo;
 
@@ -52,25 +43,23 @@ public class VGiacenzaArticolo {
     @Column(name = "fornitore")
     private String fornitore;
 
+    @Column(name = "scaduto")
+    private Integer scaduto;
+
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder();
 
-        result.append("{");
-        result.append("idArticolo: " + idArticolo);
-        result.append(", articolo: " + articolo);
-        result.append(", prezzoAcquisto: " + prezzoAcquisto);
-        result.append(", prezzoListinoBase: " + prezzoListinoBase);
-        result.append(", quantita: " + quantita);
-        result.append(", quantitaKg: " + quantitaKg);
-        result.append(", idGiacenze: " + idGiacenze);
-        result.append(", lottoGiacenze: " + lottoGiacenze);
-        result.append(", scadenzaGiacenze: " + scadenzaGiacenze);
-        result.append(", attivo: " + attivo);
-        result.append(", idFornitore: " + idFornitore);
-        result.append(", fornitore: " + fornitore);
-        result.append("}");
-
-        return result.toString();
+        return "{" +
+                "idArticolo: " + idArticolo +
+                ", articolo: " + articolo +
+                ", prezzoAcquisto: " + prezzoAcquisto +
+                ", prezzoListinoBase: " + prezzoListinoBase +
+                ", quantita: " + quantita +
+                ", quantitaKg: " + quantitaKg +
+                ", attivo: " + attivo +
+                ", idFornitore: " + idFornitore +
+                ", fornitore: " + fornitore +
+                ", scaduto: " + scaduto +
+                "}";
     }
 }

@@ -2,6 +2,7 @@ package com.contarbn.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
@@ -11,6 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @EqualsAndHashCode(exclude = {"ricettaIngredienti", "ingredienteAllergeni"})
+@Data
 @Entity
 @Table(name = "ingrediente")
 public class Ingrediente {
@@ -40,6 +42,9 @@ public class Ingrediente {
     @JoinColumn(name="id_aliquota_iva")
     private AliquotaIva aliquotaIva;
 
+    @Column(name = "scadenza_giorni")
+    private Integer scadenzaGiorni;
+
     @Column(name = "data_inserimento")
     private Timestamp dataInserimento;
 
@@ -57,120 +62,21 @@ public class Ingrediente {
     @JsonIgnoreProperties("ingrediente")
     private Set<IngredienteAllergene> ingredienteAllergeni = new HashSet<>();
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getCodice() {
-        return codice;
-    }
-
-    public void setCodice(String codice) {
-        this.codice = codice;
-    }
-
-    public String getDescrizione() {
-        return descrizione;
-    }
-
-    public void setDescrizione(String descrizione) {
-        this.descrizione = descrizione;
-    }
-
-    public BigDecimal getPrezzo() {
-        return prezzo;
-    }
-
-    public void setPrezzo(BigDecimal prezzo) {
-        this.prezzo = prezzo;
-    }
-
-    public UnitaMisura getUnitaMisura() {
-        return unitaMisura;
-    }
-
-    public void setUnitaMisura(UnitaMisura unitaMisura) {
-        this.unitaMisura = unitaMisura;
-    }
-
-    public Fornitore getFornitore() {
-        return fornitore;
-    }
-
-    public void setFornitore(Fornitore fornitore) {
-        this.fornitore = fornitore;
-    }
-
-    public AliquotaIva getAliquotaIva() {
-        return aliquotaIva;
-    }
-
-    public void setAliquotaIva(AliquotaIva aliquotaIva) {
-        this.aliquotaIva = aliquotaIva;
-    }
-
-    public Timestamp getDataInserimento() {
-        return dataInserimento;
-    }
-
-    public void setDataInserimento(Timestamp dataInserimento) {
-        this.dataInserimento = dataInserimento;
-    }
-
-    public Boolean getAttivo() {
-        return attivo;
-    }
-
-    public void setAttivo(Boolean attivo) {
-        this.attivo = attivo;
-    }
-
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
-    }
-
-    public Set<RicettaIngrediente> getRicettaIngredienti() {
-        return ricettaIngredienti;
-    }
-
-    public void setRicettaIngredienti(Set<RicettaIngrediente> ricettaIngredienti) {
-        this.ricettaIngredienti = ricettaIngredienti;
-    }
-
-    public Set<IngredienteAllergene> getIngredienteAllergeni() {
-        return ingredienteAllergeni;
-    }
-
-    public void setIngredienteAllergeni(Set<IngredienteAllergene> ingredienteAllergeni) {
-        this.ingredienteAllergeni = ingredienteAllergeni;
-    }
-
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder();
-
-        result.append("{");
-        result.append("id: " + id);
-        result.append(", codice: " + codice);
-        result.append(", descrizione: " + descrizione);
-        result.append(", prezzo: " + prezzo);
-        result.append(", unitaMisura: " + unitaMisura);
-        result.append(", fornitore: " + fornitore);
-        result.append(", fornitore: " + aliquotaIva);
-        result.append(", dataInserimento: " + dataInserimento);
-        result.append(", attivo: " + attivo);
-        result.append(", note: " + note);
-        result.append("}");
-
-        return result.toString();
+        return "{" +
+                "id: " + id +
+                ", codice: " + codice +
+                ", descrizione: " + descrizione +
+                ", prezzo: " + prezzo +
+                ", unitaMisura: " + unitaMisura +
+                ", fornitore: " + fornitore +
+                ", fornitore: " + aliquotaIva +
+                ", scadenzaGiorni: " + scadenzaGiorni +
+                ", dataInserimento: " + dataInserimento +
+                ", attivo: " + attivo +
+                ", note: " + note +
+                "}";
 
     }
 }

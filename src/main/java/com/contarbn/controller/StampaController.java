@@ -2,8 +2,8 @@ package com.contarbn.controller;
 
 import com.contarbn.service.StampaService;
 import com.contarbn.util.Constants;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -19,23 +18,19 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @Slf4j
+@RequiredArgsConstructor
 @RestController
 @RequestMapping(path="/stampe")
-@SuppressWarnings("unused")
+//@SuppressWarnings("unused")
 public class StampaController {
 
-    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+    // https://www.youtube.com/watch?v=fZtnoQpPzaw
+    // https://www.qualogy.com/techblog/java-web/creating-report-with-list-containing-list-using-jasper-report
 
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
     private final StampaService stampaService;
 
-    @Autowired
-    public StampaController(final StampaService stampaService){
-        this.stampaService = stampaService;
-        // https://www.youtube.com/watch?v=fZtnoQpPzaw
-        // https://www.qualogy.com/techblog/java-web/creating-report-with-list-containing-list-using-jasper-report
-    }
 
     @RequestMapping(method = GET, path = "/giacenze-ingredienti")
     @CrossOrigin
@@ -461,6 +456,23 @@ public class StampaController {
                 .contentType(MediaType.parseMediaType(Constants.MEDIA_TYPE_APPLICATION_PDF))
                 .body(resource);
     }
+
+    @RequestMapping(method = GET, path = "/schede-tecniche/{idSchedaTecnica}")
+    @CrossOrigin
+    public ResponseEntity<Resource> printSchedaTecnica(@PathVariable final Long idSchedaTecnica) throws Exception{
+        log.info("Creating pdf for 'scheda-tecnica' with id '{}'", idSchedaTecnica);
+
+        // create report
+        byte[] reportBytes = stampaService.generateSchedaTecnica(idSchedaTecnica);
+
+        ByteArrayResource resource = new ByteArrayResource(reportBytes);
+
+        log.info("Successfully create pdf for 'scheda-tecnica' with id '{}'", idSchedaTecnica);
+
+        return ResponseEntity.ok()
+                .headers(StampaService.createHttpHeaders("scheda-tecnica-"+idSchedaTecnica+".pdf"))
+                .contentLength(reportBytes.length)
+                .contentType(MediaType.parseMediaType(Constants.MEDIA_TYPE_APPLICATION_PDF))
+                .body(resource);
+    }
 }
-
-

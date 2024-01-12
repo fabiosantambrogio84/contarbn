@@ -11,6 +11,7 @@ import com.contarbn.util.AccountingUtils;
 import com.contarbn.util.Constants;
 import com.contarbn.util.Utils;
 import com.contarbn.util.enumeration.Provincia;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JasperRunManager;
@@ -35,74 +36,29 @@ import java.util.stream.Collectors;
 import static java.util.Comparator.naturalOrder;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class StampaService {
 
     private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
     private final GiacenzaIngredienteService giacenzaIngredienteService;
-
     private final PagamentoService pagamentoService;
-
     private final DdtService ddtService;
-
     private final AutistaService autistaService;
-
     private final OrdineClienteService ordineClienteService;
-
     private final NotaAccreditoService notaAccreditoService;
-
     private final FatturaService fatturaService;
-
     private final FatturaAccompagnatoriaService fatturaAccompagnatoriaService;
-
     private final NotaResoService notaResoService;
-
     private final RicevutaPrivatoService ricevutaPrivatoService;
-
     private final OrdineFornitoreService ordineFornitoreService;
-
     private final ListinoService listinoService;
-
     private final DocumentoAcquistoService documentoAcquistoService;
-
     private final DdtAcquistoService ddtAcquistoService;
-
     private final FatturaAcquistoService fatturaAcquistoService;
-
     private final FatturaAccompagnatoriaAcquistoService fatturaAccompagnatoriaAcquistoService;
-
-    public StampaService(final GiacenzaIngredienteService giacenzaIngredienteService, final DdtService ddtService, final PagamentoService pagamentoService,
-                         final AutistaService autistaService,
-                         final OrdineClienteService ordineClienteService,
-                         final NotaAccreditoService notaAccreditoService,
-                         final FatturaService fatturaService,
-                         final FatturaAccompagnatoriaService fatturaAccompagnatoriaService,
-                         final NotaResoService notaResoService,
-                         final RicevutaPrivatoService ricevutaPrivatoService,
-                         final OrdineFornitoreService ordineFornitoreService,
-                         final ListinoService listinoService,
-                         final DocumentoAcquistoService documentoAcquistoService,
-                         final DdtAcquistoService ddtAcquistoService,
-                         final FatturaAcquistoService fatturaAcquistoService,
-                         final FatturaAccompagnatoriaAcquistoService fatturaAccompagnatoriaAcquistoService){
-        this.giacenzaIngredienteService = giacenzaIngredienteService;
-        this.ddtService = ddtService;
-        this.pagamentoService = pagamentoService;
-        this.autistaService = autistaService;
-        this.ordineClienteService = ordineClienteService;
-        this.notaAccreditoService = notaAccreditoService;
-        this.fatturaService = fatturaService;
-        this.fatturaAccompagnatoriaService = fatturaAccompagnatoriaService;
-        this.notaResoService = notaResoService;
-        this.ricevutaPrivatoService = ricevutaPrivatoService;
-        this.ordineFornitoreService = ordineFornitoreService;
-        this.listinoService = listinoService;
-        this.documentoAcquistoService = documentoAcquistoService;
-        this.ddtAcquistoService = ddtAcquistoService;
-        this.fatturaAcquistoService = fatturaAcquistoService;
-        this.fatturaAccompagnatoriaAcquistoService = fatturaAccompagnatoriaAcquistoService;
-    }
+    private final SchedaTecnicaService schedaTecnicaService;
 
     private List<VGiacenzaIngrediente> getGiacenzeIngredienti(String ids){
         log.info("Retrieving the list of 'giacenze-ingredienti' with id in '{}' for creating pdf file", ids);
@@ -208,7 +164,7 @@ public class StampaService {
         if(agente != null){
             StringBuilder sb = new StringBuilder();
             if(!StringUtils.isEmpty(agente.getNome())){
-                sb.append(agente.getNome()+" ");
+                sb.append(agente.getNome()).append(" ");
             }
             if(!StringUtils.isEmpty(agente.getCognome())){
                 sb.append(agente.getCognome());
@@ -283,9 +239,7 @@ public class StampaService {
         List<VDocumentoAcquisto> documentiAcquisto = documentoAcquistoService.getAllByFilters(null, null, null, null, fornitore, numDocumento, tipoDocumento, dataDa, dataA, null, null);
 
         if(!documentiAcquisto.isEmpty()){
-            documentiAcquisto.forEach(da -> {
-                documentoAcquistoDataSources.add(da.toDocumentoAcquistoDataSource(simpleDateFormat));
-            });
+            documentiAcquisto.forEach(da -> documentoAcquistoDataSources.add(da.toDocumentoAcquistoDataSource(simpleDateFormat)));
         }
 
         log.info("Retrieved {} 'documento-acquisto'", documentoAcquistoDataSources.size());
@@ -499,7 +453,7 @@ public class StampaService {
         if(agente != null){
             StringBuilder sb = new StringBuilder();
             if(!StringUtils.isEmpty(agente.getNome())){
-                sb.append(agente.getNome()+" ");
+                sb.append(agente.getNome()).append(" ");
             }
             if(!StringUtils.isEmpty(agente.getCognome())){
                 sb.append(agente.getCognome());
@@ -647,7 +601,7 @@ public class StampaService {
         if(agente != null){
             StringBuilder sb = new StringBuilder();
             if(!StringUtils.isEmpty(agente.getNome())){
-                sb.append(agente.getNome()+" ");
+                sb.append(agente.getNome()).append(" ");
             }
             if(!StringUtils.isEmpty(agente.getCognome())){
                 sb.append(agente.getCognome());
@@ -778,7 +732,7 @@ public class StampaService {
         if(agente != null){
             StringBuilder sb = new StringBuilder();
             if(!StringUtils.isEmpty(agente.getNome())){
-                sb.append(agente.getNome()+" ");
+                sb.append(agente.getNome()).append(" ");
             }
             if(!StringUtils.isEmpty(agente.getCognome())){
                 sb.append(agente.getCognome());
@@ -2621,6 +2575,63 @@ public class StampaService {
         return JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
     }
 
+    public byte[] generateSchedaTecnica(Long idSchedaTecnica) throws Exception {
+
+        SchedaTecnica schedaTecnica = schedaTecnicaService.getById(idSchedaTecnica);
+
+        SchedaTecnicaDataSource schedaTecnicaDataSource = SchedaTecnicaDataSource.from(schedaTecnica);
+        List<SchedaTecnicaNutrienteDataSource> schedaTecnicaNutrienteDataSources = new ArrayList<>();
+        if(!schedaTecnica.getSchedaTecnicaNutrienti().isEmpty()){
+            for(SchedaTecnicaNutriente schedaTecnicaNutriente : schedaTecnica.getSchedaTecnicaNutrienti()){
+                schedaTecnicaNutrienteDataSources.add(SchedaTecnicaNutrienteDataSource.from(schedaTecnicaNutriente));
+            }
+            schedaTecnicaNutrienteDataSources.sort(Comparator.comparing(n -> n.getNutriente().toLowerCase()));
+        }
+        List<SchedaTecnicaAnalisiDataSource> schedaTecnicaAnalisiDataSources = new ArrayList<>();
+        if(!schedaTecnica.getSchedaTecnicaAnalisi().isEmpty()){
+            for(SchedaTecnicaAnalisi schedaTecnicaAnalisi : schedaTecnica.getSchedaTecnicaAnalisi()){
+                schedaTecnicaAnalisiDataSources.add(SchedaTecnicaAnalisiDataSource.from(schedaTecnicaAnalisi));
+            }
+            schedaTecnicaAnalisiDataSources.sort(Comparator.comparing(a -> a.getAnalisi().toLowerCase()));
+        }
+        List<SchedaTecnicaRaccoltaDataSource> schedaTecnicaRaccoltaDataSources = new ArrayList<>();
+        if(!schedaTecnica.getSchedaTecnicaRaccolte().isEmpty()){
+            for(SchedaTecnicaRaccolta schedaTecnicaRaccolta : schedaTecnica.getSchedaTecnicaRaccolte()){
+                schedaTecnicaRaccoltaDataSources.add(SchedaTecnicaRaccoltaDataSource.from(schedaTecnicaRaccolta));
+            }
+            schedaTecnicaRaccoltaDataSources.sort(Comparator.comparing(m -> m.getMateriale().toLowerCase()));
+        }
+
+        final InputStream stream = this.getClass().getResourceAsStream(Constants.JASPER_REPORT_SCHEDA_TECNICA);
+
+        JRBeanCollectionDataSource schedaTecnicaNutrientiCollectionDataSource = new JRBeanCollectionDataSource(schedaTecnicaNutrienteDataSources);
+        JRBeanCollectionDataSource schedaTecnicaAnalisiCollectionDataSource = new JRBeanCollectionDataSource(schedaTecnicaAnalisiDataSources);
+        JRBeanCollectionDataSource schedaTecnicaRaccolteCollectionDataSource = new JRBeanCollectionDataSource(schedaTecnicaRaccoltaDataSources);
+
+        // create report parameters
+        Map<String, Object> parameters = createParameters(Constants.JASPER_REPORT_SCHEDA_TECNICA);
+
+        // add data to parameters
+        parameters.put("revisione", schedaTecnicaDataSource.getRevisione());
+        parameters.put("notaSchedaTecnica", Constants.JASPER_PARAMETER_SCHEDA_TECNICA_NOTA);
+        parameters.put("notaDisposizioniComune", Constants.JASPER_PARAMETER_DISPOSIZIONI_COMUNE_NOTA);
+        parameters.put("codiceProdotto", schedaTecnicaDataSource.getCodiceProdotto());
+        parameters.put("pesoNettoConfezione", schedaTecnicaDataSource.getPesoNettoConfezione());
+        parameters.put("ingredienti", schedaTecnicaDataSource.getIngredienti());
+        parameters.put("allergeniTracce", schedaTecnicaDataSource.getAllergeniTracce());
+        parameters.put("durata", schedaTecnicaDataSource.getDurata());
+        parameters.put("conservazione", schedaTecnicaDataSource.getConservazione());
+        parameters.put("consigliConsumo", schedaTecnicaDataSource.getConsigliConsumo());
+        parameters.put("tipologiaConfezionamento", schedaTecnicaDataSource.getTipologiaConfezionamento());
+        parameters.put("imballo", schedaTecnicaDataSource.getImballo());
+        parameters.put("imballoDimensioni", schedaTecnicaDataSource.getImballoDimensioni());
+        parameters.put("schedaTecnicaNutrientiCollection", schedaTecnicaNutrientiCollectionDataSource);
+        parameters.put("schedaTecnicaAnalisiCollection", schedaTecnicaAnalisiCollectionDataSource);
+        parameters.put("schedaTecnicaRaccolteCollection", schedaTecnicaRaccolteCollectionDataSource);
+
+        return JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
+    }
+
     public static HttpHeaders createHttpHeaders(String fileName){
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename="+fileName);
@@ -2649,6 +2660,32 @@ public class StampaService {
         parameters.put("headerWebsite", "Website " + dittaInfoMap.get("WEBSITE").getValore());
         parameters.put("headerEmail", "E-mail " + dittaInfoMap.get("EMAIL").getValore());
         parameters.put("headerPec", "Pec " + dittaInfoMap.get("PEC").getValore());
+
+        return parameters;
+    }
+
+    public Map<String, Object> createParameters(String reportName){
+
+        if(StringUtils.isEmpty(reportName)){
+            return createParameters();
+        }
+
+        Map<String, DittaInfo> dittaInfoMap = DittaInfoSingleton.get().getDittaInfoMap();
+
+        Map<String, Object> parameters = new HashMap<>();
+
+        if(reportName.equals(Constants.JASPER_REPORT_SCHEDA_TECNICA)){
+            parameters.put("logo", this.getClass().getResource(Constants.JASPER_REPORT_LOGO_IMAGE_PATH));
+            parameters.put("bollino", this.getClass().getResource(Constants.JASPER_REPORT_BOLLINO_IMAGE_PATH));
+            parameters.put("headerIntestazione", dittaInfoMap.get("PDF_INTESTAZIONE").getValore());
+            parameters.put("headerPartitaIva", dittaInfoMap.get("PARTITA_IVA").getValore());
+            parameters.put("headerRea", dittaInfoMap.get("REA").getValore());
+            parameters.put("headerIndirizzo", dittaInfoMap.get("PDF_INDIRIZZO").getValore());
+            parameters.put("headerTelefono", dittaInfoMap.get("TELEFONO").getValore());
+            parameters.put("headerWebsite", dittaInfoMap.get("WEBSITE").getValore());
+            parameters.put("headerEmail", dittaInfoMap.get("EMAIL").getValore());
+            parameters.put("headerPec", dittaInfoMap.get("PEC").getValore());
+        }
 
         return parameters;
     }

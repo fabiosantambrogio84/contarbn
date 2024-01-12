@@ -1,5 +1,6 @@
 package com.contarbn.model.views;
 
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.Column;
@@ -7,9 +8,10 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-@EqualsAndHashCode()
+@Data
+@EqualsAndHashCode
 @Entity
-@Table(name = "v_giacenza_ingrediente")
+@Table(name = "v_giacenza_ingrediente_agg")
 public class VGiacenzaIngrediente {
 
     @Id
@@ -21,15 +23,6 @@ public class VGiacenzaIngrediente {
 
     @Column(name = "quantita_tot")
     private Float quantita;
-
-    @Column(name = "id_giacenze")
-    private String idGiacenze;
-
-    @Column(name = "lotto_giacenze")
-    private String lottoGiacenze;
-
-    @Column(name = "scadenza_giacenze")
-    private String scadenzaGiacenze;
 
     @Column(name = "attivo")
     private Boolean attivo;
@@ -49,121 +42,23 @@ public class VGiacenzaIngrediente {
     @Column(name = "descrizione_ingrediente")
     private String descrizioneIngrediente;
 
-    public Long getIdIngrediente() {
-        return idIngrediente;
-    }
-
-    public void setIdIngrediente(Long idIngrediente) {
-        this.idIngrediente = idIngrediente;
-    }
-
-    public String getIngrediente() {
-        return ingrediente;
-    }
-
-    public void setIngrediente(String ingrediente) {
-        this.ingrediente = ingrediente;
-    }
-
-    public Float getQuantita() {
-        return quantita;
-    }
-
-    public void setQuantita(Float quantita) {
-        this.quantita = quantita;
-    }
-
-    public String getIdGiacenze() {
-        return idGiacenze;
-    }
-
-    public void setIdGiacenze(String idGiacenze) {
-        this.idGiacenze = idGiacenze;
-    }
-
-    public String getLottoGiacenze() {
-        return lottoGiacenze;
-    }
-
-    public void setLottoGiacenze(String lottoGiacenze) {
-        this.lottoGiacenze = lottoGiacenze;
-    }
-
-    public String getScadenzaGiacenze() {
-        return scadenzaGiacenze;
-    }
-
-    public void setScadenzaGiacenze(String scadenzaGiacenze) {
-        this.scadenzaGiacenze = scadenzaGiacenze;
-    }
-
-    public Boolean getAttivo() {
-        return attivo;
-    }
-
-    public void setAttivo(Boolean attivo) {
-        this.attivo = attivo;
-    }
-
-    public String getUdm() {
-        return udm;
-    }
-
-    public void setUdm(String udm) {
-        this.udm = udm;
-    }
-
-    public Long getIdFornitore() {
-        return idFornitore;
-    }
-
-    public void setIdFornitore(Long idFornitore) {
-        this.idFornitore = idFornitore;
-    }
-
-    public String getFornitore() {
-        return fornitore;
-    }
-
-    public void setFornitore(String fornitore) {
-        this.fornitore = fornitore;
-    }
-
-    public String getCodiceIngrediente() {
-        return codiceIngrediente;
-    }
-
-    public void setCodiceIngrediente(String codiceIngrediente) {
-        this.codiceIngrediente = codiceIngrediente;
-    }
-
-    public String getDescrizioneIngrediente() {
-        return descrizioneIngrediente;
-    }
-
-    public void setDescrizioneIngrediente(String descrizioneIngrediente) {
-        this.descrizioneIngrediente = descrizioneIngrediente;
-    }
+    @Column(name = "scaduto")
+    private Integer scaduto;
 
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder();
 
-        result.append("{");
-        result.append("idIngrediente: " + idIngrediente);
-        result.append(", ingrediente: " + ingrediente);
-        result.append(", quantita: " + quantita);
-        result.append(", idGiacenze: " + idGiacenze);
-        result.append(", lottoGiacenze: " + lottoGiacenze);
-        result.append(", scadenzaGiacenze: " + scadenzaGiacenze);
-        result.append(", attivo: " + attivo);
-        result.append(", udm: " + udm);
-        result.append(", idFornitore: " + idFornitore);
-        result.append(", fornitore: " + fornitore);
-        result.append(", codiceIngrediente: " + codiceIngrediente);
-        result.append(", descrizioneIngrediente: " + descrizioneIngrediente);
-        result.append("}");
-
-        return result.toString();
+        return "{" +
+                "idIngrediente: " + idIngrediente +
+                ", ingrediente: " + ingrediente +
+                ", quantita: " + quantita +
+                ", attivo: " + attivo +
+                ", udm: " + udm +
+                ", idFornitore: " + idFornitore +
+                ", fornitore: " + fornitore +
+                ", codiceIngrediente: " + codiceIngrediente +
+                ", descrizioneIngrediente: " + descrizioneIngrediente +
+                ", scaduto: " + scaduto +
+                "}";
     }
 }

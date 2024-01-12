@@ -20,5 +20,6 @@ encoding/ordini_autisti.jrxml=UTF-8
 encoding/pagamenti.jrxml=UTF-8
 encoding/ricevuta_privato.jrxml=UTF-8
 encoding/ricevute_privati.jrxml=UTF-8
+encoding/scheda_tecnica.jrxml=UTF-8
 encoding/test_1.jrxml=UTF-8
 encoding/test_1_header.jrxml=UTF-8

@@ -1,10 +1,13 @@
 package com.contarbn.service;
 
+import com.contarbn.exception.OperationException;
 import com.contarbn.exception.ResourceNotFoundException;
 import com.contarbn.model.Ingrediente;
 import com.contarbn.model.IngredienteAllergene;
+import com.contarbn.model.RicettaIngrediente;
 import com.contarbn.repository.GiacenzaIngredienteRepository;
 import com.contarbn.repository.IngredienteRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -12,24 +15,19 @@ import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class IngredienteService {
 
     private final IngredienteRepository ingredienteRepository;
     private final GiacenzaIngredienteRepository giacenzaIngredienteRepository;
     private final IngredienteAllergeneService ingredienteAllergeneService;
-
-    public IngredienteService(final IngredienteRepository ingredienteRepository,
-                              final GiacenzaIngredienteRepository giacenzaIngredienteRepository,
-                              final IngredienteAllergeneService ingredienteAllergeneService){
-        this.ingredienteRepository = ingredienteRepository;
-        this.giacenzaIngredienteRepository = giacenzaIngredienteRepository;
-        this.ingredienteAllergeneService = ingredienteAllergeneService;
-    }
+    private final RicettaIngredienteService ricettaIngredienteService;
 
     public Set<Ingrediente> getAll(){
         log.info("Retrieving the list of 'ingredienti'");
@@ -91,13 +89,24 @@ public class IngredienteService {
 
     @Transactional
     public void delete(Long ingredienteId){
-        log.info("Deleting 'giacenze' for 'ingrediente' '{}'", ingredienteId);
-        giacenzaIngredienteRepository.deleteByIngredienteId(ingredienteId);
-        log.info("Deleted 'giacenze' for 'ingrediente' '{}'", ingredienteId);
 
-        log.info("Deleting 'ingrediente' '{}'", ingredienteId);
-        ingredienteAllergeneService.deleteByIngredienteId(ingredienteId);
-        ingredienteRepository.deleteById(ingredienteId);
-        log.info("Deleted 'ingrediente' '{}'", ingredienteId);
+        List<RicettaIngrediente> ricettaIngredienti = ricettaIngredienteService.findByIngredienteId(ingredienteId);
+        if(!ricettaIngredienti.isEmpty()){
+            throw new OperationException("Errore nella cancellazione: l'ingrediente è presente in ricette");
+        }
+
+        try{
+            log.info("Deleting 'giacenze' for 'ingrediente' '{}'", ingredienteId);
+            giacenzaIngredienteRepository.deleteByIngredienteId(ingredienteId);
+            log.info("Deleted 'giacenze' for 'ingrediente' '{}'", ingredienteId);
+
+            log.info("Deleting 'ingrediente' '{}'", ingredienteId);
+            ingredienteAllergeneService.deleteByIngredienteId(ingredienteId);
+            ingredienteRepository.deleteById(ingredienteId);
+            log.info("Deleted 'ingrediente' '{}'", ingredienteId);
+
+        } catch(Exception e){
+            throw new OperationException("Errore nella cancellazione dell'ingrediente");
+        }
     }
 }

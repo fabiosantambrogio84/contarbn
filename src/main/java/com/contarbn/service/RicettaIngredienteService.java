@@ -5,6 +5,8 @@ import com.contarbn.repository.RicettaIngredienteRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class RicettaIngredienteService {
@@ -20,6 +22,12 @@ public class RicettaIngredienteService {
         RicettaIngrediente createdRicettaIngrediente = ricettaIngredienteRepository.save(ricettaIngrediente);
         log.info("Created 'ricetta ingrediente' '{}'", createdRicettaIngrediente);
         return createdRicettaIngrediente;
+    }
+
+    public List<RicettaIngrediente> findByIngredienteId(Long ingredienteId){
+        List<RicettaIngrediente> ricettaIngredienti = ricettaIngredienteRepository.findAllByIngredienteId(ingredienteId);
+        log.info("Retrieved {} 'ricettaIngredienti' with 'ingredienteId'={}", ricettaIngredienti.size(), ingredienteId);
+        return ricettaIngredienti;
     }
 
     public void deleteByRicettaId(Long ricettaId){

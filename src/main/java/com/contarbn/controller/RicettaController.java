@@ -2,6 +2,8 @@ package com.contarbn.controller;
 
 import com.contarbn.exception.CannotChangeResourceIdException;
 import com.contarbn.model.Ricetta;
+import com.contarbn.model.SchedaTecnica;
+import com.contarbn.model.views.VSchedaTecnica;
 import com.contarbn.service.RicettaService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,5 +66,20 @@ public class RicettaController {
     public void delete(@PathVariable final Long ricettaId){
         log.info("Performing DELETE request for deleting 'ricetta' '{}'", ricettaId);
         ricettaService.delete(ricettaId);
+    }
+
+    @RequestMapping(method = GET, path = "/{ricettaId}/scheda-tecnica")
+    @CrossOrigin
+    public Object getSchedaTecnica(@PathVariable final Long ricettaId) {
+        log.info("Performing GET request for retrieving 'scheda-tecnica' for 'ricetta' '{}'", ricettaId);
+        return ricettaService.getSchedaTecnica(ricettaId);
+    }
+
+    @RequestMapping(method = POST, path = "/{ricettaId}/scheda-tecnica")
+    @ResponseStatus(CREATED)
+    @CrossOrigin
+    public SchedaTecnica saveSchedaTecnica(@PathVariable final Long ricettaId, @RequestBody final SchedaTecnica schedaTecnica){
+        log.info("Performing POST request for creating 'scheda-tecnica' for 'ricetta' {}", ricettaId);
+        return ricettaService.saveSchedaTecnica(schedaTecnica);
     }
 }

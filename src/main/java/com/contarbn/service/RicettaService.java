@@ -4,16 +4,20 @@ import com.contarbn.exception.ResourceNotFoundException;
 import com.contarbn.model.Ricetta;
 import com.contarbn.model.RicettaAllergene;
 import com.contarbn.model.RicettaIngrediente;
+import com.contarbn.model.SchedaTecnica;
 import com.contarbn.repository.RicettaRepository;
 import com.contarbn.util.Utils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class RicettaService {
 
@@ -21,16 +25,7 @@ public class RicettaService {
     private final RicettaIngredienteService ricettaIngredienteService;
     private final RicettaAllergeneService ricettaAllergeneService;
     private final ProduzioneService produzioneService;
-
-    public RicettaService(final RicettaRepository ricettaRepository,
-                          final RicettaIngredienteService ricettaIngredienteService,
-                          final RicettaAllergeneService ricettaAllergeneService,
-                          final ProduzioneService produzioneService){
-        this.ricettaRepository = ricettaRepository;
-        this.ricettaIngredienteService = ricettaIngredienteService;
-        this.ricettaAllergeneService = ricettaAllergeneService;
-        this.produzioneService = produzioneService;
-    }
+    private final SchedaTecnicaService schedaTecnicaService;
 
     public Set<Ricetta> getAll(){
         log.info("Retrieving the list of 'ricette'");
@@ -101,5 +96,19 @@ public class RicettaService {
         ricettaAllergeneService.deleteByRicettaId(ricettaId);
         ricettaRepository.deleteById(ricettaId);
         log.info("Deleted 'ricetta' '{}'", ricettaId);
+    }
+
+    public Object getSchedaTecnica(Long idRicetta){
+        log.info("Retrieving 'scheda tecnica' for 'ricetta' {}", idRicetta);
+        Optional<SchedaTecnica> schedaTecnica = schedaTecnicaService.getByIdRicetta(idRicetta);
+        if(!schedaTecnica.isPresent()) {
+           return schedaTecnicaService.getByIdRicettaFromView(idRicetta);
+        }
+        return schedaTecnica;
+    }
+
+    public SchedaTecnica saveSchedaTecnica(SchedaTecnica schedaTecnica){
+        log.info("Creating/updating 'scheda tecnica'");
+        return schedaTecnicaService.save(schedaTecnica);
     }
 }

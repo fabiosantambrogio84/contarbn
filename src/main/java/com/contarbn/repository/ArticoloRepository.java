@@ -25,7 +25,7 @@ public interface ArticoloRepository extends CrudRepository<Articolo, Long> {
 
     Set<Articolo> findByAttivoAndBarcodeStartsWithAndCompleteBarcodeIsFalse(Boolean attivo, String barcode);
 
-    @Query(value = "SELECT * FROM articolo WHERE codice LIKE ?1 ORDER BY codice", nativeQuery = true)
-    List<Articolo> findByCodiceLike(String codice);
+    @Query(value = "SELECT * FROM articolo WHERE codice LIKE ?1 AND attivo in ?2 ORDER BY codice", nativeQuery = true)
+    List<Articolo> findByCodiceLike(String codice, List<Integer> activeValues);
 
 }
