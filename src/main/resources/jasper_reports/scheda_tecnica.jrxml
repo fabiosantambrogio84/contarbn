@@ -170,7 +170,8 @@
 	<parameter name="headerSubReportPath" class="java.lang.String"/>
 	<parameter name="notaSchedaTecnica" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="notaDisposizioniComune" class="java.lang.String" isForPrompting="false"/>
-	<parameter name="codiceProdotto" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="prodotto" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="prodotto2" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="pesoNettoConfezione" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="ingredienti" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="allergeniTracce" class="java.lang.String" isForPrompting="false"/>
@@ -291,7 +292,9 @@
 				<text><![CDATA[CODICE PRODOTTO]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="50" width="140" height="30" uuid="6e3b19ca-35d4-4127-baf9-2890a75fbd21"/>
+				<reportElement x="0" y="50" width="140" height="20" uuid="6e3b19ca-35d4-4127-baf9-2890a75fbd21">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
 				<box padding="2">
 					<pen lineWidth="0.0"/>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -305,7 +308,7 @@
 				<text><![CDATA[PESO NETTO CONFEZIONE]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="90" width="140" height="20" uuid="bb37612f-a99d-4f13-8aad-96f54e55e1fa"/>
+				<reportElement x="0" y="79" width="140" height="20" uuid="bb37612f-a99d-4f13-8aad-96f54e55e1fa"/>
 				<box padding="2">
 					<pen lineWidth="0.0"/>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -319,7 +322,7 @@
 				<text><![CDATA[INGREDIENTI]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="120" width="140" height="30" uuid="84d96fe0-a1a5-4881-af83-4f3bcb93ff31"/>
+				<reportElement x="0" y="109" width="140" height="30" uuid="84d96fe0-a1a5-4881-af83-4f3bcb93ff31"/>
 				<box padding="2">
 					<pen lineWidth="0.0"/>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -333,7 +336,7 @@
 				<text><![CDATA[ALLERGENI e TRACCE]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="160" width="140" height="20" uuid="7dfeb502-2a29-4b14-9f10-cb0b025ae91a"/>
+				<reportElement x="0" y="149" width="140" height="20" uuid="7dfeb502-2a29-4b14-9f10-cb0b025ae91a"/>
 				<box padding="2">
 					<pen lineWidth="0.0"/>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -347,7 +350,7 @@
 				<text><![CDATA[DURATA]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="190" width="140" height="20" uuid="218b3c70-78fa-487c-9272-21a778063f2f"/>
+				<reportElement x="0" y="179" width="140" height="20" uuid="218b3c70-78fa-487c-9272-21a778063f2f"/>
 				<box padding="2">
 					<pen lineWidth="0.0"/>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -361,7 +364,7 @@
 				<text><![CDATA[CONSERVAZIONE]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="220" width="140" height="30" uuid="dfce130e-f442-49b5-ba8a-498f19fe9ea6"/>
+				<reportElement x="0" y="209" width="140" height="30" uuid="dfce130e-f442-49b5-ba8a-498f19fe9ea6"/>
 				<box padding="2">
 					<pen lineWidth="0.0"/>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -375,7 +378,7 @@
 				<text><![CDATA[CONSIGLI PER IL CONSUMO]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="0" y="450" width="240" height="30" uuid="c4c41604-7083-458d-bef7-a9ee9c556d55"/>
+				<reportElement positionType="Float" x="0" y="433" width="174" height="20" uuid="c4c41604-7083-458d-bef7-a9ee9c556d55"/>
 				<box padding="2">
 					<pen lineWidth="0.0"/>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -389,7 +392,7 @@
 				<text><![CDATA[TIPOLOGIA CONFEZIONAMENTO]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="0" y="480" width="240" height="30" uuid="f27fcdc5-6147-48f2-ad42-f4b3698b15a9"/>
+				<reportElement positionType="Float" x="0" y="453" width="174" height="20" uuid="f27fcdc5-6147-48f2-ad42-f4b3698b15a9"/>
 				<box padding="2">
 					<pen lineWidth="0.0"/>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -397,14 +400,15 @@
 					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement>
+				<textElement verticalAlignment="Justified">
 					<font size="9"/>
 				</textElement>
 				<text><![CDATA[IMBALLO PRIMARIO]]></text>
 			</staticText>
 			<textField textAdjust="ScaleFont">
-				<reportElement positionType="Float" x="0" y="550" width="554" height="20" uuid="5a4bec05-4d74-4399-a407-8c4d4809b9d4">
+				<reportElement positionType="Float" x="0" y="510" width="554" height="15" uuid="5a4bec05-4d74-4399-a407-8c4d4809b9d4">
 					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -419,9 +423,10 @@
 				<textFieldExpression><![CDATA[$P{notaDisposizioniComune}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="ScaleFont">
-				<reportElement positionType="Float" x="0" y="580" width="555" height="40" uuid="ce0be9a1-8f54-400b-b3c5-23de6b022e53">
+				<reportElement positionType="Float" x="0" y="530" width="555" height="28" uuid="ce0be9a1-8f54-400b-b3c5-23de6b022e53">
 					<property name="com.jaspersoft.studio.unit.firstLineIndent" value="px"/>
 					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
 				</reportElement>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -429,105 +434,121 @@
 					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement>
+				<textElement textAlignment="Center">
 					<font size="8" isItalic="true"/>
 					<paragraph firstLineIndent="0" leftIndent="2"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{notaSchedaTecnica}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="ScaleFont">
-				<reportElement x="140" y="10" width="415" height="30" uuid="847d85c9-425d-4737-99be-30d10f23d3bd"/>
+				<reportElement x="140" y="50" width="414" height="20" uuid="73f2930d-7f20-436b-b014-fcb428d4bb5b">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
+				<textElement textAlignment="Left" verticalAlignment="Top">
+					<paragraph leftIndent="2"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{codiceProdotto}]]></textFieldExpression>
-			</textField>
-			<textField textAdjust="ScaleFont">
-				<reportElement x="140" y="50" width="414" height="30" uuid="73f2930d-7f20-436b-b014-fcb428d4bb5b"/>
-				<box>
-					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$P{pesoNettoConfezione}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="ScaleFont">
-				<reportElement x="140" y="90" width="414" height="20" uuid="a7621b75-c040-4562-8fe6-c5ec2eb948f4"/>
+				<reportElement x="140" y="79" width="414" height="20" uuid="a7621b75-c040-4562-8fe6-c5ec2eb948f4">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Left" verticalAlignment="Top">
+					<paragraph leftIndent="2"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{ingredienti}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="ScaleFont">
-				<reportElement x="140" y="120" width="415" height="30" uuid="cca63165-7547-455b-a9f1-195b23e5678c"/>
+				<reportElement x="140" y="109" width="415" height="30" uuid="cca63165-7547-455b-a9f1-195b23e5678c">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Left" verticalAlignment="Top">
+					<paragraph leftIndent="2"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{allergeniTracce}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="ScaleFont">
-				<reportElement x="140" y="160" width="414" height="20" uuid="670a544c-ecc9-4f5b-bbd5-246750b231a4"/>
+				<reportElement x="140" y="149" width="414" height="20" uuid="670a544c-ecc9-4f5b-bbd5-246750b231a4">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Left" verticalAlignment="Top">
+					<paragraph leftIndent="2"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{durata}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="ScaleFont">
-				<reportElement x="140" y="190" width="414" height="20" uuid="e6f27e02-6e32-432a-af01-03f86dbabe96"/>
+				<reportElement x="140" y="179" width="414" height="20" uuid="e6f27e02-6e32-432a-af01-03f86dbabe96">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Left" verticalAlignment="Top">
+					<paragraph leftIndent="2"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{conservazione}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="ScaleFont">
-				<reportElement x="140" y="220" width="414" height="30" uuid="77507535-fc30-43c6-af22-4ec1d2cd8f46"/>
+				<reportElement x="140" y="209" width="414" height="30" uuid="77507535-fc30-43c6-af22-4ec1d2cd8f46">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Left" verticalAlignment="Top">
+					<paragraph leftIndent="2"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{consigliConsumo}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="ScaleFont">
-				<reportElement positionType="Float" x="240" y="450" width="158" height="30" uuid="dec38df1-adf6-4ae9-81a9-fd10a4a4c384"/>
+				<reportElement positionType="Float" x="174" y="433" width="126" height="20" uuid="dec38df1-adf6-4ae9-81a9-fd10a4a4c384">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Left" verticalAlignment="Top">
+					<paragraph leftIndent="2"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{tipologiaConfezionamento}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="ScaleFont">
-				<reportElement positionType="Float" x="240" y="480" width="158" height="30" uuid="05396d0e-8388-46e5-ad86-dab24b92465a">
+				<reportElement positionType="Float" x="174" y="453" width="126" height="20" uuid="05396d0e-8388-46e5-ad86-dab24b92465a">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 				</reportElement>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -535,12 +556,15 @@
 					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Left" verticalAlignment="Justified">
+					<paragraph leftIndent="2"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{imballo}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="ScaleFont">
-				<reportElement positionType="Float" x="398" y="495" width="157" height="15" uuid="9d4442f0-b1ca-48a5-a4b4-c27515ad122a">
+				<reportElement positionType="Float" x="365" y="453" width="189" height="20" uuid="9d4442f0-b1ca-48a5-a4b4-c27515ad122a">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 				</reportElement>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -548,24 +572,30 @@
 					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Left" verticalAlignment="Justified">
+					<paragraph leftIndent="2"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{imballoDimensioni}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement positionType="Float" x="398" y="480" width="157" height="15" uuid="ae602291-0baa-4ffa-acc8-6cfcde52f64b">
+				<reportElement positionType="Float" x="301" y="453" width="63" height="20" uuid="ae602291-0baa-4ffa-acc8-6cfcde52f64b">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<box>
 					<topPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
 					<rightPen lineWidth="1.0"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Justified">
-					<font size="9"/>
+				<textElement textAlignment="Left" verticalAlignment="Justified">
+					<font size="9" isBold="false"/>
+					<paragraph leftIndent="2"/>
 				</textElement>
-				<text><![CDATA[Dimensioni]]></text>
+				<text><![CDATA[DIMENSIONI]]></text>
 			</staticText>
 			<componentElement>
-				<reportElement x="0" y="260" width="280" height="180" uuid="bb65c077-8ffe-47a8-a758-54a253d82a3b">
+				<reportElement x="0" y="247" width="280" height="180" uuid="bb65c077-8ffe-47a8-a758-54a253d82a3b">
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
 					<property name="com.jaspersoft.studio.table.style.table_header" value="Table_TH"/>
 					<property name="com.jaspersoft.studio.table.style.column_header" value="Table_CH"/>
@@ -578,8 +608,9 @@
 					</datasetRun>
 					<jr:column width="140" uuid="4659603a-8ce6-482b-b6e8-7a6100d03a0b">
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Colonna1"/>
-						<jr:tableHeader style="Table_TH" height="30">
+						<jr:tableHeader style="Table_TH" height="20">
 							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
 							<box>
 								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -587,16 +618,19 @@
 								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<staticText>
-								<reportElement x="0" y="0" width="140" height="30" uuid="d88a7350-4079-411e-b6fa-e843a4def25b"/>
+								<reportElement x="0" y="0" width="140" height="20" uuid="d88a7350-4079-411e-b6fa-e843a4def25b">
+									<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+								</reportElement>
 								<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
 									<font size="9"/>
 								</textElement>
 								<text><![CDATA[DICHIARAZIONE<br>NUTRIZIONALE]]></text>
 							</staticText>
 						</jr:tableHeader>
-						<jr:detailCell style="Table_TD" height="30">
+						<jr:detailCell style="Table_TD" height="20">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
 							<textField textAdjust="ScaleFont">
-								<reportElement x="0" y="0" width="140" height="30" uuid="1e80a253-ddda-4855-b9d8-9be6d3142fe1">
+								<reportElement x="0" y="0" width="140" height="20" uuid="1e80a253-ddda-4855-b9d8-9be6d3142fe1">
 									<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 								</reportElement>
 								<textElement verticalAlignment="Middle">
@@ -609,7 +643,7 @@
 					</jr:column>
 					<jr:column width="140" uuid="c79e9dbd-f49d-44a5-b9c7-854d140cb838">
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Colonna2"/>
-						<jr:tableHeader style="Table_TH" height="30">
+						<jr:tableHeader style="Table_TH" height="20">
 							<property name="com.jaspersoft.studio.unit.width" value="px"/>
 							<box>
 								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -618,16 +652,16 @@
 								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<staticText>
-								<reportElement x="0" y="0" width="140" height="30" uuid="e474d848-6d6c-4bd6-8ecf-9d3d447f60da"/>
+								<reportElement x="0" y="0" width="140" height="20" uuid="e474d848-6d6c-4bd6-8ecf-9d3d447f60da"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="9"/>
 								</textElement>
 								<text><![CDATA[VALORI MEDI PER 100 GR]]></text>
 							</staticText>
 						</jr:tableHeader>
-						<jr:detailCell style="Table_TD" height="30">
+						<jr:detailCell style="Table_TD" height="20">
 							<textField textAdjust="ScaleFont">
-								<reportElement x="0" y="0" width="140" height="30" uuid="2e60d22f-17f0-49b9-85df-15a7b8f68850">
+								<reportElement x="0" y="0" width="140" height="20" uuid="2e60d22f-17f0-49b9-85df-15a7b8f68850">
 									<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 								</reportElement>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -641,7 +675,7 @@
 				</jr:table>
 			</componentElement>
 			<componentElement>
-				<reportElement x="314" y="259" width="240" height="180" uuid="c6d818f6-d18e-45e9-ba9f-61d0aa27167c">
+				<reportElement x="314" y="246" width="240" height="180" uuid="c6d818f6-d18e-45e9-ba9f-61d0aa27167c">
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
 					<property name="com.jaspersoft.studio.table.style.table_header" value="Table 2_TH"/>
 					<property name="com.jaspersoft.studio.table.style.column_header" value="Table 2_CH"/>
@@ -654,10 +688,11 @@
 					</datasetRun>
 					<jr:columnGroup width="240" uuid="9356d420-4a4c-4aa8-b0b0-b2633ff00c86">
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Colonne [2]"/>
-						<jr:tableHeader style="Table 2_TH" height="30" rowSpan="1">
+						<jr:tableHeader style="Table 2_TH" height="20" rowSpan="1">
 							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
 							<staticText>
-								<reportElement x="0" y="0" width="240" height="30" uuid="b5146bef-907f-4f76-b4a2-b64ac9b11dba"/>
+								<reportElement x="0" y="0" width="240" height="20" uuid="b5146bef-907f-4f76-b4a2-b64ac9b11dba"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="9"/>
 								</textElement>
@@ -666,9 +701,10 @@
 						</jr:tableHeader>
 						<jr:column width="120" uuid="b38d2cfb-d5b7-4941-b139-958a59852e66">
 							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Colonna1"/>
-							<jr:detailCell style="Table 2_TD" height="30">
+							<jr:detailCell style="Table 2_TD" height="20">
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
 								<textField textAdjust="ScaleFont">
-									<reportElement x="0" y="0" width="120" height="30" uuid="f4a15d81-fdcf-41b0-a1de-d89d6e36814b">
+									<reportElement x="0" y="0" width="120" height="20" uuid="f4a15d81-fdcf-41b0-a1de-d89d6e36814b">
 										<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 									</reportElement>
 									<textElement verticalAlignment="Middle">
@@ -681,12 +717,12 @@
 						</jr:column>
 						<jr:column width="120" uuid="33d945e4-1a37-463a-938e-4956a0d7a3c4">
 							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Colonna2"/>
-							<jr:detailCell style="Table 2_TD" height="30">
+							<jr:detailCell style="Table 2_TD" height="20">
 								<textField textAdjust="ScaleFont">
-									<reportElement x="0" y="0" width="120" height="30" uuid="e4b0300d-844a-4d43-951e-7f4bd75b4ff3">
+									<reportElement x="0" y="0" width="120" height="20" uuid="e4b0300d-844a-4d43-951e-7f4bd75b4ff3">
 										<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 									</reportElement>
-									<textElement textAlignment="Center" verticalAlignment="Middle">
+									<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
 										<font size="9"/>
 										<paragraph leftIndent="2"/>
 									</textElement>
@@ -698,11 +734,12 @@
 				</jr:table>
 			</componentElement>
 			<componentElement>
-				<reportElement positionType="Float" x="174" y="520" width="380" height="30" uuid="199576a4-7c9c-4550-8893-9ff5dc227c8e">
+				<reportElement positionType="Float" x="174" y="480" width="380" height="20" uuid="199576a4-7c9c-4550-8893-9ff5dc227c8e">
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
 					<property name="com.jaspersoft.studio.table.style.table_header" value="Table 3_TH"/>
 					<property name="com.jaspersoft.studio.table.style.column_header" value="Table 3_CH"/>
 					<property name="com.jaspersoft.studio.table.style.detail" value="Table 3_TD"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
 					<datasetRun subDataset="SchedaTecnicaRaccolteDataset" uuid="d4cfea22-9a4b-469b-80ff-8e4440cd4f7b">
@@ -710,8 +747,9 @@
 					</datasetRun>
 					<jr:column width="190" uuid="ef676a86-13fb-457e-a1b3-d68fda5bd158">
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Colonna1"/>
-						<jr:detailCell style="Table 3_TD" height="30">
+						<jr:detailCell style="Table 3_TD" height="20">
 							<property name="com.jaspersoft.studio.unit.width" value="px"/>
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
 							<box>
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
@@ -720,7 +758,7 @@
 								<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<textField textAdjust="ScaleFont">
-								<reportElement x="0" y="0" width="190" height="30" uuid="150061df-9209-4a7c-893d-1682bb5ba4b5">
+								<reportElement x="0" y="0" width="190" height="20" uuid="150061df-9209-4a7c-893d-1682bb5ba4b5">
 									<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 								</reportElement>
 								<box>
@@ -739,7 +777,7 @@
 					</jr:column>
 					<jr:column width="190" uuid="5351a89b-c0b5-4721-8364-606f2dbf2ab3">
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Colonna2"/>
-						<jr:detailCell style="Table 3_TD" height="30">
+						<jr:detailCell style="Table 3_TD" height="20">
 							<property name="com.jaspersoft.studio.unit.width" value="px"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -749,7 +787,7 @@
 								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<textField textAdjust="ScaleFont">
-								<reportElement x="0" y="0" width="190" height="30" uuid="b99e36fc-912b-4b00-96be-a2399364a178">
+								<reportElement x="0" y="0" width="190" height="20" uuid="b99e36fc-912b-4b00-96be-a2399364a178">
 									<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 								</reportElement>
 								<box>
@@ -769,8 +807,9 @@
 				</jr:table>
 			</componentElement>
 			<staticText>
-				<reportElement positionType="Float" x="0" y="520" width="174" height="30" uuid="84598a1c-5b1e-4b86-8dfa-4e801cdd037a">
+				<reportElement positionType="Float" x="0" y="480" width="174" height="20" uuid="84598a1c-5b1e-4b86-8dfa-4e801cdd037a">
 					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -784,22 +823,56 @@
 				</textElement>
 				<text><![CDATA[RACCOLTA DIFFERENZIATA]]></text>
 			</staticText>
+			<frame>
+				<reportElement x="140" y="10" width="415" height="30" uuid="ef98fede-fbb1-4b27-a66f-ccb4c8cac53a"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textField textAdjust="ScaleFont">
+					<reportElement x="0" y="1" width="414" height="29" uuid="847d85c9-425d-4737-99be-30d10f23d3bd">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Top" markup="html">
+						<font isBold="false"/>
+						<paragraph lineSpacing="Single" lineSpacingSize="0.0" leftIndent="2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["<b>"+$P{prodotto}+"</b><br/>"+$P{prodotto2}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<line>
+				<reportElement positionType="Float" x="0" y="427" width="553" height="1" forecolor="rgba(255, 255, 255, 0.9411765)" uuid="f0409326-b176-4931-9329-5d842c02deac">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+			</line>
 		</band>
 	</detail>
 	<pageFooter>
-		<band height="40" splitType="Stretch">
+		<band height="20" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<textField>
-				<reportElement x="174" y="14" width="100" height="17" uuid="80a70d67-1e11-4239-99b9-4f4139f6ffbd"/>
+				<reportElement x="174" y="1" width="100" height="17" uuid="80a70d67-1e11-4239-99b9-4f4139f6ffbd">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
-			<textField evaluationTime="Report">
-				<reportElement x="284" y="14" width="100" height="17" uuid="ae37eeab-a20d-41bf-89bc-9bc5ab7ef0eb"/>
+			<textField textAdjust="ScaleFont" evaluationTime="Report">
+				<reportElement x="283" y="1" width="100" height="17" uuid="ae37eeab-a20d-41bf-89bc-9bc5ab7ef0eb">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
 				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="275" y="14" width="9" height="17" uuid="32427fe3-5e5f-4333-91ca-11cbde864f88">
+				<reportElement x="274" y="1" width="9" height="17" uuid="32427fe3-5e5f-4333-91ca-11cbde864f88">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center"/>

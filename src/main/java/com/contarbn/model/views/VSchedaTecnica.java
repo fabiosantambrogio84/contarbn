@@ -3,10 +3,7 @@ package com.contarbn.model.views;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.sql.Date;
 
 @Data
@@ -28,11 +25,17 @@ public class VSchedaTecnica {
     @Column(name = "num_revisione")
     private Integer numRevisione;
 
+    @Column(name = "anno")
+    private Integer anno;
+
     @Column(name = "data")
     private Date data;
 
-    @Column(name = "codice_prodotto")
-    private String codiceProdotto;
+    @Column(name = "prodotto")
+    private String prodotto;
+
+    @Column(name = "prodotto_2")
+    private String prodotto2;
 
     @Column(name = "peso_netto_confezione")
     private String pesoNettoConfezione;
@@ -61,6 +64,9 @@ public class VSchedaTecnica {
     @Column(name = "imballo_dimensioni")
     private String imballoDimensioni;
 
+    @Transient
+    final private String objectType = "view";
+
     @Override
     public String toString() {
 
@@ -69,8 +75,10 @@ public class VSchedaTecnica {
                 ", idRicetta: " + idRicetta +
                 ", idSchedaTecnica: " + idSchedaTecnica +
                 ", numRevisione: " + numRevisione +
+                ", anno: " + anno +
                 ", data: " + data +
-                ", codiceProdotto: " + codiceProdotto +
+                ", prodotto: " + prodotto +
+                ", prodotto2: " + prodotto2 +
                 ", pesoNettoConfezione: " + pesoNettoConfezione +
                 ", ingredienti: " + ingredienti +
                 ", allergeniTracce: " + allergeniTracce +
@@ -80,6 +88,7 @@ public class VSchedaTecnica {
                 ", tipologiaConfezionamento: " + tipologiaConfezionamento +
                 ", imballo: " + imballo +
                 ", imballoDimensioni: " + imballoDimensioni +
+                ", objectType: " + objectType +
                 "}";
     }
 }

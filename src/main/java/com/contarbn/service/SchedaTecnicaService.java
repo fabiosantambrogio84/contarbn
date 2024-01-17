@@ -17,11 +17,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -43,26 +40,49 @@ public class SchedaTecnicaService {
     public VSchedaTecnica getByIdRicettaFromView(Long idRicetta){
         log.info("Retrieving 'scheda tecnica' view for ricetta '{}'", idRicetta);
         VSchedaTecnica vSchedaTecnica = vSchedaTecnicaRepository.findFirstByIdRicetta(idRicetta).orElseThrow(RuntimeException::new);
+        if(vSchedaTecnica.getNumRevisione() == null){
+            vSchedaTecnica.setNumRevisione(getNumRevisione(vSchedaTecnica.getAnno()));
+        }
         log.info("Retrieved 'scheda tecnica' view  '{}'", vSchedaTecnica);
         return vSchedaTecnica;
     }
 
     public Optional<SchedaTecnica> getByIdRicetta(Long idRicetta){
         log.info("Retrieving 'scheda tecnica' for ricetta '{}'", idRicetta);
-        return schedaTecnicaRepository.findFirstByIdRicetta(idRicetta);
+        Optional<SchedaTecnica> optionalSchedaTecnica = schedaTecnicaRepository.findFirstByIdRicetta(idRicetta);
+        if(!optionalSchedaTecnica.isPresent()){
+            return optionalSchedaTecnica;
+        }
+        SchedaTecnica schedaTecnica = optionalSchedaTecnica.get();
+        if(schedaTecnica.getAnno() == null){
+            Date data = schedaTecnica.getData() != null ? schedaTecnica.getData() : Date.valueOf(ZonedDateTime.now().toLocalDate());
+            int anno = data.toLocalDate().getYear();
+            int numRevisione = getNumRevisione(anno);
+            if(schedaTecnica.getData() == null){
+                schedaTecnica.setData(Date.valueOf(ZonedDateTime.now().toLocalDate()));
+            }
+            schedaTecnica.setAnno(anno);
+            schedaTecnica.setNumRevisione(numRevisione);
+        }
+        return Optional.of(schedaTecnica);
     }
 
     public SchedaTecnica save(SchedaTecnica schedaTecnica){
         log.info("Saving 'scheda tecnica'");
 
-        schedaTecnica.setNumRevisione(schedaTecnica.getNumRevisione() != null ? schedaTecnica.getNumRevisione() : 1);
-        schedaTecnica.setData(schedaTecnica.getData() != null ? schedaTecnica.getData() : Date.valueOf(LocalDate.now()));
-        schedaTecnica.setDataAggiornamento(Timestamp.from(ZonedDateTime.now().toInstant()));
-        if(schedaTecnica.getId() == null){
-            schedaTecnica.setDataInserimento(Timestamp.from(ZonedDateTime.now().toInstant()));
-        }else {
-            schedaTecnicaRepository.findById(schedaTecnica.getId()).ifPresent(s -> schedaTecnica.setDataInserimento(s.getDataInserimento()));
+        Timestamp dataInserimento = null;
+        Optional<SchedaTecnica> currentSchedaTecnica = schedaTecnicaRepository.findById(schedaTecnica.getId());
+        if(currentSchedaTecnica.isPresent()){
+            dataInserimento = currentSchedaTecnica.get().getDataInserimento();
         }
+        if(dataInserimento == null){
+            dataInserimento = Timestamp.from(ZonedDateTime.now().toInstant());
+        }
+        schedaTecnica.setDataInserimento(dataInserimento);
+        schedaTecnica.setNumRevisione(schedaTecnica.getNumRevisione() != null ? schedaTecnica.getNumRevisione() : 1);
+        schedaTecnica.setData(schedaTecnica.getData() != null ? schedaTecnica.getData() : Date.valueOf(ZonedDateTime.now().toLocalDate()));
+        schedaTecnica.setAnno(schedaTecnica.getAnno() != null ? schedaTecnica.getAnno() : ZonedDateTime.now().toLocalDate().getYear());
+        schedaTecnica.setDataAggiornamento(Timestamp.from(ZonedDateTime.now().toInstant()));
 
         SchedaTecnica resultSchedaTecnica;
 
@@ -104,6 +124,25 @@ public class SchedaTecnicaService {
 
         log.info("Saved 'scheda tecnica' '{}'", resultSchedaTecnica);
         return resultSchedaTecnica;
+    }
+
+    public Map<String, Integer> getNumRevisioneAndAnno(Date data){
+        Integer anno = data != null ? data.toLocalDate().getYear() : ZonedDateTime.now().toLocalDate().getYear();
+        Integer numRevisione = getNumRevisione(anno);
+        HashMap<String, Integer> result = new HashMap<>();
+        result.put("anno", anno);
+        result.put("numRevisione", numRevisione);
+
+        return result;
+    }
+
+    private Integer getNumRevisione(Integer anno){
+        int numRevisione = 1;
+        Integer resultNumRevisione = schedaTecnicaRepository.getLastNumRevisioneByAnno(anno);
+        if(resultNumRevisione != null){
+            numRevisione = resultNumRevisione + 1;
+        }
+        return numRevisione;
     }
 
 }

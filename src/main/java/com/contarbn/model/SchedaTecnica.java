@@ -26,11 +26,17 @@ public class SchedaTecnica {
     @Column(name = "num_revisione")
     private Integer numRevisione;
 
+    @Column(name = "anno")
+    private Integer anno;
+
     @Column(name = "data")
     private Date data;
 
-    @Column(name = "codice_prodotto")
-    private String codiceProdotto;
+    @Column(name = "prodotto")
+    private String prodotto;
+
+    @Column(name = "prodotto_2")
+    private String prodotto2;
 
     @Column(name = "peso_netto_confezione")
     private String pesoNettoConfezione;
@@ -86,8 +92,10 @@ public class SchedaTecnica {
                 "id: " + id +
                 ", idRicetta: " + idRicetta +
                 ", numRevisione: " + numRevisione +
+                ", anno: " + anno +
                 ", data: " + data +
-                ", codiceProdotto: " + codiceProdotto +
+                ", prodotto: " + prodotto +
+                ", prodotto2: " + prodotto2 +
                 ", pesoNettoConfezione: " + pesoNettoConfezione +
                 ", ingredienti: " + ingredienti +
                 ", allergeniTracce: " + allergeniTracce +

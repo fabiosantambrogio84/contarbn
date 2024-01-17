@@ -12,7 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.sql.Date;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -105,6 +107,10 @@ public class RicettaService {
            return schedaTecnicaService.getByIdRicettaFromView(idRicetta);
         }
         return schedaTecnica;
+    }
+
+    public Map<String, Integer> getSchedaTecnicaNumRevisione(Date data){
+        return schedaTecnicaService.getNumRevisioneAndAnno(data);
     }
 
     public SchedaTecnica saveSchedaTecnica(SchedaTecnica schedaTecnica){

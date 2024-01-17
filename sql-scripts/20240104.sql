@@ -43,8 +43,10 @@ CREATE TABLE contarbn.`scheda_tecnica` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   id_ricetta int unsigned,
   num_revisione int default 1,
+  anno int,
   `data` date DEFAULT NULL,
-  `codice_prodotto` varchar(255) DEFAULT NULL,
+  `prodotto` varchar(255) DEFAULT NULL,
+  `prodotto_2` varchar(255) DEFAULT NULL,
   `peso_netto_confezione` varchar(255) DEFAULT NULL,
   `ingredienti` varchar(255) DEFAULT NULL,
   `allergeni_tracce` varchar(255) DEFAULT NULL,
@@ -90,10 +92,13 @@ CREATE TABLE contarbn.`scheda_tecnica_raccolta` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
 
+ALTER TABLE contarbn.ricetta ADD nome_2 varchar(100) DEFAULT NULL after nome;
+
 create or replace algorithm = UNDEFINED view `v_ricetta` as
 select
     `ricetta`.`id` as `id_ricetta`,
     `ricetta`.`nome` as `nome_ricetta`,
+    `ricetta`.`nome_2` as `nome_ricetta_2`,
     ricetta.tempo_preparazione,
     ricetta.peso_totale,
     `ricetta`.`valori_nutrizionali` as `valori_nutrizionali`,
@@ -108,6 +113,7 @@ from
 group by
     `ricetta`.`id`,
     `ricetta`.`nome`,
+    ricetta.nome_2,
     ricetta.tempo_preparazione,
     ricetta.peso_totale,
     `ricetta`.`valori_nutrizionali`,
@@ -117,12 +123,13 @@ create or replace algorithm = UNDEFINED view `v_ricetta_info` as
 select
     ricetta.id,
     ricetta.nome,
+    ricetta.nome_2,
     ricetta.tempo_preparazione,
     ricetta.peso_totale,
     ricetta.valori_nutrizionali,
     ricetta.conservazione,
-    group_concat(distinct ingrediente.descrizione order by ingrediente.descrizione desc separator ',') as ingredienti,
-    group_concat(distinct `allergene`.`nome` order by `allergene`.`nome` desc separator ',') as allergeni_tracce
+    group_concat(distinct ingrediente.descrizione order by ingrediente.descrizione desc separator ', ') as ingredienti,
+    group_concat(distinct `allergene`.`nome` order by `allergene`.`nome` desc separator ', ') as allergeni_tracce
 from
     contarbn.ricetta
         join contarbn.ricetta_ingrediente on
@@ -136,6 +143,7 @@ from
 group by
     ricetta.id,
     ricetta.nome,
+    ricetta.nome_2,
     ricetta.tempo_preparazione,
     ricetta.peso_totale,
     ricetta.valori_nutrizionali,
@@ -147,11 +155,13 @@ select
     uuid() as id,
     v_ricetta_info.id as id_ricetta,
     scheda_tecnica.id as id_scheda_tecnica,
-    coalesce(scheda_tecnica.num_revisione, 1) as num_revisione,
+    scheda_tecnica.num_revisione as num_revisione,
+    coalesce(scheda_tecnica.anno, year(current_date())) as anno,
     coalesce(scheda_tecnica.data, current_date()) as data,
-    coalesce(scheda_tecnica.codice_prodotto, v_ricetta_info.nome) as codice_prodotto,
+    coalesce(scheda_tecnica.prodotto, v_ricetta_info.nome) as prodotto,
+    coalesce(scheda_tecnica.prodotto_2, v_ricetta_info.nome_2) as prodotto_2,
     coalesce(scheda_tecnica.peso_netto_confezione, v_ricetta_info.peso_totale) as peso_netto_confezione,
-    coalesce(scheda_tecnica.ingredienti, v_ricetta_info.ingredienti) as ingredienti,
+    coalesce(scheda_tecnica.ingredienti, CONCAT(UCASE(LEFT(v_ricetta_info.ingredienti, 1)), LCASE(SUBSTRING(v_ricetta_info.ingredienti, 2)))) as ingredienti,
     coalesce(scheda_tecnica.allergeni_tracce, v_ricetta_info.allergeni_tracce) as allergeni_tracce,
     coalesce(scheda_tecnica.durata, v_ricetta_info.tempo_preparazione) as durata,
     coalesce(scheda_tecnica.conservazione, v_ricetta_info.conservazione) as conservazione,
