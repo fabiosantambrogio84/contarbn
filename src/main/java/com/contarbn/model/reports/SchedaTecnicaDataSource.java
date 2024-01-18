@@ -3,6 +3,7 @@ package com.contarbn.model.reports;
 import com.contarbn.model.SchedaTecnica;
 import lombok.Builder;
 import lombok.Data;
+import org.apache.commons.lang.StringUtils;
 
 import java.text.SimpleDateFormat;
 
@@ -38,9 +39,16 @@ public class SchedaTecnicaDataSource {
 
     private String revisione;
 
+    private String prodottoHtml;
+
     public static SchedaTecnicaDataSource from(SchedaTecnica schedaTecnica){
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+        String prodottoHtml = "<b>"+schedaTecnica.getProdotto()+"</b>";
+        if(StringUtils.isNotEmpty(schedaTecnica.getProdotto2())){
+            prodottoHtml += "<br/>"+schedaTecnica.getProdotto2();
+        }
 
         return SchedaTecnicaDataSource.builder()
                 .numRevisione(schedaTecnica.getNumRevisione())
@@ -57,6 +65,7 @@ public class SchedaTecnicaDataSource {
                 .imballo(schedaTecnica.getImballo().getNome())
                 .imballoDimensioni(schedaTecnica.getImballoDimensioni())
                 .revisione("n "+schedaTecnica.getNumRevisione()+" del "+simpleDateFormat.format(schedaTecnica.getData()))
+                .prodottoHtml(prodottoHtml)
                 .build();
     }
 }

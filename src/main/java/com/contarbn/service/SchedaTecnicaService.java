@@ -70,13 +70,13 @@ public class SchedaTecnicaService {
     public SchedaTecnica save(SchedaTecnica schedaTecnica){
         log.info("Saving 'scheda tecnica'");
 
-        Timestamp dataInserimento = null;
-        Optional<SchedaTecnica> currentSchedaTecnica = schedaTecnicaRepository.findById(schedaTecnica.getId());
+        Timestamp dataInserimento = Timestamp.from(ZonedDateTime.now().toInstant());
+        Optional<SchedaTecnica> currentSchedaTecnica = Optional.empty();
+        if(schedaTecnica.getId() != null){
+            currentSchedaTecnica = schedaTecnicaRepository.findById(schedaTecnica.getId());
+        }
         if(currentSchedaTecnica.isPresent()){
             dataInserimento = currentSchedaTecnica.get().getDataInserimento();
-        }
-        if(dataInserimento == null){
-            dataInserimento = Timestamp.from(ZonedDateTime.now().toInstant());
         }
         schedaTecnica.setDataInserimento(dataInserimento);
         schedaTecnica.setNumRevisione(schedaTecnica.getNumRevisione() != null ? schedaTecnica.getNumRevisione() : 1);

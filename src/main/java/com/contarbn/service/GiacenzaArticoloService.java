@@ -224,8 +224,8 @@ public class GiacenzaArticoloService {
         int scaduto = 0;
         Articolo articolo = giacenzaArticolo.getArticolo();
         if(articolo != null){
-            Integer scadenzaGiorni = articolo.getScadenzaGiorni();
-            if(scadenzaGiorni != null && giacenzaArticolo.getScadenza() != null){
+            if(giacenzaArticolo.getScadenza() != null){
+                int scadenzaGiorni = articolo.getScadenzaGiorni() != null ? articolo.getScadenzaGiorni() : 0;
                 LocalDate scadenza = giacenzaArticolo.getScadenza().toLocalDate().minusDays(scadenzaGiorni);
                 if(LocalDate.now().equals(scadenza) || LocalDate.now().isAfter(scadenza)){
                     scaduto = 1;

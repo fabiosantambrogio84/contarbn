@@ -7,6 +7,7 @@ import com.contarbn.model.IngredienteAllergene;
 import com.contarbn.model.RicettaIngrediente;
 import com.contarbn.repository.GiacenzaIngredienteRepository;
 import com.contarbn.repository.IngredienteRepository;
+import com.contarbn.util.Constants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -58,6 +59,8 @@ public class IngredienteService {
     public Ingrediente create(Ingrediente ingrediente){
         log.info("Creating 'ingrediente'");
         ingrediente.setDataInserimento(Timestamp.from(ZonedDateTime.now().toInstant()));
+        ingrediente.setScadenzaGiorni(ingrediente.getScadenzaGiorni() != null ? ingrediente.getScadenzaGiorni() : Constants.DEFAULT_INGREDIENTE_SCADENZA_GIORNI);
+
         Ingrediente createdIngrediente = ingredienteRepository.save(ingrediente);
         createdIngrediente.getIngredienteAllergeni().forEach(ia -> {
             ia.getId().setIngredienteId(createdIngrediente.getId());
@@ -76,6 +79,7 @@ public class IngredienteService {
 
         Ingrediente ingredienteCurrent = ingredienteRepository.findById(ingrediente.getId()).orElseThrow(ResourceNotFoundException::new);
         ingrediente.setDataInserimento(ingredienteCurrent.getDataInserimento());
+        ingrediente.setScadenzaGiorni(ingrediente.getScadenzaGiorni() != null ? ingrediente.getScadenzaGiorni() : Constants.DEFAULT_INGREDIENTE_SCADENZA_GIORNI);
         Ingrediente updatedIngrediente = ingredienteRepository.save(ingrediente);
 
         ingredienteAllergeni.forEach(ia -> {

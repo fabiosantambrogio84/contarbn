@@ -297,3 +297,8 @@ group by
     v_giacenza_ingrediente.codice_ingrediente,
     v_giacenza_ingrediente.descrizione_ingrediente
 ;
+
+--
+UPDATE contarbn.articolo SET scadenza_giorni=5 WHERE scadenza_giorni IS NULL;
+
+UPDATE contarbn.ingrediente SET scadenza_giorni=5 WHERE scadenza_giorni IS NULL;

@@ -21,6 +21,9 @@ public interface Constants {
 
     String DEFAULT_AUTISTA_COGNOME = "fumaroni";
 
+    int DEFAULT_ARTICOLO_SCADENZA_GIORNI = 5;
+    int DEFAULT_INGREDIENTE_SCADENZA_GIORNI = 5;
+
     String DIVISA = "EUR";
 
     String EMAIL_INVIATA_OK = "Y";

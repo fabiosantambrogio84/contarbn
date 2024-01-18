@@ -8,6 +8,7 @@ import com.contarbn.repository.ArticoloRepository;
 import com.contarbn.repository.ClienteArticoloRepository;
 import com.contarbn.repository.GiacenzaArticoloRepository;
 import com.contarbn.util.BarcodeUtils;
+import com.contarbn.util.Constants;
 import com.contarbn.util.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -124,6 +125,7 @@ public class ArticoloService {
             articolo.setBarcodeMaskLottoScadenza(barcodeMaskLottoScadenza.toUpperCase());
         }
         handleBarcodeMask(articolo);
+        articolo.setScadenzaGiorni(articolo.getScadenzaGiorni() != null ? articolo.getScadenzaGiorni() : Constants.DEFAULT_ARTICOLO_SCADENZA_GIORNI);
         Articolo createdArticolo = articoloRepository.save(articolo);
 
         // compute 'listini prezzi'
@@ -179,6 +181,7 @@ public class ArticoloService {
         }
         handleBarcodeMask(articolo);
         articolo.setDataAggiornamento(Timestamp.from(ZonedDateTime.now().toInstant()));
+        articolo.setScadenzaGiorni(articolo.getScadenzaGiorni() != null ? articolo.getScadenzaGiorni() : Constants.DEFAULT_ARTICOLO_SCADENZA_GIORNI);
         Articolo updatedArticolo = articoloRepository.save(articolo);
 
         if(!updatedArticolo.getPrezzoListinoBase().equals(prezzoListinoBaseCurrent)){

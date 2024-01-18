@@ -2617,6 +2617,7 @@ public class StampaService {
         parameters.put("notaDisposizioniComune", Constants.JASPER_PARAMETER_DISPOSIZIONI_COMUNE_NOTA);
         parameters.put("prodotto", schedaTecnicaDataSource.getProdotto());
         parameters.put("prodotto2", schedaTecnicaDataSource.getProdotto2());
+        parameters.put("prodottoHtml", schedaTecnicaDataSource.getProdottoHtml());
         parameters.put("pesoNettoConfezione", schedaTecnicaDataSource.getPesoNettoConfezione());
         parameters.put("ingredienti", schedaTecnicaDataSource.getIngredienti());
         parameters.put("allergeniTracce", schedaTecnicaDataSource.getAllergeniTracce());

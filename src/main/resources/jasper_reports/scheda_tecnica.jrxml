@@ -172,6 +172,7 @@
 	<parameter name="notaDisposizioniComune" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="prodotto" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="prodotto2" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="prodottoHtml" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="pesoNettoConfezione" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="ingredienti" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="allergeniTracce" class="java.lang.String" isForPrompting="false"/>
@@ -845,7 +846,7 @@
 						<font isBold="false"/>
 						<paragraph lineSpacing="Single" lineSpacingSize="0.0" leftIndent="2"/>
 					</textElement>
-					<textFieldExpression><![CDATA["<b>"+$P{prodotto}+"</b><br/>"+$P{prodotto2}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$P{prodottoHtml}]]></textFieldExpression>
 				</textField>
 			</frame>
 			<line>
