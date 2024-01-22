@@ -14,4 +14,9 @@ public class OperationException extends RuntimeException{
         super(message);
         this.httpStatus = INTERNAL_SERVER_ERROR;
     }
+
+    public OperationException(String message, HttpStatus httpStatus){
+        super(message);
+        this.httpStatus = httpStatus;
+    }
 }

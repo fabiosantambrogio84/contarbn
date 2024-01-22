@@ -12,10 +12,13 @@ public class SchedaTecnicaRaccoltaDataSource {
 
     private String raccolta;
 
+    private Integer ordine;
+
     public static SchedaTecnicaRaccoltaDataSource from(SchedaTecnicaRaccolta schedaTecnicaRaccolta){
         return SchedaTecnicaRaccoltaDataSource.builder()
                 .materiale(schedaTecnicaRaccolta.getMateriale().getNome())
                 .raccolta(schedaTecnicaRaccolta.getRaccolta().getNome())
+                .ordine(schedaTecnicaRaccolta.getMateriale().getOrdine())
                 .build();
     }
 }

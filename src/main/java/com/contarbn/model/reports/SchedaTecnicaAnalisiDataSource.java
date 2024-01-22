@@ -16,10 +16,13 @@ public class SchedaTecnicaAnalisiDataSource {
 
     private String risultato;
 
+    private Integer ordine;
+
     public static SchedaTecnicaAnalisiDataSource from(SchedaTecnicaAnalisi schedaTecnicaAnalisi){
         return SchedaTecnicaAnalisiDataSource.builder()
                 .analisi(schedaTecnicaAnalisi.getAnalisi().getNome())
                 .risultato(parseRisultato(schedaTecnicaAnalisi.getRisultato()))
+                .ordine(schedaTecnicaAnalisi.getAnalisi().getOrdine())
                 .build();
     }
 

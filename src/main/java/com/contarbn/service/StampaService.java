@@ -2585,21 +2585,21 @@ public class StampaService {
             for(SchedaTecnicaNutriente schedaTecnicaNutriente : schedaTecnica.getSchedaTecnicaNutrienti()){
                 schedaTecnicaNutrienteDataSources.add(SchedaTecnicaNutrienteDataSource.from(schedaTecnicaNutriente));
             }
-            schedaTecnicaNutrienteDataSources.sort(Comparator.comparing(n -> n.getNutriente().toLowerCase()));
+            schedaTecnicaNutrienteDataSources.sort(Comparator.comparing(SchedaTecnicaNutrienteDataSource::getOrdine).thenComparing(n->n.getNutriente().toLowerCase()));
         }
         List<SchedaTecnicaAnalisiDataSource> schedaTecnicaAnalisiDataSources = new ArrayList<>();
         if(!schedaTecnica.getSchedaTecnicaAnalisi().isEmpty()){
             for(SchedaTecnicaAnalisi schedaTecnicaAnalisi : schedaTecnica.getSchedaTecnicaAnalisi()){
                 schedaTecnicaAnalisiDataSources.add(SchedaTecnicaAnalisiDataSource.from(schedaTecnicaAnalisi));
             }
-            schedaTecnicaAnalisiDataSources.sort(Comparator.comparing(a -> a.getAnalisi().toLowerCase()));
+            schedaTecnicaAnalisiDataSources.sort(Comparator.comparing(SchedaTecnicaAnalisiDataSource::getOrdine).thenComparing(a -> a.getAnalisi().toLowerCase()));
         }
         List<SchedaTecnicaRaccoltaDataSource> schedaTecnicaRaccoltaDataSources = new ArrayList<>();
         if(!schedaTecnica.getSchedaTecnicaRaccolte().isEmpty()){
             for(SchedaTecnicaRaccolta schedaTecnicaRaccolta : schedaTecnica.getSchedaTecnicaRaccolte()){
                 schedaTecnicaRaccoltaDataSources.add(SchedaTecnicaRaccoltaDataSource.from(schedaTecnicaRaccolta));
             }
-            schedaTecnicaRaccoltaDataSources.sort(Comparator.comparing(m -> m.getMateriale().toLowerCase()));
+            schedaTecnicaRaccoltaDataSources.sort(Comparator.comparing(SchedaTecnicaRaccoltaDataSource::getOrdine).thenComparing(m -> m.getMateriale().toLowerCase()));
         }
 
         final InputStream stream = this.getClass().getResourceAsStream(Constants.JASPER_REPORT_SCHEDA_TECNICA);

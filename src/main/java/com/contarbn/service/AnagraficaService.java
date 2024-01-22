@@ -1,5 +1,6 @@
 package com.contarbn.service;
 
+import com.contarbn.exception.OperationException;
 import com.contarbn.exception.ResourceNotFoundException;
 import com.contarbn.model.Anagrafica;
 import com.contarbn.repository.AnagraficaRepository;
@@ -12,6 +13,9 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
+
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -20,9 +24,9 @@ public class AnagraficaService {
 
     private final AnagraficaRepository anagraficaRepository;
 
-    public List<Anagrafica> getAllByTypo(TipologiaAnagrafica tipologiaAnagrafica, Boolean active){
+    public List<Anagrafica> getAllByTipoAndAttivo(TipologiaAnagrafica tipologiaAnagrafica, Boolean attivo){
         log.info("Retrieving the list of 'anagrafica {}'", tipologiaAnagrafica.name());
-        return anagraficaRepository.findAllByTipoAndAttivo(tipologiaAnagrafica.name(), Utils.getActiveValues(active));
+        return anagraficaRepository.findAllByTipoAndAttivo(tipologiaAnagrafica.name(), Utils.getActiveValues(attivo));
     }
 
     public Anagrafica getById(Long idAnagrafica){
@@ -39,6 +43,11 @@ public class AnagraficaService {
         } else {
             anagraficaRepository.findById(anagrafica.getId()).ifPresent(a -> anagrafica.setDataInserimento(a.getDataInserimento()));
         }
+        Optional<Anagrafica> anagraficaByTipoAndOrdine = anagraficaRepository.findByTipoAndOrdine(anagrafica.getTipo(), anagrafica.getOrdine());
+        if(anagraficaByTipoAndOrdine.isPresent()){
+            throw new OperationException("Anagrafica con ordine "+anagrafica.getOrdine()+" già presente", BAD_REQUEST);
+        }
+
         return anagraficaRepository.save(anagrafica);
     }
 

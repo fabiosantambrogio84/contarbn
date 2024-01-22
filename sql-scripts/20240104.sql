@@ -302,3 +302,27 @@ group by
 UPDATE contarbn.articolo SET scadenza_giorni=5 WHERE scadenza_giorni IS NULL;
 
 UPDATE contarbn.ingrediente SET scadenza_giorni=5 WHERE scadenza_giorni IS NULL;
+
+-- 22/01/2024
+ALTER TABLE contarbn.anagrafica ADD ordine int DEFAULT NULL after descrizione;
+
+update contarbn.anagrafica set ordine=1 where tipo='IMBALLO' and nome='PP - PET (Vaschetta - Pellicola)';
+update contarbn.anagrafica set ordine=1 where tipo='RACCOLTA_DIFFERENZIATA' and nome='Plastica';
+update contarbn.anagrafica set ordine=1 where tipo='TIPOLOGIA_CONFEZIONAMENTO' and nome='Termosaldatura';
+update contarbn.anagrafica set ordine=1 where tipo='MATERIALE' and nome='Pellicola 7 >PET+PP<';
+update contarbn.anagrafica set ordine=2 where tipo='MATERIALE' and nome='Vaschetta  PP';
+
+update contarbn.anagrafica set ordine=1 where tipo='ANALISI_MICROBIOLOGICA' and nome='CMT';
+update contarbn.anagrafica set ordine=2 where tipo='ANALISI_MICROBIOLOGICA' and nome='E.coli';
+update contarbn.anagrafica set ordine=3 where tipo='ANALISI_MICROBIOLOGICA' and nome='Clostridi solfito riduttori';
+update contarbn.anagrafica set ordine=4 where tipo='ANALISI_MICROBIOLOGICA' and nome='Staphylococcus aureus';
+update contarbn.anagrafica set ordine=5 where tipo='ANALISI_MICROBIOLOGICA' and nome='Salmonella spp';
+update contarbn.anagrafica set ordine=6 where tipo='ANALISI_MICROBIOLOGICA' and nome='Listeria Monocytogenes';
+
+update contarbn.anagrafica set ordine=1 where tipo='NUTRIENTE' and nome='Energia';
+update contarbn.anagrafica set ordine=2 where tipo='NUTRIENTE' and nome='Grassi';
+update contarbn.anagrafica set ordine=3 where tipo='NUTRIENTE' and nome='Grassi (di cui saturi)';
+update contarbn.anagrafica set ordine=4 where tipo='NUTRIENTE' and nome='Carboidrati';
+update contarbn.anagrafica set ordine=5 where tipo='NUTRIENTE' and nome='Carboidrati (di cui zuccheri)';
+update contarbn.anagrafica set ordine=6 where tipo='NUTRIENTE' and nome='Proteine';
+update contarbn.anagrafica set ordine=7 where tipo='NUTRIENTE' and nome='Sale';

@@ -29,6 +29,9 @@ public class Anagrafica {
     @Column(name = "descrizione")
     private String descrizione;
 
+    @Column(name = "ordine")
+    private Integer ordine;
+
     @Column(name = "attivo")
     private Boolean attivo;
 
@@ -46,10 +49,10 @@ public class Anagrafica {
                 ", tipo: " + tipo +
                 ", nome: " + nome +
                 ", descrizione: " + descrizione +
+                ", ordine: " + ordine +
                 ", attivo: " + attivo +
                 ", dataInserimento: " + dataInserimento +
                 ", dataAggiornamento: " + dataAggiornamento +
                 "}";
-
     }
 }

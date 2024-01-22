@@ -12,10 +12,13 @@ public class SchedaTecnicaNutrienteDataSource {
 
     private String valore;
 
+    private Integer ordine;
+
     public static SchedaTecnicaNutrienteDataSource from(SchedaTecnicaNutriente schedaTecnicaNutriente){
         return SchedaTecnicaNutrienteDataSource.builder()
                 .nutriente(schedaTecnicaNutriente.getNutriente().getNome())
                 .valore(schedaTecnicaNutriente.getValore())
+                .ordine(schedaTecnicaNutriente.getNutriente().getOrdine())
                 .build();
     }
 }

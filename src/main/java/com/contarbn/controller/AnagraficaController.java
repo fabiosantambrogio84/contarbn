@@ -26,37 +26,37 @@ public class AnagraficaController {
     @RequestMapping(method = GET, path = "/analisi-microbiologiche")
     @CrossOrigin
     public List<Anagrafica> getAnalisiMicrobiologiche(@RequestParam(name = "attivo", required = false) Boolean active) {
-        return anagraficaService.getAllByTypo(TipologiaAnagrafica.ANALISI_MICROBIOLOGICA, active);
+        return anagraficaService.getAllByTipoAndAttivo(TipologiaAnagrafica.ANALISI_MICROBIOLOGICA, active);
     }
 
     @RequestMapping(method = GET, path = "/imballi")
     @CrossOrigin
     public List<Anagrafica> getImballi(@RequestParam(name = "attivo", required = false) Boolean active) {
-        return anagraficaService.getAllByTypo(TipologiaAnagrafica.IMBALLO, active);
+        return anagraficaService.getAllByTipoAndAttivo(TipologiaAnagrafica.IMBALLO, active);
     }
 
     @RequestMapping(method = GET, path = "/materiali")
     @CrossOrigin
     public List<Anagrafica> getMateriali(@RequestParam(name = "attivo", required = false) Boolean active) {
-        return anagraficaService.getAllByTypo(TipologiaAnagrafica.MATERIALE, active);
+        return anagraficaService.getAllByTipoAndAttivo(TipologiaAnagrafica.MATERIALE, active);
     }
 
     @RequestMapping(method = GET, path = "/nutrienti")
     @CrossOrigin
     public List<Anagrafica> getNutrienti(@RequestParam(name = "attivo", required = false) Boolean active) {
-        return anagraficaService.getAllByTypo(TipologiaAnagrafica.NUTRIENTE, active);
+        return anagraficaService.getAllByTipoAndAttivo(TipologiaAnagrafica.NUTRIENTE, active);
     }
 
     @RequestMapping(method = GET, path = "/raccolte-differenziate")
     @CrossOrigin
     public List<Anagrafica> getRaccolteDifferenziate(@RequestParam(name = "attivo", required = false) Boolean active) {
-        return anagraficaService.getAllByTypo(TipologiaAnagrafica.RACCOLTA_DIFFERENZIATA, active);
+        return anagraficaService.getAllByTipoAndAttivo(TipologiaAnagrafica.RACCOLTA_DIFFERENZIATA, active);
     }
 
     @RequestMapping(method = GET, path = "/tipologie-confezionamento")
     @CrossOrigin
     public List<Anagrafica> getTipologieConfezionamento(@RequestParam(name = "attivo", required = false) Boolean active) {
-        return anagraficaService.getAllByTypo(TipologiaAnagrafica.TIPOLOGIA_CONFEZIONAMENTO, active);
+        return anagraficaService.getAllByTipoAndAttivo(TipologiaAnagrafica.TIPOLOGIA_CONFEZIONAMENTO, active);
     }
 
     @RequestMapping(method = GET, path = "/{anagraficaId}")
