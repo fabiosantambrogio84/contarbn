@@ -1,6 +1,7 @@
 package com.contarbn.service;
 
 import com.contarbn.model.*;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class ScheduleService {
 
@@ -21,19 +23,7 @@ public class ScheduleService {
     private final GiacenzaIngredienteService giacenzaIngredienteService;
     private final EtichettaService etichettaService;
 
-    public ScheduleService(final ScontoService scontoService,
-                           final OrdineClienteService ordineClienteService,
-                           final GiacenzaArticoloService giacenzaArticoloService,
-                           final GiacenzaIngredienteService giacenzaIngredienteService,
-                           final EtichettaService etichettaService){
-        this.scontoService = scontoService;
-        this.ordineClienteService = ordineClienteService;
-        this.giacenzaArticoloService = giacenzaArticoloService;
-        this.giacenzaIngredienteService = giacenzaIngredienteService;
-        this.etichettaService = etichettaService;
-    }
-
-    @Scheduled(cron = "0 50 17 * * ?")
+    @Scheduled(cron = "0 30 13 * * ?", zone = "Europe/Rome")
     public void deleteExpiredSconti() {
         log.info("Executing remove of expired Sconti");
         Date now = new Date(System.currentTimeMillis());
@@ -42,7 +32,7 @@ public class ScheduleService {
         log.info("Executed remove of expired Sconti");
     }
 
-    @Scheduled(cron = "0 30 23 * * ?")
+    @Scheduled(cron = "0 15 13 * * ?", zone = "Europe/Rome")
     public void deleteEvasiAndExpiredOrdiniClienti(){
         log.info("Executing remove of expired and evasi Ordini Clienti");
         Set<OrdineCliente> expiredAndEvasiOrdiniClienti = ordineClienteService.getOrdiniClientiEvasiAndExpired(1);
@@ -50,7 +40,7 @@ public class ScheduleService {
         log.info("Executed remove of expired and evasi Ordini Clienti");
     }
 
-    @Scheduled(cron = "0 30 17 * * ?")
+    @Scheduled(cron = "0 0 13 * * ?", zone = "Europe/Rome")
     public void deleteExpiredZeroGiacenze(){
         log.info("Executing remove of expired and zero Giacenze");
         LocalDate yesterday = LocalDate.now().minusDays(1);
@@ -74,7 +64,7 @@ public class ScheduleService {
         log.info("Executed remove of expired and zero Giacenze");
     }
 
-    @Scheduled(cron = "0 0 9 * * ?")
+    @Scheduled(cron = "0 0 9 * * ?", zone = "Europe/Rome")
     public void deleteEtichette(){
         log.info("Executing remove of old Etichette");
         List<Etichetta> etichette = etichettaService.getEtichetteToDelete(1);
