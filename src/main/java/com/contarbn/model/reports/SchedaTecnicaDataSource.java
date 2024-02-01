@@ -15,6 +15,8 @@ public class SchedaTecnicaDataSource {
 
     private String data;
 
+    private String codiceProdotto;
+
     private String prodotto;
 
     private String prodotto2;
@@ -23,7 +25,7 @@ public class SchedaTecnicaDataSource {
 
     private String ingredienti;
 
-    private String allergeniTracce;
+    private String tracce;
 
     private String durata;
 
@@ -53,11 +55,12 @@ public class SchedaTecnicaDataSource {
         return SchedaTecnicaDataSource.builder()
                 .numRevisione(schedaTecnica.getNumRevisione())
                 .data(simpleDateFormat.format(schedaTecnica.getData()))
+                .codiceProdotto(schedaTecnica.getCodiceProdotto())
                 .prodotto(schedaTecnica.getProdotto())
                 .prodotto2(schedaTecnica.getProdotto2())
                 .pesoNettoConfezione(schedaTecnica.getPesoNettoConfezione())
                 .ingredienti(schedaTecnica.getIngredienti())
-                .allergeniTracce(schedaTecnica.getAllergeniTracce())
+                .tracce(schedaTecnica.getTracce())
                 .durata(schedaTecnica.getDurata())
                 .conservazione(schedaTecnica.getConservazione())
                 .consigliConsumo(schedaTecnica.getConsigliConsumo())

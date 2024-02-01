@@ -1,9 +1,8 @@
 package com.contarbn.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -13,8 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Getter
-@Setter
+@Data
 @EqualsAndHashCode(exclude = {"articoloImmagini", "sconti", "listiniPrezzi", "listiniPrezziVariazioni", "ordineClienteArticoli", "ddtArticoli", "ddtAcquistoArticoli", "fatturaAccompagnatoriaArticoli", "notaAccreditoRighe", "giacenze", "produzioni"})
 @Entity
 @Table(name = "articolo")
@@ -29,6 +27,9 @@ public class Articolo {
 
     @Column(name = "descrizione")
     private String descrizione;
+
+    @Column(name = "descrizione_2")
+    private String descrizione2;
 
     @ManyToOne
     @JoinColumn(name="id_categoria")
@@ -134,32 +135,30 @@ public class Articolo {
 
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder();
 
-        result.append("{");
-        result.append("id: " + id);
-        result.append(", codice: " + codice);
-        result.append(", descrizione: " + descrizione);
-        result.append(", categoria: " + categoria);
-        result.append(", fornitore: " + fornitore);
-        result.append(", aliquotaIva: " + aliquotaIva);
-        result.append(", unitaMisura: " + unitaMisura);
-        result.append(", data: " + data);
-        result.append(", quantitaPredefinita: " + quantitaPredefinita);
-        result.append(", prezzoAcquisto: " + prezzoAcquisto);
-        result.append(", prezzoListinoBase: " + prezzoListinoBase);
-        result.append(", scadenzaGiorni: " + scadenzaGiorni);
-        result.append(", barcode: " + barcode);
-        result.append(", completeBarcode: " + completeBarcode);
-        result.append(", barcodeMaskLottoScadenza: " + barcodeMaskLottoScadenza);
-        result.append(", barcodeRegexpLotto: " + barcodeRegexpLotto);
-        result.append(", barcodeRegexpDataScadenza: " + barcodeRegexpDataScadenza);
-        result.append(", sitoWeb: " + sitoWeb);
-        result.append(", attivo: " + attivo);
-        result.append(", dataInserimento: " + dataInserimento);
-        result.append(", dataAggiornamento: " + dataAggiornamento);
-        result.append("}");
-
-        return result.toString();
+        return "{" +
+                "id: " + id +
+                ", codice: " + codice +
+                ", descrizione: " + descrizione +
+                ", descrizione2: " + descrizione2 +
+                ", categoria: " + categoria +
+                ", fornitore: " + fornitore +
+                ", aliquotaIva: " + aliquotaIva +
+                ", unitaMisura: " + unitaMisura +
+                ", data: " + data +
+                ", quantitaPredefinita: " + quantitaPredefinita +
+                ", prezzoAcquisto: " + prezzoAcquisto +
+                ", prezzoListinoBase: " + prezzoListinoBase +
+                ", scadenzaGiorni: " + scadenzaGiorni +
+                ", barcode: " + barcode +
+                ", completeBarcode: " + completeBarcode +
+                ", barcodeMaskLottoScadenza: " + barcodeMaskLottoScadenza +
+                ", barcodeRegexpLotto: " + barcodeRegexpLotto +
+                ", barcodeRegexpDataScadenza: " + barcodeRegexpDataScadenza +
+                ", sitoWeb: " + sitoWeb +
+                ", attivo: " + attivo +
+                ", dataInserimento: " + dataInserimento +
+                ", dataAggiornamento: " + dataAggiornamento +
+                "}";
     }
 }

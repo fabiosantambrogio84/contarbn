@@ -27,9 +27,6 @@ public class Ricetta {
     @Column(name = "nome")
     private String nome;
 
-    @Column(name = "nome_2")
-    private String nome2;
-
     @ManyToOne
     @JoinColumn(name="id_categoria")
     private CategoriaRicetta categoria;
@@ -64,6 +61,9 @@ public class Ricetta {
     @Column(name = "conservazione")
     private String conservazione;
 
+    @Column(name = "consigli_consumo")
+    private String consigliConsumo;
+
     @Column(name = "note")
     private String note;
 
@@ -87,7 +87,6 @@ public class Ricetta {
         result.append("id: ").append(id);
         result.append(", codice: ").append(codice);
         result.append(", nome: ").append(nome);
-        result.append(", nome2: ").append(nome2);
         result.append(", categoria: ").append(categoria);
         result.append(", tempoPreparazione: ").append(tempoPreparazione);
         result.append(", pesoTotale: ").append(pesoTotale);
@@ -99,6 +98,7 @@ public class Ricetta {
         result.append(", allergeni: ").append(allergeni);
         result.append(", valoriNutrizionali: ").append(valoriNutrizionali);
         result.append(", conservazione: ").append(conservazione);
+        result.append(", consigliConsumo: ").append(consigliConsumo);
         result.append(", note: ").append(note);
         result.append(", ingredienti: [");
         for(RicettaIngrediente ricettaIngrediente: ricettaIngredienti){

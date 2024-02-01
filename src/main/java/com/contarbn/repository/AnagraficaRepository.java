@@ -13,6 +13,6 @@ public interface AnagraficaRepository extends CrudRepository<Anagrafica, Long> {
     @Query(nativeQuery = true, value = "SELECT * FROM contarbn.anagrafica WHERE tipo = ?1 AND attivo in ?2 ORDER BY ordine, nome")
     List<Anagrafica> findAllByTipoAndAttivo(String tipo, List<Integer> activeValues);
 
-    Optional<Anagrafica> findByTipoAndOrdine(TipologiaAnagrafica tipo, Integer ordine);
+    Optional<Anagrafica> findByTipoAndOrdineAndIdNot(TipologiaAnagrafica tipo, Integer ordine, Long id);
 
 }

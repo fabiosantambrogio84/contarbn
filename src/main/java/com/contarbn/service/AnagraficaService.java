@@ -36,15 +36,17 @@ public class AnagraficaService {
 
     public Anagrafica save(Anagrafica anagrafica){
         log.info("Saving 'anagrafica' {}", anagrafica);
+        Long id = anagrafica.getId();
         anagrafica.setAttivo(anagrafica.getAttivo() != null ? anagrafica.getAttivo() : Boolean.TRUE);
         anagrafica.setDataAggiornamento(Timestamp.from(ZonedDateTime.now().toInstant()));
-        if(anagrafica.getId() == null){
+        if(id == null){
+            id = -1L;
             anagrafica.setDataInserimento(Timestamp.from(ZonedDateTime.now().toInstant()));
         } else {
-            anagraficaRepository.findById(anagrafica.getId()).ifPresent(a -> anagrafica.setDataInserimento(a.getDataInserimento()));
+            anagraficaRepository.findById(id).ifPresent(a -> anagrafica.setDataInserimento(a.getDataInserimento()));
         }
-        Optional<Anagrafica> anagraficaByTipoAndOrdine = anagraficaRepository.findByTipoAndOrdine(anagrafica.getTipo(), anagrafica.getOrdine());
-        if(anagraficaByTipoAndOrdine.isPresent()){
+        Optional<Anagrafica> anagraficaByTipoAndOrdineAndIdNot = anagraficaRepository.findByTipoAndOrdineAndIdNot(anagrafica.getTipo(), anagrafica.getOrdine(), id);
+        if(anagraficaByTipoAndOrdineAndIdNot.isPresent()){
             throw new OperationException("Anagrafica con ordine "+anagrafica.getOrdine()+" già presente", BAD_REQUEST);
         }
 

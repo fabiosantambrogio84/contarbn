@@ -2,14 +2,11 @@ package com.contarbn.controller;
 
 import com.contarbn.exception.CannotChangeResourceIdException;
 import com.contarbn.model.Ricetta;
-import com.contarbn.model.SchedaTecnica;
 import com.contarbn.service.RicettaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Date;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -65,25 +62,4 @@ public class RicettaController {
         ricettaService.delete(ricettaId);
     }
 
-    @RequestMapping(method = GET, path = "/{ricettaId}/scheda-tecnica")
-    @CrossOrigin
-    public Object getSchedaTecnica(@PathVariable final Long ricettaId) {
-        log.info("Performing GET request for retrieving 'scheda-tecnica' for 'ricetta' '{}'", ricettaId);
-        return ricettaService.getSchedaTecnica(ricettaId);
-    }
-
-    @RequestMapping(method = GET, path = "/scheda-tecnica/num-revisione")
-    @CrossOrigin
-    public Map<String, Integer> getNumRevisioneAndAnno(@RequestParam(name = "data", required = false) Date data) {
-        log.info("Performing GET request for retrieving 'num revisione' for 'scheda-tecnica' with date '{}'", data);
-        return ricettaService.getSchedaTecnicaNumRevisione(data);
-    }
-
-    @RequestMapping(method = POST, path = "/{ricettaId}/scheda-tecnica")
-    @ResponseStatus(CREATED)
-    @CrossOrigin
-    public SchedaTecnica saveSchedaTecnica(@PathVariable final Long ricettaId, @RequestBody final SchedaTecnica schedaTecnica){
-        log.info("Performing POST request for creating 'scheda-tecnica' for 'ricetta' {}", ricettaId);
-        return ricettaService.saveSchedaTecnica(schedaTecnica);
-    }
 }

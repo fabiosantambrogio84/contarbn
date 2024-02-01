@@ -14,6 +14,7 @@ import com.contarbn.util.Constants;
 import com.contarbn.util.LottoUtils;
 import com.contarbn.util.Utils;
 import com.contarbn.util.enumeration.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class ProduzioneService {
 
@@ -49,37 +51,6 @@ public class ProduzioneService {
     private final UnitaMisuraService unitaMisuraService;
     private final AliquotaIvaService aliquotaIvaService;
     private final RicettaRepository ricettaRepository;
-
-    @Autowired
-    public ProduzioneService(final ProduzioneRepository produzioneRepository,
-                             final VProduzioneRepository vProduzioneRepository,
-                             final VProduzioneEtichettaRepository vProduzioneEtichettaRepository,
-                             final ProduzioneIngredienteService produzioneIngredienteService,
-                             final ProduzioneConfezioneService produzioneConfezioneService,
-                             final GiacenzaArticoloService giacenzaArticoloService,
-                             final GiacenzaIngredienteService giacenzaIngredienteService,
-                             final ArticoloService articoloService,
-                             final IngredienteService ingredienteService,
-                             final FornitoreService fornitoreService,
-                             final ConfezioneService confezioneService,
-                             final UnitaMisuraService unitaMisuraService,
-                             final AliquotaIvaService aliquotaIvaService,
-                             final RicettaRepository ricettaRepository){
-        this.produzioneRepository = produzioneRepository;
-        this.vProduzioneRepository = vProduzioneRepository;
-        this.vProduzioneEtichettaRepository = vProduzioneEtichettaRepository;
-        this.produzioneIngredienteService = produzioneIngredienteService;
-        this.produzioneConfezioneService = produzioneConfezioneService;
-        this.giacenzaArticoloService = giacenzaArticoloService;
-        this.giacenzaIngredienteService = giacenzaIngredienteService;
-        this.articoloService = articoloService;
-        this.ingredienteService = ingredienteService;
-        this.fornitoreService = fornitoreService;
-        this.confezioneService = confezioneService;
-        this.unitaMisuraService = unitaMisuraService;
-        this.aliquotaIvaService = aliquotaIvaService;
-        this.ricettaRepository = ricettaRepository;
-    }
 
     public List<VProduzione> getAllByFilters(Integer draw, Integer start, Integer length, List<SortOrder> sortOrders, Integer codice, String ricetta, String barcodeEan13, String barcodeEan128){
         log.info("Retrieving the list of 'produzioni' filtered by request parameters");

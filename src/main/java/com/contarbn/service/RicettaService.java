@@ -27,7 +27,6 @@ public class RicettaService {
     private final RicettaIngredienteService ricettaIngredienteService;
     private final RicettaAllergeneService ricettaAllergeneService;
     private final ProduzioneService produzioneService;
-    private final SchedaTecnicaService schedaTecnicaService;
 
     public Set<Ricetta> getAll(){
         log.info("Retrieving the list of 'ricette'");
@@ -100,21 +99,4 @@ public class RicettaService {
         log.info("Deleted 'ricetta' '{}'", ricettaId);
     }
 
-    public Object getSchedaTecnica(Long idRicetta){
-        log.info("Retrieving 'scheda tecnica' for 'ricetta' {}", idRicetta);
-        Optional<SchedaTecnica> schedaTecnica = schedaTecnicaService.getByIdRicetta(idRicetta);
-        if(!schedaTecnica.isPresent()) {
-           return schedaTecnicaService.getByIdRicettaFromView(idRicetta);
-        }
-        return schedaTecnica;
-    }
-
-    public Map<String, Integer> getSchedaTecnicaNumRevisione(Date data){
-        return schedaTecnicaService.getNumRevisioneAndAnno(data);
-    }
-
-    public SchedaTecnica saveSchedaTecnica(SchedaTecnica schedaTecnica){
-        log.info("Creating/updating 'scheda tecnica'");
-        return schedaTecnicaService.save(schedaTecnica);
-    }
 }

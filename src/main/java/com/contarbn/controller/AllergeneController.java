@@ -26,9 +26,9 @@ public class AllergeneController {
 
     @RequestMapping(method = GET)
     @CrossOrigin
-    public List<Allergene> getAll() {
-        log.info("Performing GET request for retrieving list of 'allergeni'");
-        return allergeneService.getAll();
+    public List<Allergene> getAll(@RequestParam(name = "attivo", required = false) Boolean active) {
+        log.info("Performing GET request for retrieving list of 'allergeni' with attivo {}", active);
+        return allergeneService.getAll(active);
     }
 
     @RequestMapping(method = GET, path = "/{allergeneId}")

@@ -1,5 +1,6 @@
 package com.contarbn.service;
 
+import com.contarbn.exception.ResourceNotFoundException;
 import com.contarbn.model.SchedaTecnica;
 import com.contarbn.model.SchedaTecnicaAnalisi;
 import com.contarbn.model.SchedaTecnicaNutriente;
@@ -32,14 +33,23 @@ public class SchedaTecnicaService {
     private final VSchedaTecnicaRepository vSchedaTecnicaRepository;
     private final TransactionTemplate transactionTemplate;
 
+    public Object getSchedaTecnica(Long idProduzione, Long idArticolo){
+        log.info("Retrieving 'scheda tecnica' for 'produzione' {} and 'articolo' {}", idProduzione, idArticolo);
+        Optional<SchedaTecnica> schedaTecnica = getByIdProduzioneAndIdArticolo(idProduzione, idArticolo);
+        if(!schedaTecnica.isPresent()) {
+            return getByIdProduzioneAndIdArticoloFromView(idProduzione, idArticolo);
+        }
+        return schedaTecnica;
+    }
+
     public SchedaTecnica getById(Long idSchedaTecnica){
         log.info("Retrieving 'scheda tecnica' with id '{}'", idSchedaTecnica);
         return schedaTecnicaRepository.findById(idSchedaTecnica).orElseThrow(RuntimeException::new);
     }
 
-    public VSchedaTecnica getByIdRicettaFromView(Long idRicetta){
-        log.info("Retrieving 'scheda tecnica' view for ricetta '{}'", idRicetta);
-        VSchedaTecnica vSchedaTecnica = vSchedaTecnicaRepository.findFirstByIdRicetta(idRicetta).orElseThrow(RuntimeException::new);
+    public VSchedaTecnica getByIdProduzioneAndIdArticoloFromView(Long idProduzione, Long idArticolo){
+        log.info("Retrieving 'scheda tecnica' view for 'produzione' {} and 'articolo' {}", idProduzione, idArticolo);
+        VSchedaTecnica vSchedaTecnica = vSchedaTecnicaRepository.findFirstByIdProduzioneAndIdArticolo(idProduzione, idArticolo).orElseThrow(ResourceNotFoundException::new);
         if(vSchedaTecnica.getNumRevisione() == null){
             vSchedaTecnica.setNumRevisione(getNumRevisione(vSchedaTecnica.getAnno()));
         }
@@ -47,9 +57,9 @@ public class SchedaTecnicaService {
         return vSchedaTecnica;
     }
 
-    public Optional<SchedaTecnica> getByIdRicetta(Long idRicetta){
-        log.info("Retrieving 'scheda tecnica' for ricetta '{}'", idRicetta);
-        Optional<SchedaTecnica> optionalSchedaTecnica = schedaTecnicaRepository.findFirstByIdRicetta(idRicetta);
+    public Optional<SchedaTecnica> getByIdProduzioneAndIdArticolo(Long idProduzione, Long idArticolo){
+        log.info("Retrieving 'scheda tecnica' for 'produzione' {} and 'articolo' {}", idProduzione, idArticolo);
+        Optional<SchedaTecnica> optionalSchedaTecnica = schedaTecnicaRepository.findFirstByIdProduzioneAndIdArticolo(idProduzione, idArticolo);
         if(!optionalSchedaTecnica.isPresent()){
             return optionalSchedaTecnica;
         }

@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface VSchedaTecnicaRepository extends CrudRepository<VSchedaTecnica, Long> {
 
-    Optional<VSchedaTecnica> findFirstByIdRicetta(Long idRicetta);
+    Optional<VSchedaTecnica> findFirstByIdProduzioneAndIdArticolo(Long idProduzione, Long idArticolo);
 }

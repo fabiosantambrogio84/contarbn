@@ -138,10 +138,10 @@ public class VProduzioneCustomRepositoryImpl implements VProduzioneCustomReposit
             sb.append(" AND lower(ricetta) LIKE concat('%',:ricetta,'%') ");
         }
         if(barcodeEan13 != null) {
-            sb.append(" AND lower(barcodeEan13) LIKE concat('%',:barcodeEan13,'%') ");
+            sb.append(" AND lower(barcode_ean_13) LIKE concat('%',:barcodeEan13,'%') ");
         }
         if(barcodeEan128 != null) {
-            sb.append(" AND lower(barcodeEan128) LIKE concat('%',:barcodeEan128,'%') ");
+            sb.append(" AND lower(barcode_ean_128) LIKE concat('%',:barcodeEan128,'%') ");
         }
         return sb;
     }

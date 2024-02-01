@@ -6,7 +6,6 @@ import lombok.EqualsAndHashCode;
 import javax.persistence.*;
 import java.sql.Timestamp;
 
-@SuppressWarnings("ALL")
 @EqualsAndHashCode
 @Data
 @Entity
@@ -20,6 +19,12 @@ public class Allergene {
     @Column(name = "nome")
     private String nome;
 
+    @Column(name = "ordine")
+    private Integer ordine;
+
+    @Column(name = "attivo")
+    private Boolean attivo;
+
     @Column(name = "data_inserimento")
     private Timestamp dataInserimento;
 
@@ -28,15 +33,14 @@ public class Allergene {
 
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder();
 
-        result.append("{");
-        result.append("id: " + id);
-        result.append(", nome: " + nome);
-        result.append(", dataInserimento: " + dataInserimento);
-        result.append(", dataAggiornamento: " + dataAggiornamento);
-        result.append("}");
-
-        return result.toString();
+        return "{" +
+                "id: " + id +
+                ", nome: " + nome +
+                ", ordine: " + ordine +
+                ", attivo: " + attivo +
+                ", dataInserimento: " + dataInserimento +
+                ", dataAggiornamento: " + dataAggiornamento +
+                "}";
     }
 }

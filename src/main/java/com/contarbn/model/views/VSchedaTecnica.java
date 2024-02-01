@@ -16,11 +16,17 @@ public class VSchedaTecnica {
     @Column(name = "id")
     private String id;
 
-    @Column(name = "id_ricetta")
-    private Long idRicetta;
-
     @Column(name = "id_scheda_tecnica")
     private Long idSchedaTecnica;
+
+    @Column(name = "id_produzione")
+    private Long idProduzione;
+
+    @Column(name = "id_articolo")
+    private Long idArticolo;
+
+    @Column(name = "id_ricetta")
+    private Long idRicetta;
 
     @Column(name = "num_revisione")
     private Integer numRevisione;
@@ -30,6 +36,9 @@ public class VSchedaTecnica {
 
     @Column(name = "data")
     private Date data;
+
+    @Column(name = "codice_prodotto")
+    private String codiceProdotto;
 
     @Column(name = "prodotto")
     private String prodotto;
@@ -43,8 +52,8 @@ public class VSchedaTecnica {
     @Column(name = "ingredienti")
     private String ingredienti;
 
-    @Column(name = "allergeni_tracce")
-    private String allergeniTracce;
+    @Column(name = "tracce")
+    private String tracce;
 
     @Column(name = "durata")
     private String durata;
@@ -54,6 +63,9 @@ public class VSchedaTecnica {
 
     @Column(name = "consigli_consumo")
     private String consigliConsumo;
+
+    @Column(name = "id_tipologia_confezionamento")
+    private Long idTipologiaConfezionamento;
 
     @Column(name = "tipologia_confezionamento")
     private String tipologiaConfezionamento;
@@ -72,19 +84,23 @@ public class VSchedaTecnica {
 
         return "{" +
                 "id: " + id +
-                ", idRicetta: " + idRicetta +
                 ", idSchedaTecnica: " + idSchedaTecnica +
+                ", idProduzione: " + idProduzione +
+                ", idArticolo: " + idArticolo +
+                ", idRicetta: " + idRicetta +
                 ", numRevisione: " + numRevisione +
                 ", anno: " + anno +
                 ", data: " + data +
+                ", codiceProdotto: " + codiceProdotto +
                 ", prodotto: " + prodotto +
                 ", prodotto2: " + prodotto2 +
                 ", pesoNettoConfezione: " + pesoNettoConfezione +
                 ", ingredienti: " + ingredienti +
-                ", allergeniTracce: " + allergeniTracce +
+                ", tracce: " + tracce +
                 ", durata: " + durata +
                 ", conservazione: " + conservazione +
                 ", consigliConsumo: " + consigliConsumo +
+                ", idTipologiaConfezionamento: " + idTipologiaConfezionamento +
                 ", tipologiaConfezionamento: " + tipologiaConfezionamento +
                 ", imballo: " + imballo +
                 ", imballoDimensioni: " + imballoDimensioni +

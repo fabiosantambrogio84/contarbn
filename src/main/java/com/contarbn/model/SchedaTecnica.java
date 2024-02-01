@@ -20,8 +20,11 @@ public class SchedaTecnica {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "id_ricetta")
-    private Long idRicetta;
+    @Column(name = "id_produzione")
+    private Long idProduzione;
+
+    @Column(name = "id_articolo")
+    private Long idArticolo;
 
     @Column(name = "num_revisione")
     private Integer numRevisione;
@@ -31,6 +34,9 @@ public class SchedaTecnica {
 
     @Column(name = "data")
     private Date data;
+
+    @Column(name = "codice_prodotto")
+    private String codiceProdotto;
 
     @Column(name = "prodotto")
     private String prodotto;
@@ -44,8 +50,8 @@ public class SchedaTecnica {
     @Column(name = "ingredienti")
     private String ingredienti;
 
-    @Column(name = "allergeni_tracce")
-    private String allergeniTracce;
+    @Column(name = "tracce")
+    private String tracce;
 
     @Column(name = "durata")
     private String durata;
@@ -90,15 +96,17 @@ public class SchedaTecnica {
 
         return "{" +
                 "id: " + id +
-                ", idRicetta: " + idRicetta +
+                ", idProduzione: " + idProduzione +
+                ", idArticolo: " + idArticolo +
                 ", numRevisione: " + numRevisione +
                 ", anno: " + anno +
                 ", data: " + data +
+                ", codice_prodotto: " + codiceProdotto +
                 ", prodotto: " + prodotto +
                 ", prodotto2: " + prodotto2 +
                 ", pesoNettoConfezione: " + pesoNettoConfezione +
                 ", ingredienti: " + ingredienti +
-                ", allergeniTracce: " + allergeniTracce +
+                ", tracce: " + tracce +
                 ", durata: " + durata +
                 ", conservazione: " + conservazione +
                 ", consigliConsumo: " + consigliConsumo +
