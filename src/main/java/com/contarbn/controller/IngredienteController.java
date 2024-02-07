@@ -1,69 +1,53 @@
 package com.contarbn.controller;
 
 import com.contarbn.exception.CannotChangeResourceIdException;
-import com.contarbn.model.Fornitore;
 import com.contarbn.model.Ingrediente;
+import com.contarbn.model.beans.PageResponse;
+import com.contarbn.model.views.VIngrediente;
 import com.contarbn.service.IngredienteService;
+import com.contarbn.util.ResponseUtils;
+import com.contarbn.util.Utils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @Slf4j
+@RequiredArgsConstructor
 @RestController
+@CrossOrigin
 @RequestMapping(path="/ingredienti")
 public class IngredienteController {
 
     private final IngredienteService ingredienteService;
 
-    @Autowired
-    public IngredienteController(final IngredienteService ingredienteService){
-        this.ingredienteService = ingredienteService;
-    }
-
-    @RequestMapping(method = GET)
-    @CrossOrigin
-    public List<Ingrediente> getAll(@RequestParam(name = "attivo", required = false) Boolean active,
-                                    @RequestParam(name = "idFornitore", required = false) Integer idFornitore) {
+    @RequestMapping(method = GET, path = "/search")
+    public PageResponse search(@RequestParam(name = "draw", required = false) Integer draw,
+                               @RequestParam(name = "start", required = false) Integer start,
+                               @RequestParam(name = "length", required = false) Integer length,
+                               @RequestParam(name = "codice", required = false) String codice,
+                               @RequestParam(name = "descrizione", required = false) String descrizione,
+                               @RequestParam(name = "idFornitore", required = false) Integer idFornitore,
+                               @RequestParam(name = "composto", required = false) Boolean composto,
+                               @RequestParam(name = "attivo", required = false) Boolean attivo,
+                               @RequestParam Map<String,String> allRequestParams) {
         log.info("Performing GET request for retrieving list of 'ingredienti'");
-        log.info("Query parameter: 'attivo' '{}', 'idFornitore' '{}'", active, idFornitore);
+        log.info("Request params: draw {}, start {}, length {}, codice {}, descrizione {}, idFornitore {}, composto {}, attivo {}", draw, start, length, codice, descrizione, idFornitore, composto, attivo);
 
-        Predicate<Ingrediente> isIngredienteActiveEquals = ingrediente -> {
-            if(active != null){
-                return ingrediente.getAttivo().equals(active);
-            }
-            return true;
-        };
+        List<VIngrediente> data = ingredienteService.getAllByFilters(draw, start, length, Utils.getSortOrders(allRequestParams), codice, descrizione, idFornitore, composto, attivo);
+        Integer recordsCount = ingredienteService.getCountByFilters(codice, descrizione, idFornitore, composto, attivo);
 
-        Predicate<Ingrediente> isIngredienteIdFornitoreEquals = ingrediente -> {
-            if(idFornitore != null){
-                Fornitore ingredienteFornitore = ingrediente.getFornitore();
-                if(ingredienteFornitore != null){
-                    return ingredienteFornitore.getId().equals(Long.valueOf(idFornitore));
-                }
-                return false;
-            }
-            return true;
-        };
-        Set<Ingrediente> ingredienti = ingredienteService.getAll().stream()
-                .filter(isIngredienteIdFornitoreEquals
-                        .and(isIngredienteActiveEquals))
-                .collect(Collectors.toSet());
-        return ingredienti.stream().sorted(Comparator.comparing(Ingrediente::getCodice)).collect(Collectors.toList());
+        return ResponseUtils.createPageResponse(draw, recordsCount, recordsCount, data);
     }
 
     @RequestMapping(method = GET, path = "/{ingredienteId}")
-    @CrossOrigin
     public Ingrediente getOne(@PathVariable final Long ingredienteId) {
         log.info("Performing GET request for retrieving 'ingrediente' '{}'", ingredienteId);
         return ingredienteService.getOne(ingredienteId);
@@ -71,14 +55,12 @@ public class IngredienteController {
 
     @RequestMapping(method = POST)
     @ResponseStatus(CREATED)
-    @CrossOrigin
     public Ingrediente create(@RequestBody final Ingrediente ingrediente){
         log.info("Performing POST request for creating 'ingrediente'");
         return ingredienteService.create(ingrediente);
     }
 
     @RequestMapping(method = PUT, path = "/{ingredienteId}")
-    @CrossOrigin
     public Ingrediente update(@PathVariable final Long ingredienteId, @RequestBody final Ingrediente ingrediente){
         log.info("Performing PUT request for updating 'ingrediente' '{}'", ingredienteId);
         if (!Objects.equals(ingredienteId, ingrediente.getId())) {
@@ -89,9 +71,15 @@ public class IngredienteController {
 
     @RequestMapping(method = DELETE, path = "/{ingredienteId}")
     @ResponseStatus(NO_CONTENT)
-    @CrossOrigin
     public void delete(@PathVariable final Long ingredienteId){
         log.info("Performing DELETE request for deleting 'ingrediente' '{}'", ingredienteId);
         ingredienteService.delete(ingredienteId);
+    }
+
+    @RequestMapping(method = POST, path = "/operations/delete")
+    @ResponseStatus(NO_CONTENT)
+    public void deleteBulk(@RequestBody final List<Long> idIngredienti){
+        log.info("Performing BULK DELETE operation on 'ingredienti' by 'idIngrediente' (number of elements to delete: {})", idIngredienti.size());
+        ingredienteService.deleteBulk(idIngredienti);
     }
 }

@@ -1,24 +1,23 @@
-package com.contarbn.model;
+package com.contarbn.model.views;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.util.HashSet;
-import java.util.Set;
 
-@EqualsAndHashCode(exclude = {"ricettaIngredienti", "ingredienteAllergeni", "ingredienteAllergeniComposizione"})
+@EqualsAndHashCode
 @Data
 @Entity
-@Table(name = "ingrediente")
-public class Ingrediente {
+@Table(name = "v_ingrediente")
+public class VIngrediente {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "codice")
@@ -30,17 +29,17 @@ public class Ingrediente {
     @Column(name = "prezzo")
     private BigDecimal prezzo;
 
-    @ManyToOne
-    @JoinColumn(name = "id_unita_misura")
-    private UnitaMisura unitaMisura;
+    @Column(name = "id_unita_misura")
+    private Long idUnitaMisura;
 
-    @ManyToOne
-    @JoinColumn(name="id_fornitore")
-    private Fornitore fornitore;
+    @Column(name = "id_fornitore")
+    private Long idFornitore;
 
-    @ManyToOne
-    @JoinColumn(name="id_aliquota_iva")
-    private AliquotaIva aliquotaIva;
+    @Column(name = "fornitore")
+    private String fornitore;
+
+    @Column(name = "id_aliquota_iva")
+    private Long idAliquotaIva;
 
     @Column(name = "scadenza_giorni")
     private Integer scadenzaGiorni;
@@ -60,18 +59,6 @@ public class Ingrediente {
     @Column(name = "note")
     private String note;
 
-    @OneToMany(mappedBy = "ingrediente")
-    @JsonIgnore
-    Set<RicettaIngrediente> ricettaIngredienti = new HashSet<>();
-
-    @OneToMany(mappedBy = "ingrediente")
-    @JsonIgnoreProperties("ingrediente")
-    private Set<IngredienteAllergene> ingredienteAllergeni = new HashSet<>();
-
-    @OneToMany(mappedBy = "ingrediente")
-    @JsonIgnoreProperties("ingrediente")
-    private Set<IngredienteAllergeneComposizione> ingredienteAllergeniComposizione = new HashSet<>();
-
     @Override
     public String toString() {
         return "{" +
@@ -79,9 +66,10 @@ public class Ingrediente {
                 ", codice: " + codice +
                 ", descrizione: " + descrizione +
                 ", prezzo: " + prezzo +
-                ", unitaMisura: " + unitaMisura +
+                ", idUnitaMisura: " + idUnitaMisura +
+                ", idFornitore: " + idFornitore +
                 ", fornitore: " + fornitore +
-                ", fornitore: " + aliquotaIva +
+                ", idAliquotaIva: " + idAliquotaIva +
                 ", scadenzaGiorni: " + scadenzaGiorni +
                 ", dataInserimento: " + dataInserimento +
                 ", composto: " + composto +

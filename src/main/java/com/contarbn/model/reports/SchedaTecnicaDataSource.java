@@ -52,6 +52,8 @@ public class SchedaTecnicaDataSource {
             prodottoHtml += "<br/>"+schedaTecnica.getProdotto2();
         }
 
+        String ingredientiHtml = schedaTecnica.getIngredienti() != null ? schedaTecnica.getIngredienti().replaceAll("<strong>","<b>").replaceAll("</strong>","</b>") : schedaTecnica.getIngredienti();
+
         return SchedaTecnicaDataSource.builder()
                 .numRevisione(schedaTecnica.getNumRevisione())
                 .data(simpleDateFormat.format(schedaTecnica.getData()))
@@ -59,7 +61,7 @@ public class SchedaTecnicaDataSource {
                 .prodotto(schedaTecnica.getProdotto())
                 .prodotto2(schedaTecnica.getProdotto2())
                 .pesoNettoConfezione(schedaTecnica.getPesoNettoConfezione())
-                .ingredienti(schedaTecnica.getIngredienti())
+                .ingredienti(ingredientiHtml)
                 .tracce(schedaTecnica.getTracce())
                 .durata(schedaTecnica.getDurata())
                 .conservazione(schedaTecnica.getConservazione())

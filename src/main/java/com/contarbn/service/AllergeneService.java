@@ -5,6 +5,7 @@ import com.contarbn.exception.ResourceNotFoundException;
 import com.contarbn.model.Allergene;
 import com.contarbn.repository.AllergeneRepository;
 import com.contarbn.util.Utils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -16,14 +17,11 @@ import java.util.Optional;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class AllergeneService {
 
     private final AllergeneRepository allergeneRepository;
-
-    public AllergeneService(final AllergeneRepository allergeneRepository){
-        this.allergeneRepository = allergeneRepository;
-    }
 
     public List<Allergene> getAll(Boolean attivo){
         log.info("Retrieving the list of 'allergene'");
@@ -35,6 +33,13 @@ public class AllergeneService {
     public Allergene getOne(Long allergeneId){
         log.info("Retrieving 'allergene' '{}'", allergeneId);
         Allergene allergene = allergeneRepository.findById(allergeneId).orElseThrow(ResourceNotFoundException::new);
+        log.info("Retrieved 'allergene' '{}'", allergene);
+        return allergene;
+    }
+
+    public Optional<Allergene> getByNome(String nome){
+        log.info("Retrieving 'allergene' by nome '{}'", nome);
+        Optional<Allergene> allergene = allergeneRepository.findByNome(nome);
         log.info("Retrieved 'allergene' '{}'", allergene);
         return allergene;
     }
