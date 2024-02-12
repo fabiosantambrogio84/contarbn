@@ -257,7 +257,7 @@
 			</textField>
 			<staticText>
 				<reportElement x="450" y="31" width="90" height="16" uuid="a9d5020f-30ad-4191-8ab6-f2cd9752ba12"/>
-				<textElement textAlignment="Right">
+				<textElement textAlignment="Left">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[SCHEDA TECNICA]]></text>
@@ -626,7 +626,7 @@
 								<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
 									<font size="9"/>
 								</textElement>
-								<text><![CDATA[DICHIARAZIONE<br>NUTRIZIONALE]]></text>
+								<text><![CDATA[VALORI NUTRIZIONALI]]></text>
 							</staticText>
 						</jr:tableHeader>
 						<jr:detailCell style="Table_TD" height="20">
