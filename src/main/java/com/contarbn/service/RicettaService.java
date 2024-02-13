@@ -1,10 +1,9 @@
 package com.contarbn.service;
 
 import com.contarbn.exception.ResourceNotFoundException;
-import com.contarbn.model.Ricetta;
-import com.contarbn.model.RicettaAllergene;
-import com.contarbn.model.RicettaIngrediente;
-import com.contarbn.model.SchedaTecnica;
+import com.contarbn.model.*;
+import com.contarbn.repository.RicettaAnalisiRepository;
+import com.contarbn.repository.RicettaNutrienteRepository;
 import com.contarbn.repository.RicettaRepository;
 import com.contarbn.util.Utils;
 import lombok.RequiredArgsConstructor;
@@ -12,10 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.sql.Date;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
@@ -24,6 +20,8 @@ import java.util.Set;
 public class RicettaService {
 
     private final RicettaRepository ricettaRepository;
+    private final RicettaAnalisiRepository ricettaAnalisiRepository;
+    private final RicettaNutrienteRepository ricettaNutrienteRepository;
     private final RicettaIngredienteService ricettaIngredienteService;
     private final RicettaAllergeneService ricettaAllergeneService;
     private final ProduzioneService produzioneService;
@@ -48,9 +46,7 @@ public class RicettaService {
         Ricetta createdRicetta = ricettaRepository.save(ricetta);
         Float pesoTotale = ricetta.getPesoTotale();
         createdRicetta.getRicettaIngredienti().forEach(ri -> {
-            if(ri.getPercentuale() != null){
-                ri.setPercentuale(Utils.computePercentuale(ri.getQuantita(), pesoTotale));
-            }
+            ri.setPercentuale(Utils.computePercentuale(ri.getQuantita(), pesoTotale));
             ri.getId().setRicettaId(createdRicetta.getId());
             ricettaIngredienteService.create(ri);
         });
@@ -58,6 +54,15 @@ public class RicettaService {
             ra.getId().setRicettaId(createdRicetta.getId());
             ricettaAllergeneService.create(ra);
         });
+        createdRicetta.getRicettaAnalisi().forEach(ra -> {
+            ra.getId().setRicettaId(createdRicetta.getId());
+            ricettaAnalisiRepository.save(ra);
+        });
+        createdRicetta.getRicettaNutrienti().forEach(rn -> {
+            rn.getId().setRicettaId(createdRicetta.getId());
+            ricettaNutrienteRepository.save(rn);
+        });
+
         log.info("Created 'ricetta' '{}'", createdRicetta);
         return createdRicetta;
     }
@@ -73,6 +78,14 @@ public class RicettaService {
         ricetta.setRicettaAllergeni(new HashSet<>());
         ricettaAllergeneService.deleteByRicettaId(ricetta.getId());
 
+        Set<RicettaAnalisi> ricettaAnalisi = ricetta.getRicettaAnalisi();
+        ricetta.setRicettaAnalisi(new HashSet<>());
+        ricettaAnalisiRepository.deleteByRicettaId(ricetta.getId());
+
+        Set<RicettaNutriente> ricettaNutrienti = ricetta.getRicettaNutrienti();
+        ricetta.setRicettaNutrienti(new HashSet<>());
+        ricettaNutrienteRepository.deleteByRicettaId(ricetta.getId());
+
         Ricetta updatedRicetta = ricettaRepository.save(ricetta);
         Float pesoTotale = ricetta.getPesoTotale();
         ricettaIngredienti.forEach(ri -> {
@@ -83,6 +96,14 @@ public class RicettaService {
         ricettaAllergeni.forEach(ra -> {
             ra.getId().setRicettaId(updatedRicetta.getId());
             ricettaAllergeneService.create(ra);
+        });
+        ricettaAnalisi.forEach(ra -> {
+            ra.getId().setRicettaId(updatedRicetta.getId());
+            ricettaAnalisiRepository.save(ra);
+        });
+        ricettaNutrienti.forEach(rn -> {
+            rn.getId().setRicettaId(updatedRicetta.getId());
+            ricettaNutrienteRepository.save(rn);
         });
         log.info("Updated 'ricetta' '{}'", updatedRicetta);
         return updatedRicetta;
@@ -95,6 +116,8 @@ public class RicettaService {
         produzioneService.deleteByRicettaId(ricettaId);
         ricettaIngredienteService.deleteByRicettaId(ricettaId);
         ricettaAllergeneService.deleteByRicettaId(ricettaId);
+        ricettaAnalisiRepository.deleteByRicettaId(ricettaId);
+        ricettaNutrienteRepository.deleteByRicettaId(ricettaId);
         ricettaRepository.deleteById(ricettaId);
         log.info("Deleted 'ricetta' '{}'", ricettaId);
     }

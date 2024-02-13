@@ -1,15 +1,10 @@
 package com.contarbn.service;
 
 import com.contarbn.exception.ResourceNotFoundException;
-import com.contarbn.model.SchedaTecnica;
-import com.contarbn.model.SchedaTecnicaAnalisi;
-import com.contarbn.model.SchedaTecnicaNutriente;
-import com.contarbn.model.SchedaTecnicaRaccolta;
+import com.contarbn.model.*;
+import com.contarbn.model.beans.SchedaTecnicaResponse;
 import com.contarbn.model.views.VSchedaTecnica;
-import com.contarbn.repository.SchedaTecnicaAnalisiRepository;
-import com.contarbn.repository.SchedaTecnicaNutrienteRepository;
-import com.contarbn.repository.SchedaTecnicaRaccoltaRepository;
-import com.contarbn.repository.SchedaTecnicaRepository;
+import com.contarbn.repository.*;
 import com.contarbn.repository.views.VSchedaTecnicaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,15 +26,17 @@ public class SchedaTecnicaService {
     private final SchedaTecnicaNutrienteRepository schedaTecnicaNutrienteRepository;
     private final SchedaTecnicaRepository schedaTecnicaRepository;
     private final VSchedaTecnicaRepository vSchedaTecnicaRepository;
+    private final RicettaNutrienteRepository ricettaNutrienteRepository;
+    private final RicettaAnalisiRepository ricettaAnalisiRepository;
     private final TransactionTemplate transactionTemplate;
 
-    public Object getSchedaTecnica(Long idProduzione, Long idArticolo){
+    public SchedaTecnicaResponse getSchedaTecnica(Long idProduzione, Long idArticolo){
         log.info("Retrieving 'scheda tecnica' for 'produzione' {} and 'articolo' {}", idProduzione, idArticolo);
         Optional<SchedaTecnica> schedaTecnica = getByIdProduzioneAndIdArticolo(idProduzione, idArticolo);
         if(!schedaTecnica.isPresent()) {
-            return getByIdProduzioneAndIdArticoloFromView(idProduzione, idArticolo);
+            return createResponse(getByIdProduzioneAndIdArticoloFromView(idProduzione, idArticolo));
         }
-        return schedaTecnica;
+        return createResponse(schedaTecnica.get());
     }
 
     public SchedaTecnica getById(Long idSchedaTecnica){
@@ -153,6 +150,116 @@ public class SchedaTecnicaService {
             numRevisione = resultNumRevisione + 1;
         }
         return numRevisione;
+    }
+
+    private SchedaTecnicaResponse createResponse(VSchedaTecnica vSchedaTecnica){
+
+        SchedaTecnicaResponse schedaTecnicaResponse = SchedaTecnicaResponse.builder()
+                .idView(vSchedaTecnica.getId())
+                .id(vSchedaTecnica.getIdSchedaTecnica())
+                .idProduzione(vSchedaTecnica.getIdProduzione())
+                .idArticolo(vSchedaTecnica.getIdArticolo())
+                .idRicetta(vSchedaTecnica.getIdRicetta())
+                .numRevisione(vSchedaTecnica.getNumRevisione())
+                .anno(vSchedaTecnica.getAnno())
+                .data(vSchedaTecnica.getData())
+                .codiceProdotto(vSchedaTecnica.getCodiceProdotto())
+                .prodotto(vSchedaTecnica.getProdotto())
+                .prodotto2(vSchedaTecnica.getProdotto2())
+                .pesoNettoConfezione(vSchedaTecnica.getPesoNettoConfezione())
+                .ingredienti(vSchedaTecnica.getIngredienti())
+                .tracce(vSchedaTecnica.getTracce())
+                .durata(vSchedaTecnica.getDurata())
+                .conservazione(vSchedaTecnica.getConservazione())
+                .consigliConsumo(vSchedaTecnica.getConsigliConsumo())
+                .imballoDimensioni(vSchedaTecnica.getImballoDimensioni())
+                .objectType("view")
+                .build();
+
+        if(vSchedaTecnica.getIdTipologiaConfezionamento() != null){
+            Anagrafica tipologiaConfezionamento = new Anagrafica();
+            tipologiaConfezionamento.setId(vSchedaTecnica.getIdTipologiaConfezionamento());
+            tipologiaConfezionamento.setNome(vSchedaTecnica.getTipologiaConfezionamento());
+
+            schedaTecnicaResponse.setTipologiaConfezionamento(tipologiaConfezionamento);
+        }
+
+        if(vSchedaTecnica.getIdImballo() != null){
+            Anagrafica imballo = new Anagrafica();
+            imballo.setId(vSchedaTecnica.getIdImballo());
+            imballo.setNome(vSchedaTecnica.getImballo());
+
+            schedaTecnicaResponse.setImballo(imballo);
+        }
+
+        Set<SchedaTecnicaNutriente> schedaTecnicaNutrienti = new HashSet<>();
+        Set<SchedaTecnicaAnalisi> schedaTecnicaAnalisi = new HashSet<>();
+        if(vSchedaTecnica.getIdRicetta() != null){
+            Set<RicettaNutriente> ricettaNutrienti = ricettaNutrienteRepository.findByRicettaId(vSchedaTecnica.getIdRicetta());
+            if(!ricettaNutrienti.isEmpty()){
+                for(RicettaNutriente ricettaNutriente : ricettaNutrienti){
+                    SchedaTecnicaNutrienteKey schedaTecnicaNutrienteKey = new SchedaTecnicaNutrienteKey();
+                    schedaTecnicaNutrienteKey.setNutrienteId(ricettaNutriente.getId().getNutrienteId());
+
+                    SchedaTecnicaNutriente schedaTecnicaNutriente = new SchedaTecnicaNutriente();
+                    schedaTecnicaNutriente.setId(schedaTecnicaNutrienteKey);
+                    schedaTecnicaNutriente.setNutriente(ricettaNutriente.getNutriente());
+                    schedaTecnicaNutriente.setValore(ricettaNutriente.getValore());
+
+                    schedaTecnicaNutrienti.add(schedaTecnicaNutriente);
+                }
+            }
+
+            Set<RicettaAnalisi> ricettaAnalisiList = ricettaAnalisiRepository.findByRicettaId(vSchedaTecnica.getIdRicetta());
+            if(!ricettaAnalisiList.isEmpty()){
+                for(RicettaAnalisi ricettaAnalisi : ricettaAnalisiList){
+                    SchedaTecnicaAnalisiKey schedaTecnicaAnalisiKey = new SchedaTecnicaAnalisiKey();
+                    schedaTecnicaAnalisiKey.setAnalisiId(ricettaAnalisi.getId().getAnalisiId());
+
+                    SchedaTecnicaAnalisi schedaTecnicaAnalisi2 = new SchedaTecnicaAnalisi();
+                    schedaTecnicaAnalisi2.setId(schedaTecnicaAnalisiKey);
+                    schedaTecnicaAnalisi2.setAnalisi(ricettaAnalisi.getAnalisi());
+                    schedaTecnicaAnalisi2.setRisultato(ricettaAnalisi.getRisultato());
+
+                    schedaTecnicaAnalisi.add(schedaTecnicaAnalisi2);
+                }
+            }
+        }
+
+        schedaTecnicaResponse.setSchedaTecnicaNutrienti(schedaTecnicaNutrienti);
+        schedaTecnicaResponse.setSchedaTecnicaAnalisi(schedaTecnicaAnalisi);
+        return schedaTecnicaResponse;
+    }
+
+    private SchedaTecnicaResponse createResponse(SchedaTecnica schedaTecnica){
+
+        return SchedaTecnicaResponse.builder()
+                .id(schedaTecnica.getId())
+                .idProduzione(schedaTecnica.getIdProduzione())
+                .idArticolo(schedaTecnica.getIdArticolo())
+                .numRevisione(schedaTecnica.getNumRevisione())
+                .anno(schedaTecnica.getAnno())
+                .data(schedaTecnica.getData())
+                .codiceProdotto(schedaTecnica.getCodiceProdotto())
+                .prodotto(schedaTecnica.getProdotto())
+                .prodotto2(schedaTecnica.getProdotto2())
+                .pesoNettoConfezione(schedaTecnica.getPesoNettoConfezione())
+                .ingredienti(schedaTecnica.getIngredienti())
+                .tracce(schedaTecnica.getTracce())
+                .durata(schedaTecnica.getDurata())
+                .conservazione(schedaTecnica.getConservazione())
+                .consigliConsumo(schedaTecnica.getConsigliConsumo())
+                .tipologiaConfezionamento(schedaTecnica.getTipologiaConfezionamento())
+                .imballo(schedaTecnica.getImballo())
+                .imballoDimensioni(schedaTecnica.getImballoDimensioni())
+                .dataInserimento(schedaTecnica.getDataInserimento())
+                .dataAggiornamento(schedaTecnica.getDataAggiornamento())
+                .objectType("table")
+                .schedaTecnicaNutrienti(schedaTecnica.getSchedaTecnicaNutrienti())
+                .schedaTecnicaAnalisi(schedaTecnica.getSchedaTecnicaAnalisi())
+                .schedaTecnicaRaccolte(schedaTecnica.getSchedaTecnicaRaccolte())
+                .build();
+
     }
 
 }

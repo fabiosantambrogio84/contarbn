@@ -1,3 +1,87 @@
+CREATE TABLE contarbn.ricetta_20240215
+select *
+from contarbn.ricetta;
+
+CREATE TABLE contarbn.`ricetta_analisi` (
+    `id_ricetta` int unsigned NOT NULL,
+    `id_analisi` int unsigned NOT NULL,
+    `risultato` varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
+    PRIMARY KEY (`id_ricetta`,`id_analisi`),
+    CONSTRAINT `fk_ricetta_analisi_analisi` FOREIGN KEY (`id_analisi`) REFERENCES `anagrafica` (`id`),
+    CONSTRAINT `fk_ricetta_analisi_ricetta` FOREIGN KEY (`id_ricetta`) REFERENCES `ricetta` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+
+CREATE TABLE contarbn.`ricetta_nutriente` (
+    `id_ricetta` int unsigned NOT NULL,
+    `id_nutriente` int unsigned NOT NULL,
+    `valore` varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
+    PRIMARY KEY (`id_ricetta`,`id_nutriente`),
+    CONSTRAINT `fk_ricetta_nutriente_nutriente` FOREIGN KEY (`id_nutriente`) REFERENCES `anagrafica` (`id`),
+    CONSTRAINT `fk_ricetta_nutriente_scheda_tecnica` FOREIGN KEY (`id_ricetta`) REFERENCES `ricetta` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+
+alter table contarbn.ricetta drop column allergeni;
+alter table contarbn.ricetta drop column valori_nutrizionali;
+
+-- VIEWS
+
+create or replace algorithm = UNDEFINED view `v_ricetta` as
+select
+    `ricetta`.`id` as `id_ricetta`,
+    `ricetta`.`nome` as `nome_ricetta`,
+    `ricetta`.`tempo_preparazione` as `tempo_preparazione`,
+    `ricetta`.`peso_totale` as `peso_totale`,
+    group_concat(distinct concat(anagrafica.`nome`,' ',ricetta_nutriente.valore) order by anagrafica.ordine separator ',') as valori_nutrizionali,
+    `ricetta`.`conservazione` as `conservazione`,
+    group_concat(distinct `allergene`.`nome` order by `allergene`.`nome` desc separator ',') as `tracce`
+from
+    `ricetta`
+        left join ricetta_nutriente on
+            ricetta_nutriente.id_ricetta = ricetta.id
+        left join anagrafica on
+            ricetta_nutriente.id_nutriente = anagrafica.id
+        left join `ricetta_allergene` on
+            `ricetta_allergene`.`id_ricetta` = `ricetta`.`id`
+        left join `allergene` on
+            `ricetta_allergene`.`id_allergene` = `allergene`.`id`
+group by
+    `ricetta`.`id`,
+    `ricetta`.`nome`,
+    `ricetta`.`tempo_preparazione`,
+    `ricetta`.`peso_totale`,
+    `ricetta`.`conservazione`;
+
+create or replace
+algorithm = UNDEFINED view `v_ricetta_info` as
+select
+    `ricetta`.`id` as `id`,
+    `ricetta`.`nome` as `nome`,
+    `ricetta`.`tempo_preparazione` as `tempo_preparazione`,
+    `ricetta`.`peso_totale` as `peso_totale`,
+    `ricetta`.`conservazione` as `conservazione`,
+    `ricetta`.`consigli_consumo` as `consigli_consumo`,
+    `ricetta`.`scadenza_giorni` as `scadenza_giorni`,
+    group_concat(distinct `v_ingrediente`.`descrizione_scheda_tecnica` order by `ricetta_ingrediente`.`quantita` desc separator ', ') as `ingredienti`,
+    group_concat(distinct `allergene`.`nome` order by `allergene`.`ordine` asc separator ', ') as `allergeni_tracce`
+from
+    ((((`ricetta`
+        join `ricetta_ingrediente` on
+            ((`ricetta_ingrediente`.`id_ricetta` = `ricetta`.`id`)))
+        join `v_ingrediente` on
+            ((`v_ingrediente`.`id` = `ricetta_ingrediente`.`id_ingrediente`)))
+        left join `v_ricetta_allergene` on
+            ((`v_ricetta_allergene`.`id_ricetta` = `ricetta`.`id`)))
+        left join `allergene` on
+        ((`v_ricetta_allergene`.`id_allergene` = `allergene`.`id`)))
+group by
+    `ricetta`.`id`,
+    `ricetta`.`nome`,
+    `ricetta`.`tempo_preparazione`,
+    `ricetta`.`peso_totale`,
+    `ricetta`.`conservazione`,
+    `ricetta`.`consigli_consumo`,
+    `ricetta`.`scadenza_giorni`;
+
 
 create or replace algorithm = UNDEFINED view `v_scheda_tecnica` as
 select

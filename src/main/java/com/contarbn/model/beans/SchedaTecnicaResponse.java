@@ -1,90 +1,78 @@
-package com.contarbn.model.views;
+package com.contarbn.model.beans;
 
+import com.contarbn.model.Anagrafica;
+import com.contarbn.model.SchedaTecnicaAnalisi;
+import com.contarbn.model.SchedaTecnicaNutriente;
+import com.contarbn.model.SchedaTecnicaRaccolta;
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
-import javax.persistence.*;
 import java.sql.Date;
+import java.sql.Timestamp;
+import java.util.Set;
 
 @Data
-@EqualsAndHashCode
-@Entity
-@Table(name = "v_scheda_tecnica")
-public class VSchedaTecnica {
+@Builder
+public class SchedaTecnicaResponse {
 
-    @Id
-    @Column(name = "id")
-    private String id;
+    private String idView;
 
-    @Column(name = "id_scheda_tecnica")
-    private Long idSchedaTecnica;
+    private Long id;
 
-    @Column(name = "id_produzione")
     private Long idProduzione;
 
-    @Column(name = "id_articolo")
     private Long idArticolo;
 
-    @Column(name = "id_ricetta")
     private Long idRicetta;
 
-    @Column(name = "num_revisione")
     private Integer numRevisione;
 
-    @Column(name = "anno")
     private Integer anno;
 
-    @Column(name = "data")
     private Date data;
 
-    @Column(name = "codice_prodotto")
     private String codiceProdotto;
 
-    @Column(name = "prodotto")
     private String prodotto;
 
-    @Column(name = "prodotto_2")
     private String prodotto2;
 
-    @Column(name = "peso_netto_confezione")
     private String pesoNettoConfezione;
 
-    @Column(name = "ingredienti")
     private String ingredienti;
 
-    @Column(name = "tracce")
     private String tracce;
 
-    @Column(name = "durata")
     private String durata;
 
-    @Column(name = "conservazione")
     private String conservazione;
 
-    @Column(name = "consigli_consumo")
     private String consigliConsumo;
 
-    @Column(name = "id_tipologia_confezionamento")
-    private Long idTipologiaConfezionamento;
+    private Anagrafica tipologiaConfezionamento;
 
-    @Column(name = "tipologia_confezionamento")
-    private String tipologiaConfezionamento;
+    private Anagrafica imballo;
 
-    @Column(name = "id_imballo")
-    private Long idImballo;
-
-    @Column(name = "imballo")
-    private String imballo;
-
-    @Column(name = "imballo_dimensioni")
     private String imballoDimensioni;
+
+    private Timestamp dataInserimento;
+
+    private Timestamp dataAggiornamento;
+
+    private String objectType;
+
+    private Set<SchedaTecnicaNutriente> schedaTecnicaNutrienti;
+
+    private Set<SchedaTecnicaAnalisi> schedaTecnicaAnalisi;
+
+    private Set<SchedaTecnicaRaccolta> schedaTecnicaRaccolte;
 
     @Override
     public String toString() {
 
         return "{" +
-                "id: " + id +
-                ", idSchedaTecnica: " + idSchedaTecnica +
+                "idView: " + idView +
+                ", id: " + id +
                 ", idProduzione: " + idProduzione +
                 ", idArticolo: " + idArticolo +
                 ", idRicetta: " + idRicetta +
@@ -100,11 +88,12 @@ public class VSchedaTecnica {
                 ", durata: " + durata +
                 ", conservazione: " + conservazione +
                 ", consigliConsumo: " + consigliConsumo +
-                ", idTipologiaConfezionamento: " + idTipologiaConfezionamento +
                 ", tipologiaConfezionamento: " + tipologiaConfezionamento +
-                ", id_imballo: " + idImballo +
                 ", imballo: " + imballo +
                 ", imballoDimensioni: " + imballoDimensioni +
+                ", dataInserimento: " + dataInserimento +
+                ", dataAggiornamento: " + dataAggiornamento +
+                ", objectType: " + objectType +
                 "}";
     }
 }

@@ -1,6 +1,7 @@
 package com.contarbn.controller;
 
 import com.contarbn.model.SchedaTecnica;
+import com.contarbn.model.beans.SchedaTecnicaResponse;
 import com.contarbn.service.SchedaTecnicaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,8 +31,8 @@ public class SchedaTecnicaController {
 
     @RequestMapping(method = GET, path = "/{produzioneId}/{articoloId}/scheda-tecnica")
     @CrossOrigin
-    public Object getSchedaTecnica(@PathVariable final Long produzioneId,
-                                   @PathVariable final Long articoloId) {
+    public SchedaTecnicaResponse getSchedaTecnica(@PathVariable final Long produzioneId,
+                                                  @PathVariable final Long articoloId) {
         log.info("Performing GET request for retrieving 'scheda-tecnica' for 'produzione' '{}' and 'articolo' '{}'", produzioneId, articoloId);
         return schedaTecnicaService.getSchedaTecnica(produzioneId, articoloId);
     }

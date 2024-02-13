@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 @Data
-@EqualsAndHashCode(exclude = {"ricettaIngredienti", "produzioni", "ricettaAllergeni"})
+@EqualsAndHashCode(exclude = {"ricettaIngredienti", "produzioni", "ricettaAllergeni", "ricettaNutrienti", "ricettaAnalisi"})
 @Entity
 @Table(name = "ricetta")
 public class Ricetta {
@@ -52,12 +52,6 @@ public class Ricetta {
     @Column(name = "preparazione")
     private String preparazione;
 
-    @Column(name = "allergeni")
-    private String allergeni;
-
-    @Column(name = "valori_nutrizionali")
-    private String valoriNutrizionali;
-
     @Column(name = "conservazione")
     private String conservazione;
 
@@ -79,6 +73,14 @@ public class Ricetta {
     @JsonIgnore
     private List<Produzione> produzioni;
 
+    @OneToMany(mappedBy = "ricetta")
+    @JsonIgnoreProperties("ricetta")
+    private Set<RicettaNutriente> ricettaNutrienti = new HashSet<>();
+
+    @OneToMany(mappedBy = "ricetta")
+    @JsonIgnoreProperties("ricetta")
+    private Set<RicettaAnalisi> ricettaAnalisi = new HashSet<>();
+
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
@@ -95,8 +97,6 @@ public class Ricetta {
         result.append(", costoPreparazione: ").append(costoPreparazione);
         result.append(", costoTotale: ").append(costoTotale);
         result.append(", preparazione: ").append(preparazione);
-        result.append(", allergeni: ").append(allergeni);
-        result.append(", valoriNutrizionali: ").append(valoriNutrizionali);
         result.append(", conservazione: ").append(conservazione);
         result.append(", consigliConsumo: ").append(consigliConsumo);
         result.append(", note: ").append(note);

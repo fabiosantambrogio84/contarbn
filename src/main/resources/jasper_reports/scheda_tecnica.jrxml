@@ -257,8 +257,15 @@
 			</textField>
 			<staticText>
 				<reportElement x="450" y="31" width="90" height="16" uuid="a9d5020f-30ad-4191-8ab6-f2cd9752ba12"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
 				<textElement textAlignment="Left">
-					<font isBold="true"/>
+					<font size="8" isBold="true"/>
+					<paragraph lineSpacingSize="0.0"/>
 				</textElement>
 				<text><![CDATA[SCHEDA TECNICA]]></text>
 			</staticText>
