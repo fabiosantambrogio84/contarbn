@@ -317,7 +317,7 @@
 				<text><![CDATA[PESO NETTO CONFEZIONE]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="79" width="140" height="20" uuid="bb37612f-a99d-4f13-8aad-96f54e55e1fa"/>
+				<reportElement x="0" y="79" width="140" height="30" uuid="bb37612f-a99d-4f13-8aad-96f54e55e1fa"/>
 				<box padding="2">
 					<pen lineWidth="0.0"/>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -331,7 +331,7 @@
 				<text><![CDATA[INGREDIENTI]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="109" width="140" height="30" uuid="84d96fe0-a1a5-4881-af83-4f3bcb93ff31"/>
+				<reportElement x="0" y="120" width="140" height="30" uuid="84d96fe0-a1a5-4881-af83-4f3bcb93ff31"/>
 				<box padding="2">
 					<pen lineWidth="0.0"/>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -345,7 +345,7 @@
 				<text><![CDATA[TRACCE DI]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="149" width="140" height="20" uuid="7dfeb502-2a29-4b14-9f10-cb0b025ae91a"/>
+				<reportElement x="0" y="160" width="140" height="20" uuid="7dfeb502-2a29-4b14-9f10-cb0b025ae91a"/>
 				<box padding="2">
 					<pen lineWidth="0.0"/>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -359,7 +359,7 @@
 				<text><![CDATA[DURATA (giorni)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="179" width="140" height="20" uuid="218b3c70-78fa-487c-9272-21a778063f2f"/>
+				<reportElement x="0" y="190" width="140" height="20" uuid="218b3c70-78fa-487c-9272-21a778063f2f"/>
 				<box padding="2">
 					<pen lineWidth="0.0"/>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -373,7 +373,9 @@
 				<text><![CDATA[CONSERVAZIONE]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="209" width="140" height="30" uuid="dfce130e-f442-49b5-ba8a-498f19fe9ea6"/>
+				<reportElement x="0" y="218" width="140" height="20" uuid="dfce130e-f442-49b5-ba8a-498f19fe9ea6">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
 				<box padding="2">
 					<pen lineWidth="0.0"/>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -465,7 +467,7 @@
 				<textFieldExpression><![CDATA[$P{pesoNettoConfezione}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="ScaleFont">
-				<reportElement x="140" y="79" width="414" height="20" uuid="a7621b75-c040-4562-8fe6-c5ec2eb948f4">
+				<reportElement x="140" y="79" width="414" height="30" uuid="a7621b75-c040-4562-8fe6-c5ec2eb948f4">
 					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 				</reportElement>
 				<box>
@@ -480,7 +482,7 @@
 				<textFieldExpression><![CDATA[$P{ingredienti}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="ScaleFont" isBlankWhenNull="true">
-				<reportElement x="140" y="109" width="415" height="30" uuid="cca63165-7547-455b-a9f1-195b23e5678c">
+				<reportElement x="140" y="120" width="415" height="30" uuid="cca63165-7547-455b-a9f1-195b23e5678c">
 					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 				</reportElement>
 				<box>
@@ -495,7 +497,7 @@
 				<textFieldExpression><![CDATA[$P{tracce}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="ScaleFont">
-				<reportElement x="140" y="149" width="414" height="20" uuid="670a544c-ecc9-4f5b-bbd5-246750b231a4">
+				<reportElement x="140" y="160" width="414" height="20" uuid="670a544c-ecc9-4f5b-bbd5-246750b231a4">
 					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 				</reportElement>
 				<box>
@@ -510,7 +512,7 @@
 				<textFieldExpression><![CDATA[$P{durata}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="ScaleFont">
-				<reportElement x="140" y="179" width="414" height="20" uuid="e6f27e02-6e32-432a-af01-03f86dbabe96">
+				<reportElement x="140" y="190" width="414" height="20" uuid="e6f27e02-6e32-432a-af01-03f86dbabe96">
 					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 				</reportElement>
 				<box>
@@ -525,8 +527,9 @@
 				<textFieldExpression><![CDATA[$P{conservazione}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="ScaleFont">
-				<reportElement x="140" y="209" width="414" height="30" uuid="77507535-fc30-43c6-af22-4ec1d2cd8f46">
+				<reportElement x="140" y="218" width="414" height="20" uuid="77507535-fc30-43c6-af22-4ec1d2cd8f46">
 					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>

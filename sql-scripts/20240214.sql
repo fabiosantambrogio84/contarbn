@@ -1,9 +1,69 @@
+-- PROCEDURE
+DROP PROCEDURE IF EXISTS contarbn.check_views;
 
+DELIMITER $$
+$$
+CREATE DEFINER=`contarbn`@`%` PROCEDURE `contarbn`.`check_views`()
+BEGIN
+
+	-- Variables to store view name and query
+	DECLARE view_name VARCHAR(255);
+	DECLARE select_query text;
+	DECLARE result_text text;
+
+	DECLARE done BOOLEAN DEFAULT FALSE;
+
+	-- Cursor to loop through views
+	DECLARE view_cursor CURSOR FOR
+SELECT table_name
+FROM information_schema.views
+WHERE table_schema = 'contarbn';
+
+DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+	set result_text = '';
+
+	-- Open the cursor
+OPEN view_cursor;
+
+-- Loop through views
+view_loop: LOOP
+	    -- Fetch the next view name
+	    FETCH view_cursor INTO view_name;
+
+	    -- Exit the loop if no more views
+	    IF done THEN
+	        LEAVE view_loop;
+END IF;
+
+	    -- Build and execute the select query
+	    SET @select_query = CONCAT('SELECT count(*) INTO @id FROM contarbn', '.', view_name);
+PREPARE dynamic_query FROM @select_query;
+EXECUTE dynamic_query;
+DEALLOCATE PREPARE dynamic_query;
+
+if result_text = '' then
+	   		SET result_text = CONCAT('Processed views: ', view_name);
+else
+	   		SET result_text = CONCAT(result_text, '; ', view_name);
+end if;
+
+END LOOP;
+
+	-- Close the cursor
+CLOSE view_cursor;
+
+SELECT result_text AS final_result;
+END$$
+DELIMITER ;
+
+-- TABLES
 alter table contarbn.articolo add column scadenza_giorni_allarme int DEFAULT 5 after scadenza_giorni;
 
 ALTER TABLE contarbn.ingrediente CHANGE scadenza_giorni scadenza_giorni_allarme int DEFAULT 5 NULL;
 ALTER TABLE contarbn.ingrediente MODIFY COLUMN scadenza_giorni_allarme int DEFAULT 5 NULL;
 
+ALTER TABLE contarbn.scheda_tecnica MODIFY COLUMN ingredienti TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL;
 
 -- VIEWS
 drop view contarbn.v_giacenza_ingrediente_agg;
@@ -134,12 +194,14 @@ select
     `ingrediente`.`descrizione` as `descrizione`,
     `ingrediente`.`prezzo` as `prezzo`,
     `ingrediente`.`id_unita_misura` as `id_unita_misura`,
+    unita_misura.etichetta as unita_misura,
     `ingrediente`.`id_fornitore` as `id_fornitore`,
     (case
          when (`fornitore`.`ragione_sociale` is not null) then `fornitore`.`ragione_sociale`
          else `fornitore`.`ragione_sociale_2`
         end) as `fornitore`,
     `ingrediente`.`id_aliquota_iva` as `id_aliquota_iva`,
+    aliquota_iva.valore as aliquota_iva,
     `ingrediente`.`scadenza_giorni_allarme` as `scadenza_giorni_allarme`,
     `ingrediente`.`data_inserimento` as `data_inserimento`,
     `ingrediente`.`composto` as `composto`,
@@ -151,65 +213,12 @@ select
          else concat(`ingrediente`.`descrizione`, '(', replace(replace(`ingrediente`.`composizione`, '<p>', ''), '</p>', ''), ')')
         end) as `descrizione_scheda_tecnica`
 from
-    (`ingrediente`
+    `ingrediente`
         join `fornitore` on
-            ((`fornitore`.`id` = `ingrediente`.`id_fornitore`)));
+            `fornitore`.`id` = `ingrediente`.`id_fornitore`
+        left join unita_misura on
+            ingrediente.id_unita_misura = unita_misura.id
+        left join aliquota_iva on
+            ingrediente.id_aliquota_iva = aliquota_iva.id;
 
--- PROCEDURE
-DROP PROCEDURE IF EXISTS contarbn.check_views;
 
-DELIMITER $$
-$$
-CREATE DEFINER=`contarbn`@`%` PROCEDURE `contarbn`.`check_views`()
-BEGIN
-
-	-- Variables to store view name and query
-	DECLARE view_name VARCHAR(255);
-	DECLARE select_query text;
-	DECLARE result_text text;
-
-	DECLARE done BOOLEAN DEFAULT FALSE;
-
-	-- Cursor to loop through views
-	DECLARE view_cursor CURSOR FOR
-SELECT table_name
-FROM information_schema.views
-WHERE table_schema = 'contarbn';
-
-DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-
-	set result_text = '';
-
-	-- Open the cursor
-OPEN view_cursor;
-
--- Loop through views
-view_loop: LOOP
-	    -- Fetch the next view name
-	    FETCH view_cursor INTO view_name;
-
-	    -- Exit the loop if no more views
-	    IF done THEN
-	        LEAVE view_loop;
-END IF;
-
-	    -- Build and execute the select query
-	    SET @select_query = CONCAT('SELECT count(*) INTO @id FROM contarbn', '.', view_name);
-PREPARE dynamic_query FROM @select_query;
-EXECUTE dynamic_query;
-DEALLOCATE PREPARE dynamic_query;
-
-if result_text = '' then
-	   		SET result_text = CONCAT('Processed views: ', view_name);
-else
-	   		SET result_text = CONCAT(result_text, '; ', view_name);
-end if;
-
-END LOOP;
-
-	-- Close the cursor
-CLOSE view_cursor;
-
-SELECT result_text AS final_result;
-END$$
-DELIMITER ;

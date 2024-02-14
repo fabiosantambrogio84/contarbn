@@ -32,6 +32,9 @@ public class VIngrediente {
     @Column(name = "id_unita_misura")
     private Long idUnitaMisura;
 
+    @Column(name = "unita_misura")
+    private String unitaMisura;
+
     @Column(name = "id_fornitore")
     private Long idFornitore;
 
@@ -40,6 +43,9 @@ public class VIngrediente {
 
     @Column(name = "id_aliquota_iva")
     private Long idAliquotaIva;
+
+    @Column(name = "aliquota_iva")
+    private BigDecimal aliquotaIva;
 
     @Column(name = "scadenza_giorni_allarme")
     private Integer scadenzaGiorniAllarme;
@@ -67,9 +73,11 @@ public class VIngrediente {
                 ", descrizione: " + descrizione +
                 ", prezzo: " + prezzo +
                 ", idUnitaMisura: " + idUnitaMisura +
+                ", unitaMisura: " + unitaMisura +
                 ", idFornitore: " + idFornitore +
                 ", fornitore: " + fornitore +
                 ", idAliquotaIva: " + idAliquotaIva +
+                ", aliquotaIva: " + aliquotaIva +
                 ", scadenzaGiorniAllarme: " + scadenzaGiorniAllarme +
                 ", dataInserimento: " + dataInserimento +
                 ", composto: " + composto +

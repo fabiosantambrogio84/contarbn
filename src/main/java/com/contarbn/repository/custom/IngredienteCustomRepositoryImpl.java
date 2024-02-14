@@ -63,31 +63,37 @@ public class IngredienteCustomRepositoryImpl implements IngredienteCustomReposit
                     vIngrediente.setIdUnitaMisura(((Integer)queryResult[4]).longValue());
                 }
                 if(queryResult[5] != null){
-                    vIngrediente.setIdFornitore(((Integer)queryResult[5]).longValue());
+                    vIngrediente.setUnitaMisura((String)queryResult[5]);
                 }
                 if(queryResult[6] != null){
-                    vIngrediente.setFornitore((String)queryResult[6]);
+                    vIngrediente.setIdFornitore(((Integer)queryResult[6]).longValue());
                 }
                 if(queryResult[7] != null){
-                    vIngrediente.setIdAliquotaIva(((Integer)queryResult[7]).longValue());
+                    vIngrediente.setFornitore((String)queryResult[7]);
                 }
                 if(queryResult[8] != null){
-                    vIngrediente.setScadenzaGiorniAllarme((Integer)queryResult[8]);
+                    vIngrediente.setIdAliquotaIva(((Integer)queryResult[8]).longValue());
                 }
                 if(queryResult[9] != null){
-                    vIngrediente.setDataInserimento((Timestamp)queryResult[9]);
+                    vIngrediente.setAliquotaIva((BigDecimal)queryResult[9]);
                 }
                 if(queryResult[10] != null){
-                    vIngrediente.setComposto((Boolean)queryResult[10]);
+                    vIngrediente.setScadenzaGiorniAllarme((Integer)queryResult[10]);
                 }
                 if(queryResult[11] != null){
-                    vIngrediente.setComposizione((String)queryResult[11]);
+                    vIngrediente.setDataInserimento((Timestamp)queryResult[11]);
                 }
                 if(queryResult[12] != null){
-                    vIngrediente.setAttivo((Boolean)queryResult[12]);
+                    vIngrediente.setComposto((Boolean)queryResult[12]);
                 }
                 if(queryResult[13] != null){
-                    vIngrediente.setNote((String)queryResult[13]);
+                    vIngrediente.setComposizione((String)queryResult[13]);
+                }
+                if(queryResult[14] != null){
+                    vIngrediente.setAttivo((Boolean)queryResult[14]);
+                }
+                if(queryResult[15] != null){
+                    vIngrediente.setNote((String)queryResult[15]);
                 }
                 result.add(vIngrediente);
             }
