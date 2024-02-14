@@ -128,7 +128,7 @@ public class ArticoloService {
             articolo.setBarcodeMaskLottoScadenza(barcodeMaskLottoScadenza.toUpperCase());
         }
         handleBarcodeMask(articolo);
-        articolo.setScadenzaGiorni(articolo.getScadenzaGiorni() != null ? articolo.getScadenzaGiorni() : Constants.DEFAULT_ARTICOLO_SCADENZA_GIORNI);
+        articolo.setScadenzaGiorniAllarme(articolo.getScadenzaGiorniAllarme() != null ? articolo.getScadenzaGiorniAllarme() : Constants.DEFAULT_ARTICOLO_SCADENZA_GIORNI);
         Articolo createdArticolo = articoloRepository.save(articolo);
 
         // compute 'listini prezzi'
@@ -187,7 +187,7 @@ public class ArticoloService {
         }
         handleBarcodeMask(articolo);
         articolo.setDataAggiornamento(Timestamp.from(ZonedDateTime.now().toInstant()));
-        articolo.setScadenzaGiorni(articolo.getScadenzaGiorni() != null ? articolo.getScadenzaGiorni() : Constants.DEFAULT_ARTICOLO_SCADENZA_GIORNI);
+        articolo.setScadenzaGiorniAllarme(articolo.getScadenzaGiorniAllarme() != null ? articolo.getScadenzaGiorniAllarme() : Constants.DEFAULT_ARTICOLO_SCADENZA_GIORNI);
         Articolo updatedArticolo = articoloRepository.save(articolo);
 
         if(!updatedArticolo.getPrezzoListinoBase().equals(prezzoListinoBaseCurrent)){

@@ -69,7 +69,7 @@ public class IngredienteService {
     public Ingrediente create(Ingrediente ingrediente){
         log.info("Creating 'ingrediente'");
         ingrediente.setDataInserimento(Timestamp.from(ZonedDateTime.now().toInstant()));
-        ingrediente.setScadenzaGiorni(ingrediente.getScadenzaGiorni() != null ? ingrediente.getScadenzaGiorni() : Constants.DEFAULT_INGREDIENTE_SCADENZA_GIORNI);
+        ingrediente.setScadenzaGiorniAllarme(ingrediente.getScadenzaGiorniAllarme() != null ? ingrediente.getScadenzaGiorniAllarme() : Constants.DEFAULT_INGREDIENTE_SCADENZA_GIORNI);
 
         Ingrediente createdIngrediente = ingredienteRepository.save(ingrediente);
         createdIngrediente.getIngredienteAllergeni().forEach(ia -> {
@@ -100,7 +100,7 @@ public class IngredienteService {
 
         Ingrediente ingredienteCurrent = ingredienteRepository.findById(ingrediente.getId()).orElseThrow(ResourceNotFoundException::new);
         ingrediente.setDataInserimento(ingredienteCurrent.getDataInserimento());
-        ingrediente.setScadenzaGiorni(ingrediente.getScadenzaGiorni() != null ? ingrediente.getScadenzaGiorni() : Constants.DEFAULT_INGREDIENTE_SCADENZA_GIORNI);
+        ingrediente.setScadenzaGiorniAllarme(ingrediente.getScadenzaGiorniAllarme() != null ? ingrediente.getScadenzaGiorniAllarme() : Constants.DEFAULT_INGREDIENTE_SCADENZA_GIORNI);
         Ingrediente updatedIngrediente = ingredienteRepository.save(ingrediente);
 
         ingredienteAllergeni.forEach(ia -> {

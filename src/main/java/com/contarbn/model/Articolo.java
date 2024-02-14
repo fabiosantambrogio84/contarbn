@@ -62,6 +62,9 @@ public class Articolo {
     @Column(name = "scadenza_giorni")
     private Integer scadenzaGiorni;
 
+    @Column(name = "scadenza_giorni_allarme")
+    private Integer scadenzaGiorniAllarme;
+
     @Column(name = "barcode")
     private String barcode;
 
@@ -150,6 +153,7 @@ public class Articolo {
                 ", prezzoAcquisto: " + prezzoAcquisto +
                 ", prezzoListinoBase: " + prezzoListinoBase +
                 ", scadenzaGiorni: " + scadenzaGiorni +
+                ", scadenzaGiorniAllarme: " + scadenzaGiorniAllarme +
                 ", barcode: " + barcode +
                 ", completeBarcode: " + completeBarcode +
                 ", barcodeMaskLottoScadenza: " + barcodeMaskLottoScadenza +

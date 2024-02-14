@@ -72,7 +72,7 @@ public class IngredienteCustomRepositoryImpl implements IngredienteCustomReposit
                     vIngrediente.setIdAliquotaIva(((Integer)queryResult[7]).longValue());
                 }
                 if(queryResult[8] != null){
-                    vIngrediente.setScadenzaGiorni((Integer)queryResult[8]);
+                    vIngrediente.setScadenzaGiorniAllarme((Integer)queryResult[8]);
                 }
                 if(queryResult[9] != null){
                     vIngrediente.setDataInserimento((Timestamp)queryResult[9]);

@@ -4,6 +4,7 @@ import com.contarbn.exception.CannotChangeResourceIdException;
 import com.contarbn.model.*;
 import com.contarbn.repository.ClienteArticoloRepository;
 import com.contarbn.service.ArticoloService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,20 +22,14 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @Slf4j
+@RequiredArgsConstructor
 @RestController
 @RequestMapping(path="/articoli")
 public class ArticoloController {
 
     private final ArticoloService articoloService;
-
     private final ClienteArticoloRepository clienteArticoloRepository;
 
-    @Autowired
-    public ArticoloController(final ArticoloService articoloService,
-                              final ClienteArticoloRepository clienteArticoloRepository){
-        this.articoloService = articoloService;
-        this.clienteArticoloRepository = clienteArticoloRepository;
-    }
 
     @RequestMapping(method = GET)
     @CrossOrigin

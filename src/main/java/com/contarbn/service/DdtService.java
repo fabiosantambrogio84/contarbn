@@ -124,7 +124,7 @@ public class DdtService {
     }
 
     private Integer getProgressivo(Integer annoContabile){
-        Integer progressivo = 1;
+        int progressivo = 1;
         Integer resultProgressivo = ddtRepository.getLastProgressivoByAnnoContabile(annoContabile);
         if(resultProgressivo != null){
             progressivo = resultProgressivo + 1;

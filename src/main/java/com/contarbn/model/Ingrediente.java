@@ -42,8 +42,8 @@ public class Ingrediente {
     @JoinColumn(name="id_aliquota_iva")
     private AliquotaIva aliquotaIva;
 
-    @Column(name = "scadenza_giorni")
-    private Integer scadenzaGiorni;
+    @Column(name = "scadenza_giorni_allarme")
+    private Integer scadenzaGiorniAllarme;
 
     @Column(name = "data_inserimento")
     private Timestamp dataInserimento;
@@ -82,7 +82,7 @@ public class Ingrediente {
                 ", unitaMisura: " + unitaMisura +
                 ", fornitore: " + fornitore +
                 ", fornitore: " + aliquotaIva +
-                ", scadenzaGiorni: " + scadenzaGiorni +
+                ", scadenzaGiorniAllarme: " + scadenzaGiorniAllarme +
                 ", dataInserimento: " + dataInserimento +
                 ", composto: " + composto +
                 ", composizione: " + composizione +

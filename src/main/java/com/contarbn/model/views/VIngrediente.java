@@ -41,8 +41,8 @@ public class VIngrediente {
     @Column(name = "id_aliquota_iva")
     private Long idAliquotaIva;
 
-    @Column(name = "scadenza_giorni")
-    private Integer scadenzaGiorni;
+    @Column(name = "scadenza_giorni_allarme")
+    private Integer scadenzaGiorniAllarme;
 
     @Column(name = "data_inserimento")
     private Timestamp dataInserimento;
@@ -70,7 +70,7 @@ public class VIngrediente {
                 ", idFornitore: " + idFornitore +
                 ", fornitore: " + fornitore +
                 ", idAliquotaIva: " + idAliquotaIva +
-                ", scadenzaGiorni: " + scadenzaGiorni +
+                ", scadenzaGiorniAllarme: " + scadenzaGiorniAllarme +
                 ", dataInserimento: " + dataInserimento +
                 ", composto: " + composto +
                 ", composizione: " + composizione +

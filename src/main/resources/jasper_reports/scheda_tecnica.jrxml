@@ -258,10 +258,10 @@
 			<staticText>
 				<reportElement x="450" y="31" width="90" height="16" uuid="a9d5020f-30ad-4191-8ab6-f2cd9752ba12"/>
 				<box>
-					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Left">
 					<font size="8" isBold="true"/>
@@ -271,14 +271,14 @@
 			</staticText>
 			<staticText>
 				<reportElement x="450" y="47" width="90" height="14" uuid="81c2bed2-4b78-447b-936e-95850e41924f"/>
-				<textElement textAlignment="Right">
+				<textElement textAlignment="Left">
 					<font size="9" isItalic="true"/>
 				</textElement>
 				<text><![CDATA[Revisione]]></text>
 			</staticText>
 			<textField textAdjust="ScaleFont">
 				<reportElement x="450" y="62" width="90" height="16" uuid="b0dc3644-5105-4f23-97dc-a45581ae99bb"/>
-				<textElement textAlignment="Right"/>
+				<textElement textAlignment="Left"/>
 				<textFieldExpression><![CDATA[$P{revisione}]]></textFieldExpression>
 			</textField>
 		</band>
