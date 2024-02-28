@@ -1438,6 +1438,12 @@ public class StampaService {
             destinatarioParam = sb.toString();
         }
 
+        String trasportatoreParam = "";
+        Trasportatore trasportatore = ddt.getTrasportatore();
+        if(trasportatore != null){
+            trasportatoreParam = trasportatore.getCognome() + " " + trasportatore.getNome();
+        }
+
         // create 'ddtTrasportoDataOra' param
         String ddtTrasportoDataOraParam = simpleDateFormat.format(ddt.getDataTrasporto())+" "+ddt.getOraTrasporto();
 
@@ -1461,7 +1467,7 @@ public class StampaService {
         parameters.put("puntoConsegna", puntoConsegnaParam);
         parameters.put("destinatario", destinatarioParam);
         parameters.put("note", ddt.getNote());
-        parameters.put("trasportatore", ddt.getTrasportatore());
+        parameters.put("trasportatore", trasportatoreParam);
         parameters.put("nascondiPrezzi", nascondiPrezzi);
         parameters.put("nota", Constants.JASPER_PARAMETER_DDT_NOTA);
         parameters.put("ddtTrasportoTipo", ddt.getTipoTrasporto());

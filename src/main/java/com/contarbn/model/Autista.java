@@ -40,16 +40,13 @@ public class Autista {
 
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder();
 
-        result.append("{");
-        result.append("id: " + id);
-        result.append(", nome: " + nome);
-        result.append(", cognome: " + cognome);
-        result.append(", telefono: " + telefono);
-        result.append("}");
-
-        return result.toString();
+        return "{" +
+                "id: " + id +
+                ", nome: " + nome +
+                ", cognome: " + cognome +
+                ", telefono: " + telefono +
+                "}";
 
     }
 }

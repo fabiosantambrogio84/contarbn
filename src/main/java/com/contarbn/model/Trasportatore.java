@@ -7,11 +7,11 @@ import lombok.EqualsAndHashCode;
 import javax.persistence.*;
 import java.util.List;
 
-@EqualsAndHashCode(exclude = {"clienti"})
+@EqualsAndHashCode
 @Entity
-@Table(name = "agente")
+@Table(name = "trasportatore")
 @Data
-public class Agente {
+public class Trasportatore {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -31,10 +31,6 @@ public class Agente {
 
     @Column(name = "indirizzo")
     private String indirizzo;
-
-    @OneToMany(mappedBy = "agente")
-    @JsonIgnore
-    private List<Cliente> clienti;
 
     @Override
     public String toString() {

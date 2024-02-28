@@ -62,8 +62,9 @@ public class Ddt {
     @Column(name = "ora_trasporto")
     private Time oraTrasporto;
 
-    @Column(name = "trasportatore")
-    private String trasportatore;
+    @ManyToOne
+    @JoinColumn(name="id_trasportatore")
+    private Trasportatore trasportatore;
 
     @Column(name = "fatturato")
     private Boolean fatturato;
@@ -217,11 +218,11 @@ public class Ddt {
         this.oraTrasporto = oraTrasporto;
     }
 
-    public String getTrasportatore() {
+    public Trasportatore getTrasportatore() {
         return trasportatore;
     }
 
-    public void setTrasportatore(String trasportatore) {
+    public void setTrasportatore(Trasportatore trasportatore) {
         this.trasportatore = trasportatore;
     }
 
@@ -347,35 +348,32 @@ public class Ddt {
 
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder();
 
-        result.append("{");
-        result.append("id: " + id);
-        result.append(", progressivo: " + progressivo);
-        result.append(", annoContabile: " + annoContabile);
-        result.append(", data: " + data);
-        result.append(", cliente: " + cliente);
-        result.append(", puntoConsegna: " + puntoConsegna);
-        result.append(", autista: " + autista);
-        result.append(", statoDdt: " + statoDdt);
-        result.append(", causale: " + causale);
-        result.append(", numeroColli: " + numeroColli);
-        result.append(", tipoTrasporto: " + tipoTrasporto);
-        result.append(", dataTrasporto: " + dataTrasporto);
-        result.append(", oraTrasporto: " + oraTrasporto);
-        result.append(", trasportatore: " + trasportatore);
-        result.append(", fatturato: " + fatturato);
-        result.append(", totaleImponibile: " + totaleImponibile);
-        result.append(", totaleIva: " + totaleIva);
-        result.append(", totaleCosto: " + totaleCosto);
-        result.append(", totale: " + totale);
-        result.append(", totaleAcconto: " + totaleAcconto);
-        result.append(", note: " + note);
-        result.append(", modificaGiacenze: " + modificaGiacenze);
-        result.append(", dataInserimento: " + dataInserimento);
-        result.append(", dataAggiornamento: " + dataAggiornamento);
-        result.append("}");
-
-        return result.toString();
+        return "{" +
+                "id: " + id +
+                ", progressivo: " + progressivo +
+                ", annoContabile: " + annoContabile +
+                ", data: " + data +
+                ", cliente: " + cliente +
+                ", puntoConsegna: " + puntoConsegna +
+                ", autista: " + autista +
+                ", statoDdt: " + statoDdt +
+                ", causale: " + causale +
+                ", numeroColli: " + numeroColli +
+                ", tipoTrasporto: " + tipoTrasporto +
+                ", dataTrasporto: " + dataTrasporto +
+                ", oraTrasporto: " + oraTrasporto +
+                ", trasportatore: " + trasportatore +
+                ", fatturato: " + fatturato +
+                ", totaleImponibile: " + totaleImponibile +
+                ", totaleIva: " + totaleIva +
+                ", totaleCosto: " + totaleCosto +
+                ", totale: " + totale +
+                ", totaleAcconto: " + totaleAcconto +
+                ", note: " + note +
+                ", modificaGiacenze: " + modificaGiacenze +
+                ", dataInserimento: " + dataInserimento +
+                ", dataAggiornamento: " + dataAggiornamento +
+                "}";
     }
 }

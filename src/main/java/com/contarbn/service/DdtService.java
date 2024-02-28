@@ -11,8 +11,8 @@ import com.contarbn.repository.PagamentoRepository;
 import com.contarbn.repository.views.VDdtRepository;
 import com.contarbn.util.Utils;
 import com.contarbn.util.enumeration.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -26,6 +26,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class DdtService {
 
@@ -35,19 +36,6 @@ public class DdtService {
     private final PagamentoRepository pagamentoRepository;
     private final GiacenzaArticoloService giacenzaArticoloService;
     private final VDdtRepository vDdtRepository;
-
-    @Autowired
-    public DdtService(final DdtRepository ddtRepository, final DdtArticoloService ddtArticoloService,
-                      final StatoDdtService statoDdtService, final PagamentoRepository pagamentoRepository,
-                      final GiacenzaArticoloService giacenzaArticoloService,
-                      final VDdtRepository vDdtRepository){
-        this.ddtRepository = ddtRepository;
-        this.ddtArticoloService = ddtArticoloService;
-        this.statoDdtService = statoDdtService;
-        this.pagamentoRepository = pagamentoRepository;
-        this.giacenzaArticoloService = giacenzaArticoloService;
-        this.vDdtRepository = vDdtRepository;
-    }
 
     public Set<Ddt> getAll(){
         log.info("Retrieving the list of 'ddts'");
@@ -243,20 +231,24 @@ public class DdtService {
         Long id = Long.valueOf((Integer) patchDdt.get("id"));
         Ddt ddt = ddtRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
         patchDdt.forEach((key, value) -> {
-            if(key.equals("id")){
-                ddt.setId(Long.valueOf((Integer)value));
-            } else if(key.equals("idAutista")){
-                if(value != null){
-                    Autista autista = new Autista();
-                    autista.setId(Long.valueOf((Integer)value));
-                    ddt.setAutista(autista);
-                } else {
-                    ddt.setAutista(null);
-                }
-            } else if(key.equals("fatturato")){
-                if(value != null){
-                    ddt.setFatturato((Boolean)value);
-                }
+            switch (key) {
+                case "id":
+                    ddt.setId(Long.valueOf((Integer) value));
+                    break;
+                case "idAutista":
+                    if (value != null) {
+                        Autista autista = new Autista();
+                        autista.setId(Long.valueOf((Integer) value));
+                        ddt.setAutista(autista);
+                    } else {
+                        ddt.setAutista(null);
+                    }
+                    break;
+                case "fatturato":
+                    if (value != null) {
+                        ddt.setFatturato((Boolean) value);
+                    }
+                    break;
             }
         });
         Ddt patchedDdt = ddtRepository.save(ddt);
@@ -344,14 +336,6 @@ public class DdtService {
         Set<DdtArticolo> ddtArticoli = ddt.getDdtArticoli().stream().filter(da -> da.getQuantita() != null && da.getQuantita() != 0 && da.getPrezzo() != null).collect(Collectors.toSet());
         ddt.setDdtArticoli(ddtArticoli);
         return ddt;
-    }
-
-    // PAGAMENTI
-    public Set<Pagamento> getDdtPagamentiByIdDdt(Long ddtId){
-        log.info("Retrieving 'pagamenti' of 'ddt' '{}'", ddtId);
-        Set<Pagamento> pagamenti = pagamentoRepository.findByDdtIdOrderByDataDesc(ddtId);
-        log.info("Retrieved {} 'pagamenti' of 'ddt' '{}'", pagamenti.size(), ddtId);
-        return pagamenti;
     }
 
 }

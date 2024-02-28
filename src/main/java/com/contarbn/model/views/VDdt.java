@@ -73,29 +73,26 @@ public class VDdt {
 
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder();
 
-        result.append("{");
-        result.append("id: " + id);
-        result.append(", annoContabile: " + annoContabile);
-        result.append(", progressivo: " + progressivo);
-        result.append(", data: " + data);
-        result.append(", idCliente: " + idCliente);
-        result.append(", cliente: " + cliente);
-        result.append(", clienteEmail: " + clienteEmail);
-        result.append(", idAgente: " + idAgente);
-        result.append(", agente: " + agente);
-        result.append(", idAutista: " + idAutista);
-        result.append(", idStato: " + idStato);
-        result.append(", stato: " + stato);
-        result.append(", fatturato: " + fatturato);
-        result.append(", totaleAcconto: " + totaleAcconto);
-        result.append(", totale: " + totale);
-        result.append(", totaleImponibile: " + totaleImponibile);
-        result.append(", totaleCosto: " + totaleCosto);
-        result.append(", totaleIva: " + totaleIva);
-        result.append("}");
-
-        return result.toString();
+        return "{" +
+                "id: " + id +
+                ", annoContabile: " + annoContabile +
+                ", progressivo: " + progressivo +
+                ", data: " + data +
+                ", idCliente: " + idCliente +
+                ", cliente: " + cliente +
+                ", clienteEmail: " + clienteEmail +
+                ", idAgente: " + idAgente +
+                ", agente: " + agente +
+                ", idAutista: " + idAutista +
+                ", idStato: " + idStato +
+                ", stato: " + stato +
+                ", fatturato: " + fatturato +
+                ", totaleAcconto: " + totaleAcconto +
+                ", totale: " + totale +
+                ", totaleImponibile: " + totaleImponibile +
+                ", totaleCosto: " + totaleCosto +
+                ", totaleIva: " + totaleIva +
+                "}";
     }
 }
