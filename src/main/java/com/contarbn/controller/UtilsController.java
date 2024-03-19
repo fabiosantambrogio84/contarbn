@@ -1,6 +1,8 @@
 package com.contarbn.controller;
 
+import com.contarbn.service.UtilsService;
 import com.contarbn.util.enumeration.*;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,8 +14,11 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(path="/utils")
 public class UtilsController {
+
+    private final UtilsService utilsService;
 
     @RequestMapping(method = GET, path = "/province")
     @CrossOrigin
@@ -52,9 +57,9 @@ public class UtilsController {
 
     @RequestMapping(method = GET, path = "/tipologie-trasporto-ddt")
     @CrossOrigin
-    public List<String> getTipologieTrasportoDdt() {
+    public Map<String, Boolean> getTipologieTrasportoDdt() {
         log.info("Performing GET request for retrieving list of 'tipologie-trasporto-ddt'");
-        return TipologiaTrasportoDdt.labels();
+        return utilsService.getTipologieTrasportoDdt();
     }
 
     @RequestMapping(method = GET, path = "/tipologie-pagamenti")

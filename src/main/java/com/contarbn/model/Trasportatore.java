@@ -32,6 +32,9 @@ public class Trasportatore {
     @Column(name = "indirizzo")
     private String indirizzo;
 
+    @Transient
+    private boolean predefinito;
+
     @Override
     public String toString() {
 
@@ -42,7 +45,7 @@ public class Trasportatore {
                 ", telefono: " + telefono +
                 ", email: " + email +
                 ", indirizzo: " + indirizzo +
+                ", predefinito: " + predefinito +
                 "}";
-
     }
 }

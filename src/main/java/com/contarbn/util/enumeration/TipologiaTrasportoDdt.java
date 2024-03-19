@@ -6,17 +6,20 @@ import java.util.stream.Collectors;
 
 public enum TipologiaTrasportoDdt {
 
-    MITTENTE("Mittente", 2),
-    DESTINATARIO("Destinatario", 1),
-    VETTORE("Vettore", 3);
+    MITTENTE("Mittente", 2, true),
+    DESTINATARIO("Destinatario", 1, false),
+    VETTORE("Vettore", 3, false);
 
-    private String label;
+    private final String label;
 
-    private Integer order;
+    private final Integer order;
 
-    TipologiaTrasportoDdt(String label, Integer order) {
+    private Boolean predefinito;
+
+    TipologiaTrasportoDdt(String label, Integer order, Boolean predefinito) {
         this.label = label;
         this.order = order;
+        this.predefinito = predefinito;
     }
 
     public String getLabel() {
@@ -27,7 +30,13 @@ public enum TipologiaTrasportoDdt {
         return order;
     }
 
+    public Boolean getPredefinito(){return predefinito;}
+
+    public void setPredefinito(Boolean predefinito){
+        this.predefinito = predefinito;
+    }
+
     public static List<String> labels(){
-        return Arrays.asList(TipologiaTrasportoDdt.values()).stream().map(ttd -> ttd.getLabel()).collect(Collectors.toList());
+        return Arrays.stream(TipologiaTrasportoDdt.values()).map(TipologiaTrasportoDdt::getLabel).collect(Collectors.toList());
     }
 }

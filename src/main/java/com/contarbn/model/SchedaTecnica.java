@@ -73,6 +73,10 @@ public class SchedaTecnica {
     @Column(name = "imballo_dimensioni")
     private String imballoDimensioni;
 
+    @Lob
+    @Column(name = "pdf", columnDefinition="BLOB")
+    private byte[] pdf;
+
     @Column(name = "data_inserimento")
     private Timestamp dataInserimento;
 

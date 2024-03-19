@@ -74,6 +74,9 @@ public class VProduzione {
     @Column(name = "barcode_ean_128")
     private String barcodeEan128;
 
+    @Column(name = "id_scheda_tecnica")
+    private Long idSchedaTecnica;
+
     @Override
     public String toString() {
 
@@ -97,6 +100,7 @@ public class VProduzione {
                 ", ricetta: " + ricetta +
                 ", barcodeEan13: " + barcodeEan13 +
                 ", barcodeEan128: " + barcodeEan128 +
+                ", idSchedaTecnica: " + idSchedaTecnica +
                 "}";
     }
 }

@@ -1,12 +1,17 @@
 package com.contarbn.service;
 
 import com.contarbn.exception.ResourceNotFoundException;
+import com.contarbn.model.Autista;
 import com.contarbn.model.Trasportatore;
+import com.contarbn.model.views.VDdtLast;
 import com.contarbn.repository.TrasportatoreRepository;
+import com.contarbn.repository.views.VDdtLastRepository;
+import com.contarbn.util.Constants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
@@ -14,11 +19,22 @@ import java.util.Set;
 @Service
 public class TrasportatoreService {
 
+    private final VDdtLastRepository vDdtLastRepository;
     private final TrasportatoreRepository trasportatoreRepository;
 
     public Set<Trasportatore> getAll(){
         log.info("Retrieving the list of 'trasportatori'");
         Set<Trasportatore> trasportatori = trasportatoreRepository.findAll();
+        if(!trasportatori.isEmpty()){
+            Optional<VDdtLast> vDdtLast = vDdtLastRepository.find();
+            for(Trasportatore trasportatore : trasportatori){
+                if(vDdtLast.isPresent()){
+                    if(trasportatore.getId().equals(vDdtLast.get().getIdTrasportatore())){
+                        trasportatore.setPredefinito(true);
+                    }
+                }
+            }
+        }
         log.info("Retrieved {} 'trasportatori'", trasportatori.size());
         return trasportatori;
     }

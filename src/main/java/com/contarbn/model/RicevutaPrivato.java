@@ -64,8 +64,9 @@ public class RicevutaPrivato {
     @Column(name = "ora_trasporto")
     private Time oraTrasporto;
 
-    @Column(name = "trasportatore")
-    private String trasportatore;
+    @ManyToOne
+    @JoinColumn(name="id_trasportatore")
+    private Trasportatore trasportatore;
 
     @Column(name = "totale_imponibile")
     private BigDecimal totaleImponibile;
@@ -227,11 +228,11 @@ public class RicevutaPrivato {
         this.oraTrasporto = oraTrasporto;
     }
 
-    public String getTrasportatore() {
+    public Trasportatore getTrasportatore() {
         return trasportatore;
     }
 
-    public void setTrasportatore(String trasportatore) {
+    public void setTrasportatore(Trasportatore trasportatore) {
         this.trasportatore = trasportatore;
     }
 
@@ -357,36 +358,33 @@ public class RicevutaPrivato {
 
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder();
 
-        result.append("{");
-        result.append("id: " + id);
-        result.append(", progressivo: " + progressivo);
-        result.append(", anno: " + anno);
-        result.append(", data: " + data);
-        result.append(", cliente: " + cliente);
-        result.append(", puntoConsegna: " + puntoConsegna);
-        result.append(", autista: " + autista);
-        result.append(", statoRicevutaPrivato: " + statoRicevutaPrivato);
-        result.append(", causale: " + causale);
-        result.append(", speditoAde: " + speditoAde);
-        result.append(", numeroColli: " + numeroColli);
-        result.append(", tipoTrasporto: " + tipoTrasporto);
-        result.append(", dataTrasporto: " + dataTrasporto);
-        result.append(", oraTrasporto: " + oraTrasporto);
-        result.append(", trasportatore: " + trasportatore);
-        result.append(", totaleImponibile: " + totaleImponibile);
-        result.append(", totaleIva: " + totaleIva);
-        result.append(", totaleCosto: " + totaleCosto);
-        result.append(", totaleAcconto: " + totaleAcconto);
-        result.append(", totale: " + totale);
-        result.append(", totaleQuantita: " + totaleQuantita);
-        result.append(", totalePezzi: " + totalePezzi);
-        result.append(", note: " + note);
-        result.append(", dataInserimento: " + dataInserimento);
-        result.append(", dataAggiornamento: " + dataAggiornamento);
-        result.append("}");
-
-        return result.toString();
+        return "{" +
+                "id: " + id +
+                ", progressivo: " + progressivo +
+                ", anno: " + anno +
+                ", data: " + data +
+                ", cliente: " + cliente +
+                ", puntoConsegna: " + puntoConsegna +
+                ", autista: " + autista +
+                ", statoRicevutaPrivato: " + statoRicevutaPrivato +
+                ", causale: " + causale +
+                ", speditoAde: " + speditoAde +
+                ", numeroColli: " + numeroColli +
+                ", tipoTrasporto: " + tipoTrasporto +
+                ", dataTrasporto: " + dataTrasporto +
+                ", oraTrasporto: " + oraTrasporto +
+                ", trasportatore: " + trasportatore +
+                ", totaleImponibile: " + totaleImponibile +
+                ", totaleIva: " + totaleIva +
+                ", totaleCosto: " + totaleCosto +
+                ", totaleAcconto: " + totaleAcconto +
+                ", totale: " + totale +
+                ", totaleQuantita: " + totaleQuantita +
+                ", totalePezzi: " + totalePezzi +
+                ", note: " + note +
+                ", dataInserimento: " + dataInserimento +
+                ", dataAggiornamento: " + dataAggiornamento +
+                "}";
     }
 }

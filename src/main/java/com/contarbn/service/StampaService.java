@@ -1145,7 +1145,7 @@ public class StampaService {
                 .sorted(Comparator.comparing(RicevutaPrivato::getProgressivo).reversed())
                 .collect(Collectors.toList());
 
-        if(ricevutePrivato != null && !ricevutePrivato.isEmpty()){
+        if(!ricevutePrivato.isEmpty()){
             ricevutePrivato.forEach(ricevutaPrivato -> {
                 RicevutaPrivatoDataSource ricevutaPrivatoDataSource = new RicevutaPrivatoDataSource();
                 ricevutaPrivatoDataSource.setNumero(ricevutaPrivato.getProgressivo().toString());
@@ -1441,7 +1441,7 @@ public class StampaService {
         String trasportatoreParam = "";
         Trasportatore trasportatore = ddt.getTrasportatore();
         if(trasportatore != null){
-            trasportatoreParam = trasportatore.getCognome() + " " + trasportatore.getNome();
+            trasportatoreParam = trasportatore.getCognome() + " " + trasportatore.getNome() + "<br/>" + trasportatore.getIndirizzo();
         }
 
         // create 'ddtTrasportoDataOra' param
@@ -1782,6 +1782,12 @@ public class StampaService {
             totaleIva = totaleIva.add(fatturaAccompagnatoriaTotale.getTotaleIva());
         }
 
+        String trasportatoreParam = "";
+        Trasportatore trasportatore = fatturaAccompagnatoria.getTrasportatore();
+        if(trasportatore != null){
+            trasportatoreParam = trasportatore.getCognome() + " " + trasportatore.getNome() + "<br/>" + trasportatore.getIndirizzo();
+        }
+
         // fetching the .jrxml file from the resources folder.
         final InputStream stream = this.getClass().getResourceAsStream(Constants.JASPER_REPORT_FATTURA_ACCOMPAGNATORIA);
 
@@ -1803,7 +1809,7 @@ public class StampaService {
         parameters.put("puntoConsegna", puntoConsegnaParam);
         parameters.put("note", fatturaAccompagnatoria.getNote());
         parameters.put("nota", Constants.JASPER_PARAMETER_FATTURA_ACCOMPAGNATORIA_NOTA);
-        parameters.put("trasportatore", fatturaAccompagnatoria.getTrasportatore());
+        parameters.put("trasportatore", trasportatoreParam);
         parameters.put("tipoTrasporto", fatturaAccompagnatoria.getTipoTrasporto());
         parameters.put("numeroColli", fatturaAccompagnatoria.getNumeroColli());
         parameters.put("dataOraTrasporto", simpleDateFormat.format(fatturaAccompagnatoria.getDataTrasporto())+" "+fatturaAccompagnatoria.getOraTrasporto());
@@ -2514,6 +2520,12 @@ public class StampaService {
             totaleIva = ricevutaPrivatoArticoloDataSources.stream().map(RicevutaPrivatoArticoloDataSource::getIvaValore).reduce(BigDecimal.ZERO, BigDecimal::add);
         }
 
+        String trasportatoreParam = "";
+        Trasportatore trasportatore = ricevutaPrivato.getTrasportatore();
+        if(trasportatore != null){
+            trasportatoreParam = trasportatore.getCognome() + " " + trasportatore.getNome() + "<br/>" + trasportatore.getIndirizzo();
+        }
+
         // fetching the .jrxml file from the resources folder.
         final InputStream stream = this.getClass().getResourceAsStream(Constants.JASPER_REPORT_RICEVUTA_PRIVATO);
 
@@ -2531,7 +2543,7 @@ public class StampaService {
         parameters.put("puntoConsegna", puntoConsegnaParam);
         parameters.put("destinatario", destinatarioParam);
         parameters.put("note", ricevutaPrivato.getNote());
-        parameters.put("trasportatore", ricevutaPrivato.getTrasportatore());
+        parameters.put("trasportatore", trasportatoreParam);
         parameters.put("nota", Constants.JASPER_PARAMETER_RICEVUTA_PRIVATO_NOTA);
         parameters.put("totaleIva", totaleIva);
         parameters.put("ricevutaPrivatoTrasportoTipo", ricevutaPrivato.getTipoTrasporto());
@@ -2638,7 +2650,14 @@ public class StampaService {
         parameters.put("schedaTecnicaAnalisiCollection", schedaTecnicaAnalisiCollectionDataSource);
         parameters.put("schedaTecnicaRaccolteCollection", schedaTecnicaRaccolteCollectionDataSource);
 
-        return JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
+        byte[] result = JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
+
+        Map<String, Object> patchedSchedaTecnica = new HashMap<>();
+        patchedSchedaTecnica.put("id", idSchedaTecnica);
+        patchedSchedaTecnica.put("pdf", result);
+        schedaTecnicaService.patch(patchedSchedaTecnica);
+
+        return result;
     }
 
     public static HttpHeaders createHttpHeaders(String fileName){

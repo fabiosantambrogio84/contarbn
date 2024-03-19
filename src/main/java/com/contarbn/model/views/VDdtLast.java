@@ -21,15 +21,20 @@ public class VDdtLast {
     @Column(name = "id_autista")
     private Long idAutista;
 
+    @Column(name = "id_trasportatore")
+    private Long idTrasportatore;
+
+    @Column(name = "tipo_trasporto")
+    private String tipoTrasporto;
+
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder();
 
-        result.append("{");
-        result.append("id: " + id);
-        result.append(", idAutista: " + idAutista);
-        result.append("}");
-
-        return result.toString();
+        return "{" +
+                "id: " + id +
+                ", idAutista: " + idAutista +
+                ", idTrasportatore: " + idTrasportatore +
+                ", tipoTrasporto: " + tipoTrasporto +
+                "}";
     }
 }

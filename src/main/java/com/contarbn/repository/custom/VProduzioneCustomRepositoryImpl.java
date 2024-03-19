@@ -104,6 +104,9 @@ public class VProduzioneCustomRepositoryImpl implements VProduzioneCustomReposit
                 if(queryResult[18] != null){
                     vProduzione.setBarcodeEan128((String)queryResult[18]);
                 }
+                if(queryResult[19] != null){
+                    vProduzione.setIdSchedaTecnica(((Integer)queryResult[19]).longValue());
+                }
                 result.add(vProduzione);
             }
         }

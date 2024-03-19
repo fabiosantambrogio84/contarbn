@@ -337,7 +337,7 @@
 				<reportElement positionType="Float" x="0" y="581" width="100" height="20" uuid="6b0e55fd-e9b3-4b77-acb0-ec7153688bd5">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
-				<textElement textAlignment="Center" verticalAlignment="Top">
+				<textElement textAlignment="Left" verticalAlignment="Top">
 					<font size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{ddtTrasportoTipo}]]></textFieldExpression>
@@ -761,7 +761,7 @@
 				<reportElement positionType="Float" x="0" y="630" width="100" height="20" uuid="12d04679-d122-4b1b-887b-773ab673fd85">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
-				<textElement>
+				<textElement markup="html">
 					<font size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{trasportatore}]]></textFieldExpression>

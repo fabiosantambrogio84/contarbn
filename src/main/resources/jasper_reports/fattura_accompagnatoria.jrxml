@@ -799,6 +799,7 @@
 				<reportElement positionType="Float" x="170" y="594" width="100" height="30" uuid="da19bf67-058b-44cf-b3c7-b8799c718181">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
+				<textElement markup="html"/>
 				<textFieldExpression><![CDATA[$P{trasportatore}]]></textFieldExpression>
 			</textField>
 			<staticText>

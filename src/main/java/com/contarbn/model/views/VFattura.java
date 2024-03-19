@@ -86,33 +86,30 @@ public class VFattura {
 
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder();
 
-        result.append("{");
-        result.append("id: " + id);
-        result.append(", progressivo: " + progressivo);
-        result.append(", anno: " + anno);
-        result.append(", data: " + data);
-        result.append(", idTipo: " + idTipo);
-        result.append(", tipoCodice: " + tipoCodice);
-        result.append(", idCliente: " + idCliente);
-        result.append(", cliente: " + cliente);
-        result.append(", clienteEmail: " + clienteEmail);
-        result.append(", idTipoPagamento: " + idTipoPagamento);
-        result.append(", idAgente: " + idAgente);
-        result.append(", agente: " + agente);
-        result.append(", stato: " + idStato);
-        result.append(", statoCodice: " + statoCodice);
-        result.append(", speditoAde: " + speditoAde);
-        result.append(", totaleImponibile: " + totaleImponibile);
-        result.append(", totaleIva: " + totaleIva);
-        result.append(", totaleAcconto: " + totaleAcconto);
-        result.append(", totale: " + totale);
-        result.append(", note: " + note);
-        result.append(", dataInserimento: " + dataInserimento);
-        result.append(", dataAggiornamento: " + dataAggiornamento);
-        result.append("}");
-
-        return result.toString();
+        return "{" +
+                "id: " + id +
+                ", progressivo: " + progressivo +
+                ", anno: " + anno +
+                ", data: " + data +
+                ", idTipo: " + idTipo +
+                ", tipoCodice: " + tipoCodice +
+                ", idCliente: " + idCliente +
+                ", cliente: " + cliente +
+                ", clienteEmail: " + clienteEmail +
+                ", idTipoPagamento: " + idTipoPagamento +
+                ", idAgente: " + idAgente +
+                ", agente: " + agente +
+                ", stato: " + idStato +
+                ", statoCodice: " + statoCodice +
+                ", speditoAde: " + speditoAde +
+                ", totaleImponibile: " + totaleImponibile +
+                ", totaleIva: " + totaleIva +
+                ", totaleAcconto: " + totaleAcconto +
+                ", totale: " + totale +
+                ", note: " + note +
+                ", dataInserimento: " + dataInserimento +
+                ", dataAggiornamento: " + dataAggiornamento +
+                "}";
     }
 }

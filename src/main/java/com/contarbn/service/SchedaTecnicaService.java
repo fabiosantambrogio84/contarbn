@@ -133,6 +133,42 @@ public class SchedaTecnicaService {
         return resultSchedaTecnica;
     }
 
+    public void patch(Map<String,Object> patchSchedaTecnica){
+        log.info("Patching 'scheda tecnica'");
+
+        Long id = (Long) patchSchedaTecnica.get("id");
+        SchedaTecnica schedaTecnica = getById(id);
+        patchSchedaTecnica.forEach((key, value) -> {
+            switch (key) {
+                case "id":
+                    schedaTecnica.setId((Long)value);
+                    break;
+                case "pdf":
+                    schedaTecnica.setPdf((byte[])value);
+                    break;
+            }
+        });
+        SchedaTecnica resultSchedaTecnica;
+
+        resultSchedaTecnica = transactionTemplate.execute(status -> schedaTecnicaRepository.save(schedaTecnica));
+
+        log.info("Patched 'scheda tecnica' '{}'", resultSchedaTecnica);
+    }
+
+    public void delete(Long idSchedaTecnica){
+        log.info("Deleting 'scheda tecnica' {}", idSchedaTecnica);
+
+        transactionTemplate.execute(status -> {
+            schedaTecnicaRaccoltaRepository.deleteBySchedaTecnicaId(idSchedaTecnica);
+            schedaTecnicaAnalisiRepository.deleteBySchedaTecnicaId(idSchedaTecnica);
+            schedaTecnicaNutrienteRepository.deleteBySchedaTecnicaId(idSchedaTecnica);
+            schedaTecnicaRepository.deleteById(idSchedaTecnica);
+            return null;
+        });
+
+        log.info("Deleted 'scheda tecnica' {}", idSchedaTecnica);
+    }
+
     public Map<String, Integer> getNumRevisioneAndAnno(Date data){
         Integer anno = data != null ? data.toLocalDate().getYear() : ZonedDateTime.now().toLocalDate().getYear();
         Integer numRevisione = getNumRevisione(anno);

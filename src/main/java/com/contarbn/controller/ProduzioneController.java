@@ -8,6 +8,7 @@ import com.contarbn.model.views.VProduzioneEtichetta;
 import com.contarbn.service.ProduzioneService;
 import com.contarbn.util.ResponseUtils;
 import com.contarbn.util.Utils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,15 +21,12 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @Slf4j
+@RequiredArgsConstructor
 @RestController
 @RequestMapping(path="/produzioni")
 public class ProduzioneController {
 
     private final ProduzioneService produzioneService;
-
-    public ProduzioneController(final ProduzioneService produzioneService){
-        this.produzioneService = produzioneService;
-    }
 
     @RequestMapping(method = GET, path = "/search")
     @CrossOrigin
