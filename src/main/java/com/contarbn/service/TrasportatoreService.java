@@ -1,14 +1,14 @@
 package com.contarbn.service;
 
 import com.contarbn.exception.ResourceNotFoundException;
-import com.contarbn.model.Autista;
 import com.contarbn.model.Trasportatore;
-import com.contarbn.model.views.VDdtLast;
+import com.contarbn.model.views.VDocumentoLast;
 import com.contarbn.repository.TrasportatoreRepository;
-import com.contarbn.repository.views.VDdtLastRepository;
-import com.contarbn.util.Constants;
+import com.contarbn.repository.views.VDocumentoLastRepository;
+import com.contarbn.util.enumeration.Documento;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -19,17 +19,17 @@ import java.util.Set;
 @Service
 public class TrasportatoreService {
 
-    private final VDdtLastRepository vDdtLastRepository;
+    private final VDocumentoLastRepository vDocumentoLastRepository;
     private final TrasportatoreRepository trasportatoreRepository;
 
-    public Set<Trasportatore> getAll(){
+    public Set<Trasportatore> getAll(String context){
         log.info("Retrieving the list of 'trasportatori'");
         Set<Trasportatore> trasportatori = trasportatoreRepository.findAll();
         if(!trasportatori.isEmpty()){
-            Optional<VDdtLast> vDdtLast = vDdtLastRepository.find();
+            Optional<VDocumentoLast> vDocumentoLast = vDocumentoLastRepository.find(StringUtils.isNotEmpty(context) ? context : Documento.DDT.getName());
             for(Trasportatore trasportatore : trasportatori){
-                if(vDdtLast.isPresent()){
-                    if(trasportatore.getId().equals(vDdtLast.get().getIdTrasportatore())){
+                if(vDocumentoLast.isPresent()){
+                    if(trasportatore.getId().equals(vDocumentoLast.get().getIdTrasportatore())){
                         trasportatore.setPredefinito(true);
                     }
                 }

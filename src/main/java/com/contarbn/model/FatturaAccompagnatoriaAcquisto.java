@@ -64,8 +64,9 @@ public class FatturaAccompagnatoriaAcquisto {
     @Column(name = "ora_trasporto")
     private Time oraTrasporto;
 
-    @Column(name = "trasportatore")
-    private String trasportatore;
+    @ManyToOne
+    @JoinColumn(name="id_trasportatore")
+    private Trasportatore trasportatore;
 
     @Column(name = "totale_imponibile")
     private BigDecimal totaleImponibile;

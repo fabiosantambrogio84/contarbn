@@ -3,8 +3,11 @@ package com.contarbn.service;
 import com.contarbn.exception.ResourceNotFoundException;
 import com.contarbn.model.*;
 import com.contarbn.model.beans.SchedaTecnicaResponse;
+import com.contarbn.model.beans.SortOrder;
 import com.contarbn.model.views.VSchedaTecnica;
+import com.contarbn.model.views.VSchedaTecnicaLight;
 import com.contarbn.repository.*;
+import com.contarbn.repository.views.VSchedaTecnicaLightRepository;
 import com.contarbn.repository.views.VSchedaTecnicaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,11 +29,26 @@ public class SchedaTecnicaService {
     private final SchedaTecnicaNutrienteRepository schedaTecnicaNutrienteRepository;
     private final SchedaTecnicaRepository schedaTecnicaRepository;
     private final VSchedaTecnicaRepository vSchedaTecnicaRepository;
+    private final VSchedaTecnicaLightRepository vSchedaTecnicaLightRepository;
     private final RicettaNutrienteRepository ricettaNutrienteRepository;
     private final RicettaAnalisiRepository ricettaAnalisiRepository;
     private final TransactionTemplate transactionTemplate;
 
-    public SchedaTecnicaResponse getSchedaTecnica(Long idProduzione, Long idArticolo){
+    public List<VSchedaTecnicaLight> getAllByFilters(Integer draw, Integer start, Integer length, List<SortOrder> sortOrders, String prodotto){
+        log.info("Retrieving the list of 'schede-tecniche' filtered by request parameters");
+        List<VSchedaTecnicaLight> produzioni = vSchedaTecnicaLightRepository.findByFilters(draw, start, length, sortOrders, prodotto);
+        log.info("Retrieved {} 'schede-tecniche'", produzioni.size());
+        return produzioni;
+    }
+
+    public Integer getCountByFilters(String prodotto){
+        log.info("Retrieving the count of 'schede-tecniche' filtered by request parameters");
+        Integer count = vSchedaTecnicaLightRepository.countByFilters(prodotto);
+        log.info("Retrieved {} 'schede-tecniche'", count);
+        return count;
+    }
+
+    public SchedaTecnicaResponse get(Long idProduzione, Long idArticolo){
         log.info("Retrieving 'scheda tecnica' for 'produzione' {} and 'articolo' {}", idProduzione, idArticolo);
         Optional<SchedaTecnica> schedaTecnica = getByIdProduzioneAndIdArticolo(idProduzione, idArticolo);
         if(!schedaTecnica.isPresent()) {

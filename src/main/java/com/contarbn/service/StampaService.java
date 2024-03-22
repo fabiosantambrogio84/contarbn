@@ -1374,6 +1374,13 @@ public class StampaService {
         return ordineFornitoreArticoloDataSources.stream().sorted(Comparator.comparing(oads -> oads.getDescrizioneArticolo().toLowerCase())).collect(Collectors.toList());
     }
 
+    public SchedaTecnica getSchedaTecnica(Long idSchedaTecnica){
+        log.info("Retrieving 'scheda-tecnica' with id '{}' for creating pdf file", idSchedaTecnica);
+        SchedaTecnica schedaTecnica = schedaTecnicaService.getById(idSchedaTecnica);
+        log.info("Retrieved 'scheda-tecnica' with id '{}'", idSchedaTecnica);
+        return schedaTecnica;
+    }
+
     public byte[] generateDdt(Long idDdt) throws Exception{
 
         // retrieve the Ddt
@@ -2595,7 +2602,7 @@ public class StampaService {
 
     public byte[] generateSchedaTecnica(Long idSchedaTecnica) throws Exception {
 
-        SchedaTecnica schedaTecnica = schedaTecnicaService.getById(idSchedaTecnica);
+        SchedaTecnica schedaTecnica = getSchedaTecnica(idSchedaTecnica);
 
         SchedaTecnicaDataSource schedaTecnicaDataSource = SchedaTecnicaDataSource.from(schedaTecnica);
         List<SchedaTecnicaNutrienteDataSource> schedaTecnicaNutrienteDataSources = new ArrayList<>();

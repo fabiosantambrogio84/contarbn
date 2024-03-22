@@ -6,8 +6,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.sql.Date;
 import java.util.*;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -55,11 +57,11 @@ public class UtilsController {
         return Arrays.asList(TipologiaOrdine.values());
     }
 
-    @RequestMapping(method = GET, path = "/tipologie-trasporto-ddt")
+    @RequestMapping(method = GET, path = "/tipologie-trasporto")
     @CrossOrigin
-    public Map<String, Boolean> getTipologieTrasportoDdt() {
-        log.info("Performing GET request for retrieving list of 'tipologie-trasporto-ddt'");
-        return utilsService.getTipologieTrasportoDdt();
+    public Map<String, Boolean> getTipologieTrasporto(@RequestParam(name = "context", required = false) String context) {
+        log.info("Performing GET request for retrieving list of 'tipologie-trasporto' for context {}", context);
+        return utilsService.getTipologieTrasporto(context);
     }
 
     @RequestMapping(method = GET, path = "/tipologie-pagamenti")

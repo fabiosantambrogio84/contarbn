@@ -4,9 +4,8 @@ import com.contarbn.exception.CannotChangeResourceIdException;
 import com.contarbn.model.*;
 import com.contarbn.service.RicevutaPrivatoService;
 import com.contarbn.util.Utils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -21,18 +20,13 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
+@Slf4j
+@RequiredArgsConstructor
 @RestController
 @RequestMapping(path="/ricevute-privati")
 public class RicevutaPrivatoController {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(RicevutaPrivatoController.class);
-
     private final RicevutaPrivatoService ricevutaPrivatoService;
-
-    @Autowired
-    public RicevutaPrivatoController(final RicevutaPrivatoService ricevutaPrivatoService){
-        this.ricevutaPrivatoService = ricevutaPrivatoService;
-    }
 
     @RequestMapping(method = GET)
     @CrossOrigin
@@ -47,8 +41,8 @@ public class RicevutaPrivatoController {
                            @RequestParam(name = "articolo", required = false) Integer idArticolo,
                            @RequestParam(name = "stato", required = false) Integer idStato,
                            @RequestParam(name = "idCliente", required = false) Integer idCliente) {
-        LOGGER.info("Performing GET request for retrieving list of 'ricevute privato'");
-        LOGGER.info("Request params: dataDa {}, dataA {}, progressivo {}, importo {}, tipoPagamento {}, cliente {}, agente {}, autista {}, articolo {}, stato {}, idCliente {}",
+        log.info("Performing GET request for retrieving list of 'ricevute privato'");
+        log.info("Request params: dataDa {}, dataA {}, progressivo {}, importo {}, tipoPagamento {}, cliente {}, agente {}, autista {}, articolo {}, stato {}, idCliente {}",
                 dataDa, dataA, progressivo, importo, idTipoPagamento, cliente, idAgente, idAutista, idArticolo, idStato, idCliente);
 
         Predicate<RicevutaPrivato> isRicevutaPrivatoDataDaGreaterOrEquals = ricevutaPrivato -> {
@@ -86,9 +80,7 @@ public class RicevutaPrivatoController {
             if(cliente != null){
                 Cliente ricevutaPrivatoCliente = ricevutaPrivato.getCliente();
                 if(ricevutaPrivatoCliente != null){
-                    if((ricevutaPrivatoCliente.getRagioneSociale().toLowerCase()).contains(cliente.toLowerCase())){
-                        return true;
-                    }
+                    return (ricevutaPrivatoCliente.getRagioneSociale().toLowerCase()).contains(cliente.toLowerCase());
                 }
                 return false;
             }
@@ -100,9 +92,7 @@ public class RicevutaPrivatoController {
                 if(ricevutaPrivatoCliente != null){
                     Agente agente = ricevutaPrivatoCliente.getAgente();
                     if(agente != null){
-                        if(agente.getId().equals(Long.valueOf(idAgente))){
-                            return true;
-                        }
+                        return agente.getId().equals(Long.valueOf(idAgente));
                     }
                 }
                 return false;
@@ -113,9 +103,7 @@ public class RicevutaPrivatoController {
             if(idAutista != null){
                 Autista autista = ricevutaPrivato.getAutista();
                 if(autista != null){
-                    if(autista.getId().equals(Long.valueOf(idAutista))){
-                        return true;
-                    }
+                    return autista.getId().equals(Long.valueOf(idAutista));
                 }
                 return false;
             }
@@ -125,7 +113,7 @@ public class RicevutaPrivatoController {
             if(idArticolo != null){
                 Set<RicevutaPrivatoArticolo> ricevutaPrivatoArticoli = ricevutaPrivato.getRicevutaPrivatoArticoli();
                 if(ricevutaPrivatoArticoli != null && !ricevutaPrivatoArticoli.isEmpty()){
-                    return ricevutaPrivatoArticoli.stream().filter(da -> da.getId() != null).map(da -> da.getId()).filter(daId -> daId.getArticoloId() != null && daId.getArticoloId().equals(Long.valueOf(idArticolo))).findFirst().isPresent();
+                    return ricevutaPrivatoArticoli.stream().filter(da -> da.getId() != null).map(RicevutaPrivatoArticolo::getId).anyMatch(daId -> daId.getArticoloId() != null && daId.getArticoloId().equals(Long.valueOf(idArticolo)));
                 }
                 return false;
             }
@@ -158,14 +146,14 @@ public class RicevutaPrivatoController {
     @RequestMapping(method = GET, path = "/{ricevutaPrivatoId}")
     @CrossOrigin
     public RicevutaPrivato getOne(@PathVariable final Long ricevutaPrivatoId) {
-        LOGGER.info("Performing GET request for retrieving 'ricevuta privato' '{}'", ricevutaPrivatoId);
+        log.info("Performing GET request for retrieving 'ricevuta privato' '{}'", ricevutaPrivatoId);
         return ricevutaPrivatoService.getOne(ricevutaPrivatoId);
     }
 
     @RequestMapping(method = GET, path = "/progressivo")
     @CrossOrigin
     public Map<String, Integer> getAnnoAndProgressivo() {
-        LOGGER.info("Performing GET request for retrieving 'anno' and 'progressivo' for a new ricevuta privato");
+        log.info("Performing GET request for retrieving 'anno' and 'progressivo' for a new ricevuta privato");
         return ricevutaPrivatoService.getAnnoAndProgressivo();
     }
 
@@ -173,25 +161,36 @@ public class RicevutaPrivatoController {
     @ResponseStatus(CREATED)
     @CrossOrigin
     public RicevutaPrivato create(@RequestBody final RicevutaPrivato ricevutaPrivato){
-        LOGGER.info("Performing POST request for creating 'ricevuta privato'");
+        log.info("Performing POST request for creating 'ricevuta privato'");
         return ricevutaPrivatoService.create(ricevutaPrivato);
     }
 
     @RequestMapping(method = PUT, path = "/{ricevutaPrivatoId}")
     @CrossOrigin
     public RicevutaPrivato update(@PathVariable final Long ricevutaPrivatoId, @RequestBody final RicevutaPrivato ricevutaPrivato){
-        LOGGER.info("Performing PUT request for updating 'ricevuta privato' '{}'", ricevutaPrivatoId);
+        log.info("Performing PUT request for updating 'ricevuta privato' '{}'", ricevutaPrivatoId);
         if (!Objects.equals(ricevutaPrivatoId, ricevutaPrivato.getId())) {
             throw new CannotChangeResourceIdException();
         }
         return ricevutaPrivatoService.update(ricevutaPrivato);
     }
 
+    @RequestMapping(method = PATCH, path = "/{ricevutaPrivatoId}")
+    @CrossOrigin
+    public RicevutaPrivato patch(@PathVariable final Long ricevutaPrivatoId, @RequestBody final Map<String,Object> patchRicevutaPrivato){
+        log.info("Performing PATCH request for updating 'ricevuta privato' '{}'", ricevutaPrivatoId);
+        Long id = Long.valueOf((Integer) patchRicevutaPrivato.get("id"));
+        if (!Objects.equals(ricevutaPrivatoId, id)) {
+            throw new CannotChangeResourceIdException();
+        }
+        return ricevutaPrivatoService.patch(patchRicevutaPrivato);
+    }
+
     @RequestMapping(method = DELETE, path = "/{ricevutaPrivatoId}")
     @ResponseStatus(NO_CONTENT)
     @CrossOrigin
     public void delete(@PathVariable final Long ricevutaPrivatoId){
-        LOGGER.info("Performing DELETE request for deleting 'ricevuta privato' '{}'", ricevutaPrivatoId);
+        log.info("Performing DELETE request for deleting 'ricevuta privato' '{}'", ricevutaPrivatoId);
         ricevutaPrivatoService.delete(ricevutaPrivatoId);
     }
 

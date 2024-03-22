@@ -1,91 +1,87 @@
 package com.contarbn.controller;
 
-import com.contarbn.model.Ddt;
-import com.contarbn.model.Fattura;
-import com.contarbn.model.NotaAccredito;
-import com.contarbn.model.OrdineFornitore;
+import com.contarbn.model.*;
 import com.contarbn.service.EmailService;
 import com.contarbn.service.StampaService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @SuppressWarnings({"unused"})
+@Slf4j
+@RequiredArgsConstructor
 @RestController
 @RequestMapping(path="/emails")
 public class EmailController {
-
-    private final static Logger LOGGER = LoggerFactory.getLogger(EmailController.class);
 
     private final StampaService stampaService;
 
     private final EmailService emailService;
 
-    @Autowired
-    public EmailController(final StampaService stampaService,
-                           final EmailService emailService){
-        this.stampaService = stampaService;
-        this.emailService = emailService;
-    }
-
     @RequestMapping(method = GET, path = "/ddts/{idDdt}")
     @CrossOrigin
     public void sendEmailDdt(@PathVariable final Long idDdt) throws Exception{
 
-        LOGGER.info("Sending email for ddt '{}'", idDdt);
+        log.info("Sending email for ddt '{}'", idDdt);
 
         byte[] reportBytes = stampaService.generateDdt(idDdt);
         Ddt ddt = stampaService.getDdt(idDdt);
         emailService.sendEmailDdt(ddt, reportBytes);
 
-        LOGGER.info("Successfully sent email for ddt '{}'", idDdt);
+        log.info("Successfully sent email for ddt '{}'", idDdt);
     }
 
     @RequestMapping(method = GET, path = "/fatture/{idFattura}")
     @CrossOrigin
     public void sendEmailFattura(@PathVariable final Long idFattura) throws Exception{
 
-        LOGGER.info("Sending email for fattura '{}'", idFattura);
+        log.info("Sending email for fattura '{}'", idFattura);
 
         byte[] reportBytes = stampaService.generateFattura(idFattura);
         Fattura fattura = stampaService.getFattura(idFattura);
         emailService.sendEmailFattura(fattura, reportBytes);
 
-        LOGGER.info("Successfully sent email for fattura '{}'", idFattura);
+        log.info("Successfully sent email for fattura '{}'", idFattura);
     }
 
     @RequestMapping(method = GET, path = "/note-accredito/{idNotaAccredito}")
     @CrossOrigin
     public void sendEmailNotaAccredito(@PathVariable final Long idNotaAccredito) throws Exception{
 
-        LOGGER.info("Sending email for notaAccredito '{}'", idNotaAccredito);
+        log.info("Sending email for notaAccredito '{}'", idNotaAccredito);
 
         byte[] reportBytes = stampaService.generateNotaAccredito(idNotaAccredito);
         NotaAccredito notaAccredito = stampaService.getNotaAccredito(idNotaAccredito);
         emailService.sendEmailNotaAccredito(notaAccredito, reportBytes);
 
-        LOGGER.info("Successfully sent email for notaAccredito '{}'", idNotaAccredito);
+        log.info("Successfully sent email for notaAccredito '{}'", idNotaAccredito);
     }
 
     @RequestMapping(method = GET, path = "/ordini-fornitori/{idOrdineFornitore}")
     @CrossOrigin
     public void sendEmailOrdineFornitore(@PathVariable final Long idOrdineFornitore) throws Exception{
 
-        LOGGER.info("Sending email for ordine-fornitore '{}'", idOrdineFornitore);
+        log.info("Sending email for ordine-fornitore '{}'", idOrdineFornitore);
 
         byte[] reportBytes = stampaService.generateOrdineFornitore(idOrdineFornitore);
         OrdineFornitore ordineFornitore = stampaService.getOrdineFornitore(idOrdineFornitore);
         emailService.sendEmailOrdineFornitore(ordineFornitore, reportBytes);
 
-        LOGGER.info("Successfully sent email for ordine-fornitore '{}'", idOrdineFornitore);
+        log.info("Successfully sent email for ordine-fornitore '{}'", idOrdineFornitore);
+    }
+
+    @RequestMapping(method = POST, path = "/schede-tecniche/{idSchedaTecnica}")
+    @CrossOrigin
+    public void sendEmailOrdineFornitoreSchedaTecnica(@PathVariable final Long idSchedaTecnica,
+                                                      @RequestBody final Map<String, Object> bodyRequest) throws Exception {
+        log.info("Sending email for scheda-tecnica '{}'", idSchedaTecnica);
+        SchedaTecnica schedaTecnica = stampaService.getSchedaTecnica(idSchedaTecnica);
+        emailService.sendEmailSchedaTecnica(schedaTecnica, bodyRequest);
     }
 
 }
-
-

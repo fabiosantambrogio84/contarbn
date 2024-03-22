@@ -17,7 +17,6 @@ import com.contarbn.util.enumeration.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -119,43 +118,50 @@ public class ProduzioneService {
             pi.getId().setProduzioneId(produzioneId);
             pi.getId().setUuid(UUID.randomUUID().toString());
 
+            produzioneIngredienteService.create(pi);
+
             // compute 'giacenza ingrediente'
             giacenzaIngredienteService.computeGiacenza(pi.getId().getIngredienteId(), pi.getLotto(), pi.getScadenza(), pi.getQuantita(), Resource.PRODUZIONE_INGREDIENTE);
-
-            produzioneIngredienteService.create(pi);
         });
 
         createdProduzione.getProduzioneConfezioni().stream().forEach(pc -> {
             pc.getId().setProduzioneId(produzioneId);
             pc.setLottoProduzione(createdLotto);
 
+            Long id;
+            float quantita = 0f;
             if(tipologia.equals("SCORTA")){
                 Confezione confezione = confezioneService.getOne(pc.getId().getConfezioneId());
 
                 // create, or retrieve, the associated Ingrediente
                 Ingrediente ingrediente = getOrCreateIngrediente(confezione, idRicetta);
                 pc.setIngrediente(ingrediente);
+                id = ingrediente.getId();
 
-                float quantita = 0f;
                 if(confezione.getPeso() != null){
                     BigDecimal quantitaBd = BigDecimal.valueOf(confezione.getPeso() / 1000);
                     quantitaBd = Utils.roundQuantity(quantitaBd);
                     quantita = quantitaBd.floatValue() * pc.getNumConfezioniProdotte();
                 }
 
-                // compute 'giacenza ingrediente'
-                giacenzaIngredienteService.computeGiacenza(ingrediente.getId(), createdLotto, scadenzaProduzione, quantita, Resource.PRODUZIONE_SCORTA);
-
             } else {
                 // create, or retrieve, the associated Articolo
                 Articolo articolo = getOrCreateArticolo(pc, idRicetta, dataProduzione);
                 pc.setArticolo(articolo);
-
-                // compute 'giacenza articolo'
-                giacenzaArticoloService.computeGiacenza(articolo.getId(), createdLotto, scadenzaProduzione, pc.getNumConfezioniProdotte().floatValue(), Resource.PRODUZIONE);
-
+                id = articolo.getId();
+                quantita = pc.getNumConfezioniProdotte().floatValue();
             }
+
             produzioneConfezioneService.create(pc);
+
+            if(tipologia.equals("SCORTA")){
+                // compute 'giacenza ingrediente'
+                giacenzaIngredienteService.computeGiacenza(id, createdLotto, scadenzaProduzione, quantita, Resource.PRODUZIONE_SCORTA);
+            } else {
+                // compute 'giacenza articolo'
+                giacenzaArticoloService.computeGiacenza(id, createdLotto, scadenzaProduzione, quantita, Resource.PRODUZIONE);
+            }
+
         });
         Integer numeroConfezioni = createdProduzione.getProduzioneConfezioni().stream().mapToInt(ProduzioneConfezione::getNumConfezioni).sum();
 

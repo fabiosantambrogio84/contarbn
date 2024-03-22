@@ -24,9 +24,9 @@ public class TrasportatoreController {
 
     @RequestMapping(method = GET)
     @CrossOrigin
-    public Set<Trasportatore> getAll() {
-        log.info("Performing GET request for retrieving list of 'trasportatori'");
-        return trasportatoreService.getAll();
+    public Set<Trasportatore> getAll(@RequestParam(name = "context", required = false) String context) {
+        log.info("Performing GET request for retrieving list of 'trasportatori' with context {}", context);
+        return trasportatoreService.getAll(context);
     }
 
     @RequestMapping(method = GET, path = "/{trasportatoreId}")

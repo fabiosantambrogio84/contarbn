@@ -8,8 +8,8 @@ import com.contarbn.model.views.VDdt;
 import com.contarbn.service.DdtService;
 import com.contarbn.util.ResponseUtils;
 import com.contarbn.util.Utils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
@@ -24,16 +24,12 @@ import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @Slf4j
 @SuppressWarnings({"unused"})
+@RequiredArgsConstructor
 @RestController
 @RequestMapping(path="/ddts")
 public class DdtController {
 
     private final DdtService ddtService;
-
-    @Autowired
-    public DdtController(final DdtService ddtService){
-        this.ddtService = ddtService;
-    }
 
     @RequestMapping(method = GET)
     @CrossOrigin

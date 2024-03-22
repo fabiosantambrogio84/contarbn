@@ -3,9 +3,8 @@ package com.contarbn.controller;
 import com.contarbn.exception.CannotChangeResourceIdException;
 import com.contarbn.model.Autista;
 import com.contarbn.service.AutistaService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Comparator;
@@ -18,24 +17,19 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
+@Slf4j
+@RequiredArgsConstructor
 @RestController
 @RequestMapping(path="/autisti")
 public class AutistaController {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(AutistaController.class);
-
     private final AutistaService autistaService;
-
-    @Autowired
-    public AutistaController(final AutistaService autistaService){
-        this.autistaService = autistaService;
-    }
 
     @RequestMapping(method = GET)
     @CrossOrigin
-    public List<Autista> getAll(@RequestParam(name = "attivo", required = false) Boolean active) {
-        LOGGER.info("Performing GET request for retrieving list of 'autisti'");
-        LOGGER.info("Request params: attivo {}", active);
+    public List<Autista> getAll(@RequestParam(name = "attivo", required = false) Boolean active,
+                                @RequestParam(name = "context", required = false) String context) {
+        log.info("Performing GET request for retrieving list of 'autisti' with attivo {}, context {}", active, context);
 
         Predicate<Autista> isAutistaAttivoEquals = autista -> {
             if(active != null){
@@ -44,7 +38,7 @@ public class AutistaController {
             return true;
         };
 
-        return autistaService.getAll().stream()
+        return autistaService.getAll(context).stream()
                 .filter(isAutistaAttivoEquals)
                 .sorted(Comparator.comparing(Autista::getCognome).thenComparing(Autista::getNome))
                 .collect(Collectors.toList());
@@ -53,7 +47,7 @@ public class AutistaController {
     @RequestMapping(method = GET, path = "/{autistaId}")
     @CrossOrigin
     public Autista getOne(@PathVariable final Long autistaId) {
-        LOGGER.info("Performing GET request for retrieving 'autista' '{}'", autistaId);
+        log.info("Performing GET request for retrieving 'autista' '{}'", autistaId);
         return autistaService.getOne(autistaId);
     }
 
@@ -61,14 +55,14 @@ public class AutistaController {
     @ResponseStatus(CREATED)
     @CrossOrigin
     public Autista create(@RequestBody final Autista autista){
-        LOGGER.info("Performing POST request for creating 'autista'");
+        log.info("Performing POST request for creating 'autista'");
         return autistaService.create(autista);
     }
 
     @RequestMapping(method = PUT, path = "/{autistaId}")
     @CrossOrigin
     public Autista update(@PathVariable final Long autistaId, @RequestBody final Autista autista){
-        LOGGER.info("Performing PUT request for updating 'autista' '{}'", autistaId);
+        log.info("Performing PUT request for updating 'autista' '{}'", autistaId);
         if (!Objects.equals(autistaId, autista.getId())) {
             throw new CannotChangeResourceIdException();
         }
@@ -79,7 +73,7 @@ public class AutistaController {
     @ResponseStatus(NO_CONTENT)
     @CrossOrigin
     public void delete(@PathVariable final Long autistaId){
-        LOGGER.info("Performing DELETE request for deleting 'autista' '{}'", autistaId);
+        log.info("Performing DELETE request for deleting 'autista' '{}'", autistaId);
         autistaService.delete(autistaId);
     }
 }

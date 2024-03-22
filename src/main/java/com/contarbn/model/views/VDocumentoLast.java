@@ -11,8 +11,8 @@ import javax.persistence.Table;
 @Data
 @EqualsAndHashCode()
 @Entity
-@Table(name = "v_ddt_last")
-public class VDdtLast {
+@Table(name = "v_documento_last")
+public class VDocumentoLast {
 
     @Id
     @Column(name = "id")

@@ -7,8 +7,8 @@ import com.contarbn.repository.PagamentoRepository;
 import com.contarbn.repository.RicevutaPrivatoRepository;
 import com.contarbn.util.Utils;
 import com.contarbn.util.enumeration.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -20,6 +20,7 @@ import java.time.ZonedDateTime;
 import java.util.*;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class RicevutaPrivatoService {
 
@@ -29,21 +30,6 @@ public class RicevutaPrivatoService {
     private final StatoRicevutaPrivatoService statoRicevutaPrivatoService;
     private final GiacenzaArticoloService giacenzaArticoloService;
     private final PagamentoRepository pagamentoRepository;
-
-    @Autowired
-    public RicevutaPrivatoService(final RicevutaPrivatoRepository ricevutaPrivatoRepository,
-                                  final RicevutaPrivatoArticoloService ricevutaPrivatoArticoloService,
-                                  final RicevutaPrivatoTotaleService ricevutaPrivatoTotaleService,
-                                  final StatoRicevutaPrivatoService statoRicevutaPrivatoService,
-                                  final GiacenzaArticoloService giacenzaArticoloService,
-                                  final PagamentoRepository pagamentoRepository){
-        this.ricevutaPrivatoRepository = ricevutaPrivatoRepository;
-        this.ricevutaPrivatoArticoloService = ricevutaPrivatoArticoloService;
-        this.ricevutaPrivatoTotaleService = ricevutaPrivatoTotaleService;
-        this.statoRicevutaPrivatoService = statoRicevutaPrivatoService;
-        this.giacenzaArticoloService = giacenzaArticoloService;
-        this.pagamentoRepository = pagamentoRepository;
-    }
 
     public Set<RicevutaPrivato> getAll(){
         log.info("Retrieving the list of 'ricevute privato'");
@@ -217,6 +203,34 @@ public class RicevutaPrivatoService {
         log.info("Updated 'ricevuta privato' '{}'", updatedRicevutaPrivato);
 
         return updatedRicevutaPrivato;
+    }
+
+    @Transactional
+    public RicevutaPrivato patch(Map<String,Object> patchRicevutaPrivato){
+        log.info("Patching 'ricevuta privato'");
+
+        Long id = Long.valueOf((Integer) patchRicevutaPrivato.get("id"));
+        RicevutaPrivato ricevutaPrivato = ricevutaPrivatoRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        patchRicevutaPrivato.forEach((key, value) -> {
+            switch (key) {
+                case "id":
+                    ricevutaPrivato.setId(Long.valueOf((Integer) value));
+                    break;
+                case "idAutista":
+                    if (value != null) {
+                        Autista autista = new Autista();
+                        autista.setId(Long.valueOf((Integer) value));
+                        ricevutaPrivato.setAutista(autista);
+                    } else {
+                        ricevutaPrivato.setAutista(null);
+                    }
+                    break;
+            }
+        });
+        RicevutaPrivato patchedRicevutaPrivato = ricevutaPrivatoRepository.save(ricevutaPrivato);
+
+        log.info("Patched 'ricevuta privato' '{}'", patchedRicevutaPrivato);
+        return patchedRicevutaPrivato;
     }
 
     @Transactional

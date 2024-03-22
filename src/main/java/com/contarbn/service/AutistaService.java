@@ -2,11 +2,13 @@ package com.contarbn.service;
 
 import com.contarbn.exception.ResourceNotFoundException;
 import com.contarbn.model.Autista;
-import com.contarbn.model.views.VDdtLast;
+import com.contarbn.model.views.VDocumentoLast;
 import com.contarbn.repository.AutistaRepository;
-import com.contarbn.repository.views.VDdtLastRepository;
+import com.contarbn.repository.views.VDocumentoLastRepository;
 import com.contarbn.util.Constants;
+import com.contarbn.util.enumeration.Documento;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,23 +21,23 @@ public class AutistaService {
 
     private final AutistaRepository autistaRepository;
 
-    private final VDdtLastRepository vDdtLastRepository;
+    private final VDocumentoLastRepository vDocumentoLastRepository;
 
     @Autowired
     public AutistaService(final AutistaRepository autistaRepository,
-                          final VDdtLastRepository vDdtLastRepository){
+                          final VDocumentoLastRepository vDocumentoLastRepository){
         this.autistaRepository = autistaRepository;
-        this.vDdtLastRepository = vDdtLastRepository;
+        this.vDocumentoLastRepository = vDocumentoLastRepository;
     }
 
-    public Set<Autista> getAll(){
+    public Set<Autista> getAll(String context){
         log.info("Retrieving the list of 'autisti'");
         Set<Autista> autisti = autistaRepository.findAll();
         if(!autisti.isEmpty()){
-            Optional<VDdtLast> vDdtLast = vDdtLastRepository.find();
+            Optional<VDocumentoLast> vDocumentoLast = vDocumentoLastRepository.find(StringUtils.isNotEmpty(context) ? context : Documento.DDT.getName());
             for(Autista autista : autisti){
-                if(vDdtLast.isPresent()){
-                    if(autista.getId().equals(vDdtLast.get().getIdAutista())){
+                if(vDocumentoLast.isPresent()){
+                    if(autista.getId().equals(vDocumentoLast.get().getIdAutista())){
                         autista.setPredefinito(true);
                     }
                 } else {

@@ -22,7 +22,7 @@ public enum Resource {
     PRODUZIONE_INGREDIENTE("produzione ingrediente"),
     RICEVUTA_PRIVATO("ricevuta privato");
 
-    private String label;
+    private final String label;
 
     Resource(String label) {
         this.label = label;

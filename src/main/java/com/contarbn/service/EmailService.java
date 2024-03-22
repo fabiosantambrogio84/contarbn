@@ -17,6 +17,7 @@ import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
+import java.util.Map;
 import java.util.Properties;
 
 @Slf4j
@@ -178,6 +179,16 @@ public class EmailService {
         return createMessage(session, emailTo, emailSubject, emailBody, txtFileName, reportBytes);
     }
 
+    private Message createSchedaTecnicaMessage(Session session, SchedaTecnica schedaTecnica, Map<String, Object> bodyRequest) throws Exception{
+
+        String emailTo = (String)bodyRequest.get("to");
+        String emailSubject = "Scheda tecnica prodotto '"+schedaTecnica.getCodiceProdotto()+" "+schedaTecnica.getProdotto()+"' num revisione "+schedaTecnica.getNumRevisione();
+        String attachmentName = "scheda_tecnica_num_revisione_"+schedaTecnica.getNumRevisione();
+        String emailBody = "In allegato il pdf della scheda tecnica.<br/>Cordiali saluti";
+
+        return createMessage(session, emailTo, emailSubject, emailBody, attachmentName, schedaTecnica.getPdf());
+    }
+
     private void sendMessage(Transport transport, Message message) throws Exception{
         transport.sendMessage(message, message.getRecipients(Message.RecipientType.TO));
     }
@@ -222,6 +233,14 @@ public class EmailService {
         Session session = createSession();
         Transport transport = connect(session);
         Message message = createRecapReportFattureMessage(session, fileName, reportBytes);
+        sendMessage(transport, message);
+        closeTransport(transport);
+    }
+
+    public void sendEmailSchedaTecnica(SchedaTecnica schedaTecnica, Map<String, Object> bodyRequest) throws Exception{
+        Session session = createSession();
+        Transport transport = connect(session);
+        Message message = createSchedaTecnicaMessage(session, schedaTecnica, bodyRequest);
         sendMessage(transport, message);
         closeTransport(transport);
     }
