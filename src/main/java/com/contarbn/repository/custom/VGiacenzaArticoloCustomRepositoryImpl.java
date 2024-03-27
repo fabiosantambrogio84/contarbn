@@ -22,7 +22,7 @@ public class VGiacenzaArticoloCustomRepositoryImpl implements VGiacenzaArticoloC
     public List<VGiacenzaArticolo> findByFilters(Integer draw, Integer start, Integer length, List<SortOrder> sortOrders, String articolo, Boolean attivo, Integer idFornitore, String lotto, Date scadenza, Boolean scaduto) {
         StringBuilder sb = createQueryAsString("distinct v_giacenza_articolo_agg.*", articolo, attivo, idFornitore, lotto, scadenza, scaduto);
 
-        StringBuilder order = new StringBuilder(" ORDER BY v_giacenza_articolo_agg.articolo ASC, v_giacenza_articolo_agg.quantita_tot ASC, v_giacenza_articolo_agg.prezzo_listino_base ASC");
+        StringBuilder order = new StringBuilder(" ORDER BY v_giacenza_articolo_agg.articolo ASC, v_giacenza_articolo_agg.pezzi ASC, v_giacenza_articolo_agg.quantita ASC, v_giacenza_articolo_agg.prezzo_listino_base ASC");
         if(draw != null && draw != -1){
             int limit = length != null ? length : 20;
             int offset = start != null ? start : 0;
@@ -70,13 +70,22 @@ public class VGiacenzaArticoloCustomRepositoryImpl implements VGiacenzaArticoloC
                     vGiacenzaArticolo.setFornitore(((String)queryResult[6]));
                 }
                 if(queryResult[7] != null){
-                    vGiacenzaArticolo.setQuantita(((BigDecimal)queryResult[7]).floatValue());
+                    vGiacenzaArticolo.setUnitaMisura(((String)queryResult[7]));
                 }
                 if(queryResult[8] != null){
-                    vGiacenzaArticolo.setQuantitaKg(((BigDecimal)queryResult[8]).floatValue());
+                    vGiacenzaArticolo.setQuantita(((BigDecimal)queryResult[8]).floatValue());
                 }
                 if(queryResult[9] != null){
-                    vGiacenzaArticolo.setScaduto(((Integer)queryResult[9]));
+                    vGiacenzaArticolo.setPezzi(((BigInteger)queryResult[9]).intValue());
+                }
+                if(queryResult[10] != null){
+                    vGiacenzaArticolo.setQuantitaResult(((BigDecimal)queryResult[10]).floatValue());
+                }
+                if(queryResult[11] != null){
+                    vGiacenzaArticolo.setTotale(((BigDecimal)queryResult[11]).floatValue());
+                }
+                if(queryResult[12] != null){
+                    vGiacenzaArticolo.setScaduto(((Integer)queryResult[12]));
                 }
                 result.add(vGiacenzaArticolo);
             }
@@ -110,7 +119,7 @@ public class VGiacenzaArticoloCustomRepositoryImpl implements VGiacenzaArticoloC
         }
 
         sb.append(" WHERE 1=1 ");
-        sb.append(" AND coalesce(v_giacenza_articolo_agg.quantita_tot, 0) != 0 ");
+        sb.append(" AND (coalesce(v_giacenza_articolo_agg.quantita, 0) != 0 OR coalesce(v_giacenza_articolo_agg.pezzi, 0) != 0) ");
         if(StringUtils.isNotEmpty(articolo)) {
             sb.append(" AND lower(v_giacenza_articolo_agg.articolo) LIKE concat('%',:articolo,'%') ");
         }

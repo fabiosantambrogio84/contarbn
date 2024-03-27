@@ -6,9 +6,8 @@ import com.contarbn.model.Sconto;
 import com.contarbn.repository.ScontoRepository;
 import com.contarbn.util.enumeration.Resource;
 import com.contarbn.util.enumeration.TipologiaSconto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
@@ -20,24 +19,18 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class ScontoService {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(ScontoService.class);
 
     private final ScontoRepository scontoRepository;
 
     private final ArticoloService articoloService;
 
-    @Autowired
-    public ScontoService(final ScontoRepository scontoRepository, final ArticoloService articoloService){
-        this.scontoRepository = scontoRepository;
-        this.articoloService = articoloService;
-    }
-
     public List<Sconto> getAll(){
-        LOGGER.info("Retrieving the list of 'sconti'");
+        log.info("Retrieving the list of 'sconti'");
         List<Sconto> sconti = scontoRepository.findAll();
-        LOGGER.info("Retrieved {} 'sconti'", sconti.size());
+        log.info("Retrieved {} 'sconti'", sconti.size());
         return sconti;
     }
 
@@ -55,7 +48,7 @@ public class ScontoService {
             return true;
         };
 
-        LOGGER.info("Retrieving the list of valid  'sconti' for {} '{}' and date '{}'", resource.getLabel(), idResource, data);
+        log.info("Retrieving the list of valid  'sconti' for {} '{}' and date '{}'", resource.getLabel(), idResource, data);
 
         // retrieve the Sconti of tipologia ARTICOLO valid at date
         List<Sconto> validScontiArticoli = new ArrayList<>();
@@ -72,7 +65,7 @@ public class ScontoService {
         }
 
 
-        LOGGER.info("Valid Sconti Articolo size {}", validScontiArticoli.size());
+        log.info("Valid Sconti Articolo size {}", validScontiArticoli.size());
 
         // retrieve the Sconti of tipologia FORNITORE valid at date (without Articolo valued)
         List<Sconto> validScontiFornitoriWithoutArticoli = new ArrayList<>();
@@ -88,7 +81,7 @@ public class ScontoService {
                     .collect(Collectors.toList());
         }
 
-        LOGGER.info("Valid Sconti Fornitore (without id_articolo) size {}", validScontiFornitoriWithoutArticoli.size());
+        log.info("Valid Sconti Fornitore (without id_articolo) size {}", validScontiFornitoriWithoutArticoli.size());
 
         // create the list of valid Sconti of tipologia FORNITORE with Articolo valued
         List<Sconto> validScontiFornitori = new ArrayList<>();
@@ -108,18 +101,18 @@ public class ScontoService {
                 validScontiFornitori.add(sconto);
             });
         });
-        LOGGER.info("Valid Sconti Fornitore (with id_articolo) size {}", validScontiFornitori.size());
+        log.info("Valid Sconti Fornitore (with id_articolo) size {}", validScontiFornitori.size());
 
         List<Sconto> validScontiArticoloFornitore = Stream.concat(validScontiArticoli.stream(), validScontiFornitori.stream()).collect(Collectors.toList());
 
-        LOGGER.info("Valid Sconti Articolo and Fornitore size {}", validScontiArticoloFornitore.size());
+        log.info("Valid Sconti Articolo and Fornitore size {}", validScontiArticoloFornitore.size());
 
         // create a map with key Articolo.id and value the list of associated Sconti
         Map<Long, List<Sconto>> articoloScontiMap = new HashMap<>();
         validScontiArticoloFornitore.forEach(sa -> {
             Articolo articolo = sa.getArticolo();
             if(articolo != null){
-                articoloScontiMap.computeIfAbsent(articolo.getId(), v -> new ArrayList<Sconto>());
+                articoloScontiMap.computeIfAbsent(articolo.getId(), v -> new ArrayList<>());
                 articoloScontiMap.computeIfPresent(articolo.getId(), (key, value) -> {
                     value.add(sa);
                     return value;
@@ -127,13 +120,10 @@ public class ScontoService {
             }
         });
 
-        Comparator<Sconto> compareByDataInserimento = new Comparator<Sconto>() {
-            @Override
-            public int compare(Sconto s1, Sconto s2) {
-                Long d1 = s1.getDataInserimento().getTime();
-                Long d2 = s2.getDataInserimento().getTime();
-                return d2.compareTo(d1);
-            }
+        Comparator<Sconto> compareByDataInserimento = (s1, s2) -> {
+            Long d1 = s1.getDataInserimento().getTime();
+            Long d2 = s2.getDataInserimento().getTime();
+            return d2.compareTo(d1);
         };
 
         List<Sconto> sconti = new ArrayList<>();
@@ -142,60 +132,56 @@ public class ScontoService {
             List<Sconto> articoloSconti = entry.getValue();
 
             Optional<Sconto> optionalSconto = articoloSconti.stream()
-                    .filter(s -> s.getTipologia().equals(TipologiaSconto.ARTICOLO.name()))
-                    .sorted(compareByDataInserimento)
-                    .findFirst();
+                    .filter(s -> s.getTipologia().equals(TipologiaSconto.ARTICOLO.name())).min(compareByDataInserimento);
             if(optionalSconto.isPresent()){
                 sconti.add(optionalSconto.get());
             } else {
                 articoloSconti.stream()
-                        .filter(s -> s.getTipologia().equals(TipologiaSconto.FORNITORE.name()))
-                        .sorted(compareByDataInserimento)
-                        .findFirst().ifPresent(s -> sconti.add(s));
+                        .filter(s -> s.getTipologia().equals(TipologiaSconto.FORNITORE.name())).min(compareByDataInserimento).ifPresent(sconti::add);
             }
         }
 
-        LOGGER.info("Retrieved {} 'sconti'", sconti.size());
+        log.info("Retrieved {} 'sconti'", sconti.size());
         return sconti;
     }
 
     public Sconto getOne(Long scontoId){
-        LOGGER.info("Retrieving 'sconto' '{}'", scontoId);
+        log.info("Retrieving 'sconto' '{}'", scontoId);
         Sconto sconto = scontoRepository.findById(scontoId).orElseThrow(ResourceNotFoundException::new);
-        LOGGER.info("Retrieved 'sconto' '{}'", sconto);
+        log.info("Retrieved 'sconto' '{}'", sconto);
         return sconto;
     }
 
     public List<Sconto> create(List<Sconto> sconti){
-        LOGGER.info("Creating 'sconti'");
+        log.info("Creating 'sconti'");
         sconti.forEach(s -> {
             s.setDataInserimento(Timestamp.from(ZonedDateTime.now().toInstant()));
             Sconto createdSconto = scontoRepository.save(s);
-            LOGGER.info("Created 'sconto' '{}'", createdSconto);
+            log.info("Created 'sconto' '{}'", createdSconto);
         });
 
         return sconti;
     }
 
     public Sconto update(Sconto sconto){
-        LOGGER.info("Updating 'sconto'");
+        log.info("Updating 'sconto'");
         Sconto scontoCurrent = scontoRepository.findById(sconto.getId()).orElseThrow(ResourceNotFoundException::new);
         sconto.setDataInserimento(scontoCurrent.getDataInserimento());
         Sconto updatedSconto = scontoRepository.save(sconto);
-        LOGGER.info("Updated 'sconto' '{}'", updatedSconto);
+        log.info("Updated 'sconto' '{}'", updatedSconto);
         return updatedSconto;
     }
 
     public void delete(Long scontoId){
-        LOGGER.info("Deleting 'sconto' '{}'", scontoId);
+        log.info("Deleting 'sconto' '{}'", scontoId);
         scontoRepository.deleteById(scontoId);
-        LOGGER.info("Deleted 'sconto' '{}'", scontoId);
+        log.info("Deleted 'sconto' '{}'", scontoId);
     }
 
     public List<Sconto> getAllByTipologia(String tipologia){
-        LOGGER.info("Retrieving the list of 'sconti' filtered by tipologia '{}'", tipologia);
+        log.info("Retrieving the list of 'sconti' filtered by tipologia '{}'", tipologia);
         List<Sconto> sconti = scontoRepository.findByTipologia(tipologia);
-        LOGGER.info("Retrieved {} 'sconti'", sconti.size());
+        log.info("Retrieved {} 'sconti'", sconti.size());
         return sconti;
     }
 

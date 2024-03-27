@@ -15,7 +15,5 @@ public interface MovimentazioneManualeArticoloRepository extends CrudRepository<
 
     Set<MovimentazioneManualeArticolo> findByArticoloId(Long idArticolo);
 
-    void deleteByArticoloId(Long idArticolo);
-
     void deleteByArticoloIdIn(List<Long> idArticoli);
 }

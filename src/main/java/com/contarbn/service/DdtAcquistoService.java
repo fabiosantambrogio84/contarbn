@@ -5,10 +5,10 @@ import com.contarbn.model.*;
 import com.contarbn.model.beans.DdtAcquistoRicercaLotto;
 import com.contarbn.repository.DdtAcquistoRepository;
 import com.contarbn.util.Utils;
+import com.contarbn.util.enumeration.Operation;
 import com.contarbn.util.enumeration.Resource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -19,9 +19,9 @@ import java.time.ZonedDateTime;
 import java.util.*;
 
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class DdtAcquistoService {
-
-    private final static Logger LOGGER = LoggerFactory.getLogger(DdtAcquistoService.class);
 
     private final DdtAcquistoRepository ddtAcquistoRepository;
     private final DdtAcquistoArticoloService ddtAcquistoArticoloService;
@@ -30,45 +30,30 @@ public class DdtAcquistoService {
     private final GiacenzaIngredienteService giacenzaIngredienteService;
     private final StatoDdtService statoDdtService;
 
-    @Autowired
-    public DdtAcquistoService(final DdtAcquistoRepository ddtAcquistoRepository,
-                              final DdtAcquistoArticoloService ddtAcquistoArticoloService,
-                              final DdtAcquistoIngredienteService ddtAcquistoIngredienteService,
-                              final GiacenzaArticoloService giacenzaArticoloService,
-                              final GiacenzaIngredienteService giacenzaIngredienteService,
-                              final StatoDdtService statoDdtService){
-        this.ddtAcquistoRepository = ddtAcquistoRepository;
-        this.ddtAcquistoArticoloService = ddtAcquistoArticoloService;
-        this.ddtAcquistoIngredienteService = ddtAcquistoIngredienteService;
-        this.giacenzaArticoloService = giacenzaArticoloService;
-        this.giacenzaIngredienteService = giacenzaIngredienteService;
-        this.statoDdtService = statoDdtService;
-    }
-
     public Set<DdtAcquisto> getAll(){
-        LOGGER.info("Retrieving the list of 'ddts acquisto'");
+        log.info("Retrieving the list of 'ddts acquisto'");
         Set<DdtAcquisto> ddtsAcquisto = ddtAcquistoRepository.findAllByOrderByNumeroDesc();
-        LOGGER.info("Retrieved {} 'ddts acquisto'", ddtsAcquisto.size());
+        log.info("Retrieved {} 'ddts acquisto'", ddtsAcquisto.size());
         return ddtsAcquisto;
     }
 
     public Set<DdtAcquistoRicercaLotto> getAllByLotto(String lotto){
-        LOGGER.info("Retrieving the list of 'ddts acquisto' filtered by 'lotto' '{}'", lotto);
+        log.info("Retrieving the list of 'ddts acquisto' filtered by 'lotto' '{}'", lotto);
         Set<DdtAcquistoRicercaLotto> ddtsAcquisto = ddtAcquistoRepository.findAllByLotto(lotto);
-        LOGGER.info("Retrieved {} 'ddts acquisto'", ddtsAcquisto.size());
+        log.info("Retrieved {} 'ddts acquisto'", ddtsAcquisto.size());
         return ddtsAcquisto;
     }
 
     public DdtAcquisto getOne(Long ddtAcquistoId){
-        LOGGER.info("Retrieving 'ddt acquisto' '{}'", ddtAcquistoId);
+        log.info("Retrieving 'ddt acquisto' '{}'", ddtAcquistoId);
         DdtAcquisto ddtAcquisto = ddtAcquistoRepository.findById(ddtAcquistoId).orElseThrow(ResourceNotFoundException::new);
-        LOGGER.info("Retrieved 'ddt acquisto' '{}'", ddtAcquisto);
+        log.info("Retrieved 'ddt acquisto' '{}'", ddtAcquisto);
         return ddtAcquisto;
     }
 
     @Transactional
     public DdtAcquisto create(DdtAcquisto ddtAcquisto){
-        LOGGER.info("Creating 'ddt acquisto'");
+        log.info("Creating 'ddt acquisto'");
 
         if(ddtAcquisto.getNumeroColli() == null){
             ddtAcquisto.setNumeroColli(1);
@@ -84,7 +69,7 @@ public class DdtAcquistoService {
             ddtAcquistoArticoloService.create(daa);
 
             // compute 'giacenza articolo'
-            giacenzaArticoloService.computeGiacenza(daa.getId().getArticoloId(), daa.getLotto(), daa.getDataScadenza(), daa.getQuantita(), Resource.DDT_ACQUISTO);
+            giacenzaArticoloService.computeGiacenza(daa.getId().getArticoloId(), daa.getLotto(), daa.getDataScadenza());
         });
 
         createdDdtAcquisto.getDdtAcquistoIngredienti().forEach(dai -> {
@@ -100,13 +85,13 @@ public class DdtAcquistoService {
 
         ddtAcquistoRepository.save(createdDdtAcquisto);
 
-        LOGGER.info("Created 'ddt acquisto' '{}'", createdDdtAcquisto);
+        log.info("Created 'ddt acquisto' '{}'", createdDdtAcquisto);
         return createdDdtAcquisto;
     }
 
     @Transactional
     public DdtAcquisto update(DdtAcquisto ddtAcquisto){
-        LOGGER.info("Updating 'ddt acquisto'");
+        log.info("Updating 'ddt acquisto'");
 
         Boolean modificaGiacenze = ddtAcquisto.getModificaGiacenze();
 
@@ -130,7 +115,7 @@ public class DdtAcquistoService {
 
             if(modificaGiacenze != null && modificaGiacenze.equals(Boolean.TRUE)){
                 // compute 'giacenza articolo'
-                giacenzaArticoloService.computeGiacenza(daa.getId().getArticoloId(), daa.getLotto(), daa.getDataScadenza(), daa.getQuantita(), Resource.DDT_ACQUISTO);
+                giacenzaArticoloService.computeGiacenza(daa.getId().getArticoloId(), daa.getLotto(), daa.getDataScadenza());
             }
             ddtAcquistoArticoloService.create(daa);
         });
@@ -148,13 +133,13 @@ public class DdtAcquistoService {
         computeTotali(updatedDdtAcquisto, ddtAcquistoArticoli, ddtAcquistoIngredienti);
 
         ddtAcquistoRepository.save(updatedDdtAcquisto);
-        LOGGER.info("Updated 'ddt acquisto' '{}'", updatedDdtAcquisto);
+        log.info("Updated 'ddt acquisto' '{}'", updatedDdtAcquisto);
         return updatedDdtAcquisto;
     }
 
     @Transactional
     public DdtAcquisto patch(Map<String,Object> patchDdtAcquisto){
-        LOGGER.info("Patching 'ddt acquisto'");
+        log.info("Patching 'ddt acquisto'");
 
         Long id = Long.valueOf((Integer) patchDdtAcquisto.get("id"));
         DdtAcquisto ddtAcquisto = ddtAcquistoRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
@@ -169,13 +154,16 @@ public class DdtAcquistoService {
         });
         DdtAcquisto patchedDdtAcquisto = ddtAcquistoRepository.save(ddtAcquisto);
 
-        LOGGER.info("Patched 'ddt acquisto' '{}'", patchedDdtAcquisto);
+        log.info("Patched 'ddt acquisto' '{}'", patchedDdtAcquisto);
         return patchedDdtAcquisto;
     }
 
     @Transactional
     public void delete(Long ddtAcquistoId, Boolean modificaGiacenze){
-        LOGGER.info("Deleting 'ddt acquisto' '{}' ('modificaGiacenze={}')", ddtAcquistoId, modificaGiacenze);
+        log.info("Deleting 'ddt acquisto' '{}' ('modificaGiacenze={}')", ddtAcquistoId, modificaGiacenze);
+        
+        DdtAcquisto ddtAcquisto = getOne(ddtAcquistoId);
+        
         Set<DdtAcquistoArticolo> ddtAcquistoArticoli = ddtAcquistoArticoloService.findByDdtAcquistoId(ddtAcquistoId);
         Set<DdtAcquistoIngrediente> ddtAcquistoIngredienti = ddtAcquistoIngredienteService.findByDdtAcquistoId(ddtAcquistoId);
 
@@ -183,18 +171,21 @@ public class DdtAcquistoService {
         ddtAcquistoIngredienteService.deleteByDdtAcquistoId(ddtAcquistoId);
         ddtAcquistoRepository.deleteById(ddtAcquistoId);
 
-        if(modificaGiacenze.equals(Boolean.TRUE)){
-            for (DdtAcquistoArticolo ddtAcquistoArticolo:ddtAcquistoArticoli) {
-                // compute 'giacenza articolo'
-                giacenzaArticoloService.computeGiacenza(ddtAcquistoArticolo.getId().getArticoloId(), ddtAcquistoArticolo.getLotto(), ddtAcquistoArticolo.getDataScadenza(), ddtAcquistoArticolo.getQuantita(), Resource.DDT_ACQUISTO);
+        for (DdtAcquistoArticolo ddtAcquistoArticolo:ddtAcquistoArticoli) {
+
+            giacenzaArticoloService.createMovimentazioneManualeArticolo(ddtAcquistoArticolo.getId().getArticoloId(), ddtAcquistoArticolo.getLotto(), ddtAcquistoArticolo.getDataScadenza(), ddtAcquistoArticolo.getNumeroPezzi(), ddtAcquistoArticolo.getQuantita(), Operation.DELETE, Resource.DDT_ACQUISTO, ddtAcquisto.getId(), ddtAcquisto.getNumero(), null, (ddtAcquisto.getFornitore() != null ? ddtAcquisto.getFornitore().getRagioneSociale() : null));
+
+            if(modificaGiacenze.equals(Boolean.TRUE)){
+                giacenzaArticoloService.computeGiacenza(ddtAcquistoArticolo.getId().getArticoloId(), ddtAcquistoArticolo.getLotto(), ddtAcquistoArticolo.getDataScadenza());
             }
-            for (DdtAcquistoIngrediente ddtAcquistoIngrediente:ddtAcquistoIngredienti) {
-                // compute 'giacenza ingrediente'
-                giacenzaIngredienteService.computeGiacenza(ddtAcquistoIngrediente.getId().getIngredienteId(), ddtAcquistoIngrediente.getLotto(), ddtAcquistoIngrediente.getDataScadenza(), ddtAcquistoIngrediente.getQuantita(), Resource.DDT_ACQUISTO);
-            }
+
         }
 
-        LOGGER.info("Deleted 'ddt acquisto' '{}'", ddtAcquistoId);
+        for (DdtAcquistoIngrediente ddtAcquistoIngrediente:ddtAcquistoIngredienti) {
+            giacenzaIngredienteService.computeGiacenza(ddtAcquistoIngrediente.getId().getIngredienteId(), ddtAcquistoIngrediente.getLotto(), ddtAcquistoIngrediente.getDataScadenza(), ddtAcquistoIngrediente.getQuantita(), Resource.DDT_ACQUISTO);
+        }
+
+        log.info("Deleted 'ddt acquisto' '{}'", ddtAcquistoId);
     }
 
     private void computeTotali(DdtAcquisto ddtAcquisto, Set<DdtAcquistoArticolo> ddtAcquistoArticoli, Set<DdtAcquistoIngrediente> ddtAcquistoIngredienti){

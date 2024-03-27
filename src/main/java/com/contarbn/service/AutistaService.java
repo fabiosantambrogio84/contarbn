@@ -6,7 +6,7 @@ import com.contarbn.model.views.VDocumentoLast;
 import com.contarbn.repository.AutistaRepository;
 import com.contarbn.repository.views.VDocumentoLastRepository;
 import com.contarbn.util.Constants;
-import com.contarbn.util.enumeration.Documento;
+import com.contarbn.util.enumeration.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ public class AutistaService {
         log.info("Retrieving the list of 'autisti'");
         Set<Autista> autisti = autistaRepository.findAll();
         if(!autisti.isEmpty()){
-            Optional<VDocumentoLast> vDocumentoLast = vDocumentoLastRepository.find(StringUtils.isNotEmpty(context) ? context : Documento.DDT.getName());
+            Optional<VDocumentoLast> vDocumentoLast = vDocumentoLastRepository.find(StringUtils.isNotEmpty(context) ? context : Resource.DDT.getParam());
             for(Autista autista : autisti){
                 if(vDocumentoLast.isPresent()){
                     if(autista.getId().equals(vDocumentoLast.get().getIdAutista())){

@@ -28,6 +28,9 @@ public class GiacenzaArticolo {
     @Column(name = "scadenza")
     private Date scadenza;
 
+    @Column(name = "pezzi")
+    private Integer pezzi;
+
     @Column(name = "quantita")
     private Float quantita;
 

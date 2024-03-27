@@ -6,6 +6,7 @@ import com.contarbn.model.*;
 import com.contarbn.repository.FatturaAccompagnatoriaRepository;
 import com.contarbn.repository.PagamentoRepository;
 import com.contarbn.util.Utils;
+import com.contarbn.util.enumeration.Operation;
 import com.contarbn.util.enumeration.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -139,7 +140,7 @@ public class FatturaAccompagnatoriaService {
             fatturaAccompagnatoria.setProgressivo(progressivo);
         }
 
-        checkExistsByAnnoAndProgressivoAndIdNot(fatturaAccompagnatoria.getAnno(),fatturaAccompagnatoria.getProgressivo(), Long.valueOf(-1));
+        checkExistsByAnnoAndProgressivoAndIdNot(fatturaAccompagnatoria.getAnno(),fatturaAccompagnatoria.getProgressivo(), -1L);
 
         fatturaAccompagnatoria.setStatoFattura(statoFatturaService.getDaPagare());
         fatturaAccompagnatoria.setTipoFattura(tipoFatturaService.getAccompagnatoria());
@@ -157,7 +158,7 @@ public class FatturaAccompagnatoriaService {
                 fatturaAccompagnatoriaArticoloService.create(faa);
 
                 // compute 'giacenza articolo'
-                giacenzaArticoloService.computeGiacenza(faa.getId().getArticoloId(), faa.getLotto(), faa.getScadenza(), faa.getQuantita(), Resource.FATTURA_ACCOMPAGNATORIA);
+                giacenzaArticoloService.computeGiacenza(faa.getId().getArticoloId(), faa.getLotto(), faa.getScadenza());
             } else {
                 log.info("FatturaAccompagnatoriaArticolo not saved because quantity null or zero ({}) or prezzo zero ({})", faa.getQuantita(), faa.getPrezzo());
             }
@@ -223,6 +224,8 @@ public class FatturaAccompagnatoriaService {
     public void delete(Long fatturaAccompagnatoriaId){
         log.info("Deleting 'fattura accompagnatoria' '{}'", fatturaAccompagnatoriaId);
 
+        FatturaAccompagnatoria fatturaAccompagnatoria = getOne(fatturaAccompagnatoriaId);
+
         Set<FatturaAccompagnatoriaArticolo> fatturaAccompagnatoriaArticoli = fatturaAccompagnatoriaArticoloService.findByFatturaAccompagnatoriaId(fatturaAccompagnatoriaId);
 
         pagamentoRepository.deleteByFatturaAccompagnatoriaId(fatturaAccompagnatoriaId);
@@ -231,8 +234,10 @@ public class FatturaAccompagnatoriaService {
         fatturaAccompagnatoriaRepository.deleteById(fatturaAccompagnatoriaId);
 
         for (FatturaAccompagnatoriaArticolo fatturaAccompagnatoriaArticolo:fatturaAccompagnatoriaArticoli) {
-            // compute 'giacenza articolo'
-            giacenzaArticoloService.computeGiacenza(fatturaAccompagnatoriaArticolo.getId().getArticoloId(), fatturaAccompagnatoriaArticolo.getLotto(), fatturaAccompagnatoriaArticolo.getScadenza(), fatturaAccompagnatoriaArticolo.getQuantita(), Resource.FATTURA_ACCOMPAGNATORIA);
+
+            giacenzaArticoloService.createMovimentazioneManualeArticolo(fatturaAccompagnatoriaArticolo.getId().getArticoloId(), fatturaAccompagnatoriaArticolo.getLotto(), fatturaAccompagnatoriaArticolo.getScadenza(), fatturaAccompagnatoriaArticolo.getNumeroPezzi(), fatturaAccompagnatoriaArticolo.getQuantita(), Operation.DELETE, Resource.FATTURA_ACCOMPAGNATORIA, fatturaAccompagnatoria.getId(), String.valueOf(fatturaAccompagnatoria.getProgressivo()), fatturaAccompagnatoria.getAnno(), null);
+
+            giacenzaArticoloService.computeGiacenza(fatturaAccompagnatoriaArticolo.getId().getArticoloId(), fatturaAccompagnatoriaArticolo.getLotto(), fatturaAccompagnatoriaArticolo.getScadenza());
         }
 
         log.info("Deleted 'fattura accompagnatoria' '{}'", fatturaAccompagnatoriaId);

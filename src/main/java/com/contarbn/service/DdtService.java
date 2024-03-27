@@ -10,6 +10,7 @@ import com.contarbn.repository.DdtRepository;
 import com.contarbn.repository.PagamentoRepository;
 import com.contarbn.repository.views.VDdtRepository;
 import com.contarbn.util.Utils;
+import com.contarbn.util.enumeration.Operation;
 import com.contarbn.util.enumeration.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -155,7 +156,7 @@ public class DdtService {
             ddtArticoloService.create(da);
 
             // compute 'giacenza articolo'
-            giacenzaArticoloService.computeGiacenza(da.getId().getArticoloId(), da.getLotto(), da.getScadenza(), da.getQuantita(), Resource.DDT);
+            giacenzaArticoloService.computeGiacenza(da.getId().getArticoloId(), da.getLotto(), da.getScadenza());
         });
 
         // update 'pezzi-da-evadere' and 'stato-ordine' on OrdineCliente
@@ -213,7 +214,7 @@ public class DdtService {
 
             if(modificaGiacenze != null && modificaGiacenze.equals(Boolean.TRUE)){
                 // compute 'giacenza articolo'
-                giacenzaArticoloService.computeGiacenza(da.getId().getArticoloId(), da.getLotto(), da.getScadenza(), da.getQuantita(), Resource.DDT);
+                giacenzaArticoloService.computeGiacenza(da.getId().getArticoloId(), da.getLotto(), da.getScadenza());
             }
         });
 
@@ -261,6 +262,8 @@ public class DdtService {
     public void delete(Long ddtId, Boolean modificaGiacenze){
         log.info("Deleting 'ddt' '{}' ('modificaGiacenze={}')", ddtId, modificaGiacenze);
 
+        Ddt ddt = getOne(ddtId);
+
         Set<DdtArticolo> ddtArticoli = ddtArticoloService.findByDdtId(ddtId);
 
         // update 'pezzi-da-evadere' and 'stato-ordine' on OrdineCliente
@@ -270,12 +273,15 @@ public class DdtService {
         ddtArticoloService.deleteByDdtId(ddtId);
         ddtRepository.deleteById(ddtId);
 
-        if(modificaGiacenze.equals(Boolean.TRUE)){
-            for (DdtArticolo ddtArticolo:ddtArticoli) {
-                // compute 'giacenza articolo'
-                giacenzaArticoloService.computeGiacenza(ddtArticolo.getId().getArticoloId(), ddtArticolo.getLotto(), ddtArticolo.getScadenza(), ddtArticolo.getQuantita(), Resource.DDT);
+        for (DdtArticolo ddtArticolo:ddtArticoli) {
+
+            giacenzaArticoloService.createMovimentazioneManualeArticolo(ddtArticolo.getId().getArticoloId(), ddtArticolo.getLotto(), ddtArticolo.getScadenza(), ddtArticolo.getNumeroPezzi(), ddtArticolo.getQuantita(), Operation.DELETE, Resource.DDT, ddt.getId(), String.valueOf(ddt.getProgressivo()), ddt.getAnnoContabile(), null);
+
+            if(modificaGiacenze.equals(Boolean.TRUE)){
+                giacenzaArticoloService.computeGiacenza(ddtArticolo.getId().getArticoloId(), ddtArticolo.getLotto(), ddtArticolo.getScadenza());
             }
         }
+
         log.info("Deleted 'ddt' '{}'", ddtId);
     }
 

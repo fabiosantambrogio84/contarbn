@@ -28,11 +28,20 @@ public class VGiacenzaArticolo {
     @Column(name = "prezzo_listino_base")
     private BigDecimal prezzoListinoBase;
 
-    @Column(name = "quantita_tot")
+    @Column(name = "unita_misura")
+    private String unitaMisura;
+
+    @Column(name = "quantita")
     private Float quantita;
 
-    @Column(name = "quantita_kg")
-    private Float quantitaKg;
+    @Column(name = "pezzi")
+    private Integer pezzi;
+
+    @Column(name = "quantita_result")
+    private Float quantitaResult;
+
+    @Column(name = "totale")
+    private Float totale;
 
     @Column(name = "attivo")
     private Boolean attivo;
@@ -54,8 +63,11 @@ public class VGiacenzaArticolo {
                 ", articolo: " + articolo +
                 ", prezzoAcquisto: " + prezzoAcquisto +
                 ", prezzoListinoBase: " + prezzoListinoBase +
+                ", unitaMisura: " + unitaMisura +
                 ", quantita: " + quantita +
-                ", quantitaKg: " + quantitaKg +
+                ", pezzi: " + pezzi +
+                ", quantitaResult: " + quantitaResult +
+                ", totale: " + totale +
                 ", attivo: " + attivo +
                 ", idFornitore: " + idFornitore +
                 ", fornitore: " + fornitore +

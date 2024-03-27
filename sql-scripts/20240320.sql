@@ -98,7 +98,6 @@ from
 ;
 
 -- GIACENZE
-/*
 alter table contarbn.movimentazione_manuale_articolo CHANGE quantita quantita_old decimal(10,3) NULL;
 alter table contarbn.movimentazione_manuale_articolo add column pezzi int after scadenza;
 alter table contarbn.movimentazione_manuale_articolo add column quantita decimal(10,3) after pezzi;
@@ -110,10 +109,86 @@ alter table contarbn.movimentazione_manuale_articolo add column anno_documento i
 alter table contarbn.movimentazione_manuale_articolo add column fornitore_documento varchar(255) after anno_documento;
 
 update contarbn.movimentazione_manuale_articolo set pezzi = round(quantita_old), operation='CREATE';
-*/
 
 -- alter table contarbn.movimentazione_manuale_articolo drop column quantita_old;
 
+alter table contarbn.giacenza_articolo CHANGE quantita quantita_old decimal(10,3) NULL;
+alter table contarbn.giacenza_articolo add column pezzi int after scadenza;
+alter table contarbn.giacenza_articolo add column quantita decimal(10,3) after pezzi;
 
+update contarbn.giacenza_articolo set pezzi = round(quantita_old);
+-- alter table contarbn.giacenza_articolo drop column quantita_old;
 
+update contarbn.articolo set id_unita_misura = 2 where id_unita_misura is null;
 
+create or replace algorithm = UNDEFINED view `v_giacenza_articolo` as
+select
+    `giacenza_articolo`.`id` as `id`,
+    `giacenza_articolo`.`id_articolo` as `id_articolo`,
+    concat(`articolo`.`codice`, ' ', coalesce(`articolo`.`descrizione`, '')) as `articolo`,
+    `articolo`.`prezzo_acquisto` as `prezzo_acquisto`,
+    `articolo`.`prezzo_listino_base` as `prezzo_listino_base`,
+    unita_misura.etichetta as unita_misura,
+    `giacenza_articolo`.`quantita` as `quantita`,
+       giacenza_articolo.pezzi as pezzi,
+    case
+        when unita_misura.nome = 'pz' then
+            giacenza_articolo.pezzi
+        else
+            giacenza_articolo.quantita
+        end as quantita_result,
+     case
+         when unita_misura.nome = 'pz' then
+             giacenza_articolo.pezzi * articolo.prezzo_acquisto
+         else
+             giacenza_articolo.quantita * articolo.prezzo_acquisto
+         end as totale,
+    `articolo`.`attivo` as `attivo`,
+    `articolo`.`id_fornitore` as `id_fornitore`,
+    `fornitore`.`ragione_sociale` as `fornitore`,
+    `giacenza_articolo`.`lotto` as `lotto`,
+    `giacenza_articolo`.`scadenza` as `scadenza`,
+    `articolo`.`scadenza_giorni_allarme` as `scadenza_giorni_allarme`,
+    (case
+         when (curdate() >= (`giacenza_articolo`.`scadenza` - interval coalesce(`articolo`.`scadenza_giorni_allarme`, 0) day)) then 1
+         else 0
+        end) as `scaduto`
+from giacenza_articolo
+join articolo on
+    giacenza_articolo.id_articolo = articolo.id
+join unita_misura on
+    articolo.id_unita_misura = unita_misura.id
+left join fornitore on
+    articolo.id_fornitore = fornitore.id
+;
+
+create or replace algorithm = UNDEFINED view `v_giacenza_articolo_agg` as
+select
+    `v_giacenza_articolo`.`id_articolo` as `id_articolo`,
+    `v_giacenza_articolo`.`articolo` as `articolo`,
+    `v_giacenza_articolo`.`prezzo_acquisto` as `prezzo_acquisto`,
+    `v_giacenza_articolo`.`prezzo_listino_base` as `prezzo_listino_base`,
+    `v_giacenza_articolo`.`attivo` as `attivo`,
+    `v_giacenza_articolo`.`id_fornitore` as `id_fornitore`,
+    `v_giacenza_articolo`.`fornitore` as `fornitore`,
+    v_giacenza_articolo.unita_misura,
+    sum(`v_giacenza_articolo`.`quantita`) as `quantita`,
+    cast(sum(`v_giacenza_articolo`.pezzi) as signed) as pezzi,
+    sum(`v_giacenza_articolo`.`quantita_result`) as `quantita_result`,
+    sum(`v_giacenza_articolo`.`totale`) as totale,
+    (case
+         when (sum(`v_giacenza_articolo`.`scaduto`) > 0) then 1
+         else 0
+        end) as `scaduto`
+from
+    `v_giacenza_articolo`
+group by
+    `v_giacenza_articolo`.`id_articolo`,
+    `v_giacenza_articolo`.`articolo`,
+    `v_giacenza_articolo`.`prezzo_acquisto`,
+    `v_giacenza_articolo`.`prezzo_listino_base`,
+    `v_giacenza_articolo`.`attivo`,
+    `v_giacenza_articolo`.`id_fornitore`,
+    `v_giacenza_articolo`.`fornitore`,
+    v_giacenza_articolo.unita_misura
+;

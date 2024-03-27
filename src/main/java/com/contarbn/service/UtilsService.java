@@ -2,7 +2,7 @@ package com.contarbn.service;
 
 import com.contarbn.model.views.VDocumentoLast;
 import com.contarbn.repository.views.VDocumentoLastRepository;
-import com.contarbn.util.enumeration.Documento;
+import com.contarbn.util.enumeration.Resource;
 import com.contarbn.util.enumeration.TipologiaTrasporto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,16 +30,16 @@ public class UtilsService {
         Optional<VDocumentoLast> vDocumentoLast;
         switch (finalContext) {
             case "ddt":
-                vDocumentoLast = vDocumentoLastRepository.find(Documento.DDT.getName());
+                vDocumentoLast = vDocumentoLastRepository.find(Resource.DDT.getParam());
                 break;
             case "fattura-accompagnatoria":
-                vDocumentoLast = vDocumentoLastRepository.find(Documento.FATTURA_ACCOMPAGNATORIA.getName());
+                vDocumentoLast = vDocumentoLastRepository.find(Resource.FATTURA_ACCOMPAGNATORIA.getParam());
                 break;
             case "ricevuta-privato":
-                vDocumentoLast = vDocumentoLastRepository.find(Documento.RICEVUTA_PRIVATO.getName());
+                vDocumentoLast = vDocumentoLastRepository.find(Resource.RICEVUTA_PRIVATO.getParam());
                 break;
             case "fattura-accompagnatoria-acquisto":
-                vDocumentoLast = vDocumentoLastRepository.find(Documento.FATTURA_ACCOMPAGNATORIA_ACQUISTO.getName());
+                vDocumentoLast = vDocumentoLastRepository.find(Resource.FATTURA_ACCOMPAGNATORIA_ACQUISTO.getParam());
                 break;
             default:
                 vDocumentoLast = Optional.empty();

@@ -1,5 +1,6 @@
 package com.contarbn.model;
 
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
@@ -8,6 +9,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 @EqualsAndHashCode
+@Data
 @Entity
 @Table(name = "movimentazione_manuale_articolo")
 public class MovimentazioneManualeArticolo {
@@ -26,8 +28,29 @@ public class MovimentazioneManualeArticolo {
     @Column(name = "scadenza")
     private Date scadenza;
 
+    @Column(name = "pezzi")
+    private Integer pezzi;
+
     @Column(name = "quantita")
     private Float quantita;
+
+    @Column(name = "operation")
+    private String operation;
+
+    @Column(name = "context")
+    private String context;
+
+    @Column(name = "id_documento")
+    private Long idDocumento;
+
+    @Column(name = "num_documento")
+    private String numDocumento;
+
+    @Column(name = "anno_documento")
+    private Integer annoDocumento;
+
+    @Column(name = "fornitore_documento")
+    private String fornitoreDocumento;
 
     @Column(name = "data_inserimento")
     private Timestamp dataInserimento;
@@ -38,85 +61,25 @@ public class MovimentazioneManualeArticolo {
     @Transient
     List<Movimentazione> movimentazioni;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Articolo getArticolo() {
-        return articolo;
-    }
-
-    public void setArticolo(Articolo articolo) {
-        this.articolo = articolo;
-    }
-
-    public String getLotto() {
-        return lotto;
-    }
-
-    public void setLotto(String lotto) {
-        this.lotto = lotto;
-    }
-
-    public Date getScadenza() {
-        return scadenza;
-    }
-
-    public void setScadenza(Date scadenza) {
-        this.scadenza = scadenza;
-    }
-
-    public Float getQuantita() {
-        return quantita;
-    }
-
-    public void setQuantita(Float quantita) {
-        this.quantita = quantita;
-    }
-
-    public Timestamp getDataInserimento() {
-        return dataInserimento;
-    }
-
-    public void setDataInserimento(Timestamp dataInserimento) {
-        this.dataInserimento = dataInserimento;
-    }
-
-    public Timestamp getDataAggiornamento() {
-        return dataAggiornamento;
-    }
-
-    public void setDataAggiornamento(Timestamp dataAggiornamento) {
-        this.dataAggiornamento = dataAggiornamento;
-    }
-
-    public List<Movimentazione> getMovimentazioni() {
-        return movimentazioni;
-    }
-
-    public void setMovimentazioni(List<Movimentazione> movimentazioni) {
-        this.movimentazioni = movimentazioni;
-    }
-
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder();
 
-        result.append("{");
-        result.append("id: " + id);
-        result.append(", articolo: " + articolo);
-        result.append(", lotto: " + lotto);
-        result.append(", scadenza: " + scadenza);
-        result.append(", quantita: " + quantita);
-        result.append(", dataInserimento: " + dataInserimento);
-        result.append(", dataAggiornamento: " + dataAggiornamento);
-        result.append("}");
-
-        return result.toString();
+        return "{" +
+                "id: " + id +
+                ", articolo: " + articolo +
+                ", lotto: " + lotto +
+                ", scadenza: " + scadenza +
+                ", pezzi: " + pezzi +
+                ", quantita: " + quantita +
+                ", operation: " + operation +
+                ", context: " + context +
+                ", idDocumento: " + idDocumento +
+                ", numDocumento: " + numDocumento +
+                ", annoDocumento: " + annoDocumento +
+                ", fornitoreDocumento: " + fornitoreDocumento +
+                ", dataInserimento: " + dataInserimento +
+                ", dataAggiornamento: " + dataAggiornamento +
+                "}";
 
     }
 }

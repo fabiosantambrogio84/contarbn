@@ -90,20 +90,6 @@ public class DdtArticoloService {
         return createdDdtArticolo;
     }
 
-    public DdtArticolo update(DdtArticolo ddtArticolo){
-        LOGGER.info("Updating 'ddt articolo'");
-        DdtArticolo ddtArticoloCurrent = ddtArticoloRepository.findById(ddtArticolo.getId()).orElseThrow(ResourceNotFoundException::new);
-        ddtArticolo.setDataInserimento(ddtArticoloCurrent.getDataInserimento());
-        ddtArticolo.setDataAggiornamento(Timestamp.from(ZonedDateTime.now().toInstant()));
-        ddtArticolo.setImponibile(computeImponibile(ddtArticolo));
-        ddtArticolo.setCosto(computeCosto(ddtArticolo));
-        ddtArticolo.setTotale(computeTotale(ddtArticolo));
-
-        DdtArticolo updatedDdtArticolo = ddtArticoloRepository.save(ddtArticolo);
-        LOGGER.info("Updated 'ddt articolo' '{}'", updatedDdtArticolo);
-        return updatedDdtArticolo;
-    }
-
     @Transactional
     public void deleteByDdtId(Long ddtId){
         LOGGER.info("Deleting 'ddt articolo' by 'ddt' '{}'", ddtId);

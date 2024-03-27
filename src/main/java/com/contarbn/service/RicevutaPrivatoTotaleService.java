@@ -1,60 +1,45 @@
 package com.contarbn.service;
 
-import com.contarbn.exception.ResourceNotFoundException;
 import com.contarbn.model.RicevutaPrivatoTotale;
 import com.contarbn.repository.RicevutaPrivatoTotaleRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.Set;
 
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class RicevutaPrivatoTotaleService {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(RicevutaPrivatoTotaleService.class);
 
     private final RicevutaPrivatoTotaleRepository ricevutaPrivatoTotaleRepository;
 
-    @Autowired
-    public RicevutaPrivatoTotaleService(final RicevutaPrivatoTotaleRepository ricevutaPrivatoTotaleRepository){
-        this.ricevutaPrivatoTotaleRepository = ricevutaPrivatoTotaleRepository;
-    }
-
     public Set<RicevutaPrivatoTotale> findAll(){
-        LOGGER.info("Retrieving the list of 'ricevuta privato totali'");
+        log.info("Retrieving the list of 'ricevuta privato totali'");
         Set<RicevutaPrivatoTotale> ricevutaPrivatoTotali = ricevutaPrivatoTotaleRepository.findAll();
-        LOGGER.info("Retrieved {} 'ricevuta privato totali'", ricevutaPrivatoTotali.size());
+        log.info("Retrieved {} 'ricevuta privato totali'", ricevutaPrivatoTotali.size());
         return ricevutaPrivatoTotali;
     }
 
+    @Transactional
     public RicevutaPrivatoTotale create(RicevutaPrivatoTotale ricevutaPrivatoTotale){
-        LOGGER.info("Creating 'ricevuta privato totale'");
+        log.info("Creating 'ricevuta privato totale'");
         ricevutaPrivatoTotale.setDataInserimento(Timestamp.from(ZonedDateTime.now().toInstant()));
 
         RicevutaPrivatoTotale createdRicevutaPrivatoTotale = ricevutaPrivatoTotaleRepository.save(ricevutaPrivatoTotale);
-        LOGGER.info("Created 'ricevuta privato totale' '{}'", createdRicevutaPrivatoTotale);
+        log.info("Created 'ricevuta privato totale' '{}'", createdRicevutaPrivatoTotale);
         return createdRicevutaPrivatoTotale;
     }
 
-    public RicevutaPrivatoTotale update(RicevutaPrivatoTotale ricevutaPrivatoTotale){
-        LOGGER.info("Updating 'ricevuta privato totale'");
-        RicevutaPrivatoTotale ricevutaPrivatoTotaleCurrent = ricevutaPrivatoTotaleRepository.findById(ricevutaPrivatoTotale.getId()).orElseThrow(ResourceNotFoundException::new);
-        ricevutaPrivatoTotale.setDataInserimento(ricevutaPrivatoTotaleCurrent.getDataInserimento());
-        ricevutaPrivatoTotale.setDataAggiornamento(Timestamp.from(ZonedDateTime.now().toInstant()));
-
-        RicevutaPrivatoTotale updatedRicevutaPrivatoTotale = ricevutaPrivatoTotaleRepository.save(ricevutaPrivatoTotale);
-        LOGGER.info("Updated 'ricevuta privato totale' '{}'", updatedRicevutaPrivatoTotale);
-        return updatedRicevutaPrivatoTotale;
-    }
-
+    @Transactional
     public void deleteByRicevutaPrivatoId(Long ricevutaPrivatoId){
-        LOGGER.info("Deleting 'ricevuta privato totali' by 'ricevuta privato' '{}'", ricevutaPrivatoId);
+        log.info("Deleting 'ricevuta privato totali' by 'ricevuta privato' '{}'", ricevutaPrivatoId);
         ricevutaPrivatoTotaleRepository.deleteByRicevutaPrivatoId(ricevutaPrivatoId);
-        LOGGER.info("Deleted 'ricevuta privato totali' by 'ricevuta privato' '{}'", ricevutaPrivatoId);
+        log.info("Deleted 'ricevuta privato totali' by 'ricevuta privato' '{}'", ricevutaPrivatoId);
     }
 
 }

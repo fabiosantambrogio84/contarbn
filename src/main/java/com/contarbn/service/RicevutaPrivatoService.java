@@ -6,6 +6,7 @@ import com.contarbn.model.*;
 import com.contarbn.repository.PagamentoRepository;
 import com.contarbn.repository.RicevutaPrivatoRepository;
 import com.contarbn.util.Utils;
+import com.contarbn.util.enumeration.Operation;
 import com.contarbn.util.enumeration.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -113,7 +114,7 @@ public class RicevutaPrivatoService {
                 ricevutaPrivatoArticoloService.create(faa);
 
                 // compute 'giacenza articolo'
-                giacenzaArticoloService.computeGiacenza(faa.getId().getArticoloId(), faa.getLotto(), faa.getScadenza(), faa.getQuantita(), Resource.RICEVUTA_PRIVATO);
+                giacenzaArticoloService.computeGiacenza(faa.getId().getArticoloId(), faa.getLotto(), faa.getScadenza());
             } else {
                 log.info("RicevutaPrivatoArticolo not saved because quantity null or zero ({}) or prezzo zero ({})", faa.getQuantita(), faa.getPrezzo());
             }
@@ -183,7 +184,7 @@ public class RicevutaPrivatoService {
 
                 if(modificaGiacenze != null && modificaGiacenze.equals(Boolean.TRUE)) {
                     // compute 'giacenza articolo'
-                    giacenzaArticoloService.computeGiacenza(faa.getId().getArticoloId(), faa.getLotto(), faa.getScadenza(), faa.getQuantita(), Resource.RICEVUTA_PRIVATO);
+                    giacenzaArticoloService.computeGiacenza(faa.getId().getArticoloId(), faa.getLotto(), faa.getScadenza());
                 }
 
             } else {
@@ -237,6 +238,8 @@ public class RicevutaPrivatoService {
     public void delete(Long ricevutaPrivatoId){
         log.info("Deleting 'ricevuta privato' '{}'", ricevutaPrivatoId);
 
+        RicevutaPrivato ricevutaPrivato = getOne(ricevutaPrivatoId);
+
         Set<RicevutaPrivatoArticolo> ricevutaPrivatoArticoli = ricevutaPrivatoArticoloService.findByRicevutaPrivatoId(ricevutaPrivatoId);
 
         pagamentoRepository.deleteByRicevutaPrivatoId(ricevutaPrivatoId);
@@ -245,8 +248,10 @@ public class RicevutaPrivatoService {
         ricevutaPrivatoRepository.deleteById(ricevutaPrivatoId);
 
         for (RicevutaPrivatoArticolo ricevutaPrivatoArticolo:ricevutaPrivatoArticoli) {
-            // compute 'giacenza articolo'
-            giacenzaArticoloService.computeGiacenza(ricevutaPrivatoArticolo.getId().getArticoloId(), ricevutaPrivatoArticolo.getLotto(), ricevutaPrivatoArticolo.getScadenza(), ricevutaPrivatoArticolo.getQuantita(), Resource.RICEVUTA_PRIVATO);
+
+            giacenzaArticoloService.createMovimentazioneManualeArticolo(ricevutaPrivatoArticolo.getId().getArticoloId(), ricevutaPrivatoArticolo.getLotto(), ricevutaPrivatoArticolo.getScadenza(), ricevutaPrivatoArticolo.getNumeroPezzi(), ricevutaPrivatoArticolo.getQuantita(), Operation.DELETE, Resource.RICEVUTA_PRIVATO, ricevutaPrivato.getId(), String.valueOf(ricevutaPrivato.getProgressivo()), ricevutaPrivato.getAnno(), null);
+
+            giacenzaArticoloService.computeGiacenza(ricevutaPrivatoArticolo.getId().getArticoloId(), ricevutaPrivatoArticolo.getLotto(), ricevutaPrivatoArticolo.getScadenza());
         }
 
         log.info("Deleted 'ricevuta privato' '{}'", ricevutaPrivatoId);

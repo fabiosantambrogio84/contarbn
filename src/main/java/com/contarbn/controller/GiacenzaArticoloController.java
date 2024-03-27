@@ -84,4 +84,12 @@ public class GiacenzaArticoloController {
         log.info("Performing BULK DELETE operation on 'giacenze articoli' by 'idArticolo' (number of elements to delete: {})", idArticoli.size());
         giacenzaArticoloService.bulkDelete(idArticoli);
     }
+
+    @RequestMapping(method = POST, path = "/compute")
+    @ResponseStatus(NO_CONTENT)
+    @CrossOrigin
+    public void compute(@RequestBody final Long[] idsArticoli) {
+        log.info("Performing GET request for computing 'giacenze articolo'");
+        giacenzaArticoloService.computeGiacenzaBulk(idsArticoli);
+    }
 }

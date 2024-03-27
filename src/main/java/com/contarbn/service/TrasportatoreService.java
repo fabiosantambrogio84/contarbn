@@ -5,7 +5,7 @@ import com.contarbn.model.Trasportatore;
 import com.contarbn.model.views.VDocumentoLast;
 import com.contarbn.repository.TrasportatoreRepository;
 import com.contarbn.repository.views.VDocumentoLastRepository;
-import com.contarbn.util.enumeration.Documento;
+import com.contarbn.util.enumeration.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -26,7 +26,7 @@ public class TrasportatoreService {
         log.info("Retrieving the list of 'trasportatori'");
         Set<Trasportatore> trasportatori = trasportatoreRepository.findAll();
         if(!trasportatori.isEmpty()){
-            Optional<VDocumentoLast> vDocumentoLast = vDocumentoLastRepository.find(StringUtils.isNotEmpty(context) ? context : Documento.DDT.getName());
+            Optional<VDocumentoLast> vDocumentoLast = vDocumentoLastRepository.find(StringUtils.isNotEmpty(context) ? context : Resource.DDT.getParam());
             for(Trasportatore trasportatore : trasportatori){
                 if(vDocumentoLast.isPresent()){
                     if(trasportatore.getId().equals(vDocumentoLast.get().getIdTrasportatore())){

@@ -8,6 +8,7 @@ import com.contarbn.model.beans.SortOrder;
 import com.contarbn.model.views.VGiacenzaArticolo;
 import com.contarbn.repository.GiacenzaArticoloRepository;
 import com.contarbn.repository.views.VGiacenzaArticoloRepository;
+import com.contarbn.util.enumeration.Operation;
 import com.contarbn.util.enumeration.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -66,16 +67,18 @@ public class GiacenzaArticoloService {
     public GiacenzaArticolo create(GiacenzaArticolo giacenzaArticolo){
         log.info("Creating 'giacenza articolo'");
 
-        // create movimentazione manuale articolo
         movimentazioneManualeArticoloService.create(giacenzaArticolo);
 
-        computeGiacenza(giacenzaArticolo.getArticolo().getId(), giacenzaArticolo.getLotto(), giacenzaArticolo.getScadenza(), giacenzaArticolo.getQuantita(), Resource.MOVIMENTAZIONE_MANUALE_ARTICOLO);
-
-        //giacenzaArticolo.setDataInserimento(Timestamp.from(ZonedDateTime.now().toInstant()));
-        //GiacenzaArticolo createdGiacenzaArticolo = giacenzaArticoloRepository.save(giacenzaArticolo);
+        computeGiacenza(giacenzaArticolo.getArticolo().getId(), giacenzaArticolo.getLotto(), giacenzaArticolo.getScadenza());
 
         log.info("Created 'giacenza articolo' '{}'", giacenzaArticolo);
         return giacenzaArticolo;
+    }
+
+    @Transactional
+    public void createMovimentazioneManualeArticolo(Long idArticolo, String lotto, Date scadenza, Integer pezzi, Float quantita, Operation operation, Resource resource, Long idDocumento, String numDocumento, Integer annoDocumento, String fornitoreDocumento){
+
+        movimentazioneManualeArticoloService.create(idArticolo, lotto, scadenza, pezzi, quantita, operation, resource, idDocumento, numDocumento, annoDocumento, fornitoreDocumento);
     }
 
     @Transactional
@@ -115,7 +118,7 @@ public class GiacenzaArticoloService {
         List<Movimentazione> movimentazioni = new ArrayList<>();
         Set<Movimentazione> movimentazioniArticolo = new HashSet<>();
         if(giacenzeArticoli != null && !giacenzeArticoli.isEmpty()){
-            giacenzeArticoli.forEach(ga -> movimentazioniArticolo.addAll(movimentazioneService.getMovimentazioniArticolo(ga)));
+            giacenzeArticoli.forEach(ga -> movimentazioniArticolo.addAll(movimentazioneService.getMovimentazioniArticolo(ga.getArticolo().getId(), ga.getLotto(), ga.getScadenza())));
         }
         if(!movimentazioniArticolo.isEmpty()){
             movimentazioni = new ArrayList<>(movimentazioniArticolo);
@@ -123,6 +126,8 @@ public class GiacenzaArticoloService {
         }
 
         result.put("articolo", giacenzaArticolo.getArticolo());
+        result.put("unitaMisura", giacenzaArticolo.getUnitaMisura());
+        result.put("pezzi", giacenzaArticolo.getPezzi());
         result.put("quantita", giacenzaArticolo.getQuantita());
         result.put("movimentazioni", movimentazioni);
 
@@ -130,9 +135,8 @@ public class GiacenzaArticoloService {
         return result;
     }
 
-    public void computeGiacenza(Long idArticolo, String lotto, Date scadenza, Float quantita, Resource resource){
-        log.info("Compute 'giacenza articolo' for idArticolo '{}', lotto '{}',scadenza '{}',quantita '{}'",
-                idArticolo, lotto, scadenza, quantita);
+    public void computeGiacenza(Long idArticolo, String lotto, Date scadenza){
+        log.info("Compute 'giacenza articolo' for idArticolo '{}', lotto '{}',scadenza '{}'", idArticolo, lotto, scadenza);
 
         log.info("Retrieving 'giacenza articolo' of articolo '{}' and lotto '{}'", idArticolo, lotto);
         Optional<GiacenzaArticolo> giacenzaOptional = Optional.empty();
@@ -145,79 +149,86 @@ public class GiacenzaArticoloService {
                 giacenzaOptional = giacenze.stream().findFirst();
             }
         }
+
+        Set<Movimentazione> movimentazioni = movimentazioneService.getMovimentazioniArticolo(idArticolo, lotto, scadenza);
+
+        Map<String, Object> quantitaAndPezzi = computeQuantitaAndPezzi(movimentazioni);
+        int pezzi = (Integer)quantitaAndPezzi.get("pezzi");
+        float quantita = (Float)quantitaAndPezzi.get("quantita");
+
+        Timestamp dataInserimento;
+
         if(giacenzaOptional.isPresent()){
             giacenzaArticolo = giacenzaOptional.get();
-            log.info("Retrieved 'giacenza articolo' {}", giacenzaArticolo);
+            log.info("Updating 'giacenza articolo' {}", giacenzaArticolo);
 
-            Set<Movimentazione> movimentazioni = movimentazioneService.getMovimentazioniArticolo(giacenzaArticolo);
-            Float quantitaInput;
-            Float quantitaOutput;
-            float newQuantita;
-
-            log.info("Computing input and output quantities");
-
-            if(movimentazioni != null && !movimentazioni.isEmpty()){
-                // 'movimentazioni' in input
-                quantitaInput = movimentazioni.stream().filter(m -> m.getInputOutput().equals("INPUT") && m.getQuantita() != null).map(Movimentazione::getQuantita).reduce(0f, Float::sum);
-
-                // 'movimentazioni' in output
-                quantitaOutput = movimentazioni.stream().filter(m -> m.getInputOutput().equals("OUTPUT") && m.getQuantita() != null).map(Movimentazione::getQuantita).reduce(0f, Float::sum);
-
-                quantita = (quantita != null ? quantita : 0f);
-
-                switch(resource){
-                    case DDT:
-                        quantitaOutput = quantitaOutput + quantita;
-                        break;
-                    case DDT_ACQUISTO:
-                        quantitaInput = quantitaInput + quantita;
-                        break;
-                    case FATTURA_ACCOMPAGNATORIA:
-                        quantitaOutput = quantitaOutput + quantita;
-                        break;
-                    case PRODUZIONE:
-                        quantitaInput = quantitaInput + quantita;
-                        break;
-                    case RICEVUTA_PRIVATO:
-                        quantitaOutput = quantitaOutput + quantita;
-                        break;
-                    default:
-                        break;
-                }
-                newQuantita = quantitaInput - quantitaOutput;
-            } else {
-                newQuantita = (quantita != null ? quantita : 0f);
-            }
-            giacenzaArticolo.setQuantita(newQuantita);
-            Articolo articolo = new Articolo();
-            articolo.setId(idArticolo);
-            giacenzaArticolo.setArticolo(articolo);
-
-            giacenzaArticolo = giacenzaArticoloRepository.save(giacenzaArticolo);
-            log.info("Updated 'giacenza articolo' {}", giacenzaArticolo);
+            dataInserimento = giacenzaArticolo.getDataInserimento();
 
         } else {
             log.info("Creating a new 'giacenza articolo'");
-            float newQuantita = 0f;
-            if(quantita != null){
-                newQuantita = quantita;
-            }
-            if(resource.equals(Resource.DDT) || resource.equals(Resource.FATTURA_ACCOMPAGNATORIA)){
-                newQuantita = newQuantita * -1;
-            }
 
             giacenzaArticolo = new GiacenzaArticolo();
-            Articolo articolo = new Articolo();
-            articolo.setId(idArticolo);
-            giacenzaArticolo.setArticolo(articolo);
-            giacenzaArticolo.setLotto(lotto);
-            giacenzaArticolo.setScadenza(scadenza);
-            giacenzaArticolo.setQuantita(newQuantita);
-            giacenzaArticolo.setDataInserimento(Timestamp.from(ZonedDateTime.now().toInstant()));
-            giacenzaArticolo = giacenzaArticoloRepository.save(giacenzaArticolo);
-            log.info("Created a new 'giacenza articolo' {}", giacenzaArticolo);
+
+            dataInserimento = Timestamp.from(ZonedDateTime.now().toInstant());
+        }
+        Articolo articolo = new Articolo();
+        articolo.setId(idArticolo);
+        giacenzaArticolo.setArticolo(articolo);
+        giacenzaArticolo.setLotto(lotto);
+        giacenzaArticolo.setScadenza(scadenza);
+        giacenzaArticolo.setQuantita(quantita);
+        giacenzaArticolo.setPezzi(pezzi);
+        giacenzaArticolo.setDataInserimento(dataInserimento);
+        giacenzaArticolo.setDataAggiornamento(Timestamp.from(ZonedDateTime.now().toInstant()));
+        giacenzaArticoloRepository.save(giacenzaArticolo);
+    }
+
+    public void computeGiacenzaBulk(Long[] idsArticoli){
+        Set<GiacenzaArticolo> giacenzeArticoli;
+        if(idsArticoli != null){
+            giacenzeArticoli = giacenzaArticoloRepository.findByArticoloIdIn(Arrays.asList(idsArticoli));
+        } else {
+            giacenzeArticoli = giacenzaArticoloRepository.findAll();
         }
 
+        for(GiacenzaArticolo giacenzaArticolo : giacenzeArticoli){
+            computeGiacenza(giacenzaArticolo.getArticolo().getId(), giacenzaArticolo.getLotto(), giacenzaArticolo.getScadenza());
+        }
+    }
+
+    private Map<String, Object> computeQuantitaAndPezzi(Set<Movimentazione> movimentazioni){
+        Map<String, Object> result = new HashMap<>();
+
+        Integer pezziInput;
+        Integer pezziOutput;
+        int newPezzi;
+
+        Float quantitaInput;
+        Float quantitaOutput;
+        float newQuantita;
+
+        log.info("Computing input and output quantities");
+
+        if(movimentazioni != null && !movimentazioni.isEmpty()){
+
+            quantitaInput = movimentazioni.stream().filter(m -> m.getInputOutput().equals("INPUT") && m.getQuantita() != null).map(Movimentazione::getQuantita).reduce(0f, Float::sum);
+            quantitaOutput = movimentazioni.stream().filter(m -> m.getInputOutput().equals("OUTPUT") && m.getQuantita() != null).map(Movimentazione::getQuantita).reduce(0f, Float::sum);
+
+            newQuantita = quantitaInput - quantitaOutput;
+
+            pezziInput = movimentazioni.stream().filter(m -> m.getInputOutput().equals("INPUT") && m.getPezzi() != null).map(Movimentazione::getPezzi).reduce(0, Integer::sum);
+            pezziOutput = movimentazioni.stream().filter(m -> m.getInputOutput().equals("OUTPUT") && m.getPezzi() != null).map(Movimentazione::getPezzi).reduce(0, Integer::sum);
+
+            newPezzi = pezziInput - pezziOutput;
+
+        } else {
+            newQuantita = 0f;
+            newPezzi = 0;
+        }
+
+        result.put("pezzi", newPezzi);
+        result.put("quantita", newQuantita);
+        return result;
     }
 
     private void setScaduto(GiacenzaArticolo giacenzaArticolo){

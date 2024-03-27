@@ -92,7 +92,7 @@ public class FatturaAccompagnatoriaAcquistoService {
                 fatturaAccompagnatoriaAcquistoArticoloService.create(faa);
 
                 // compute 'giacenza articolo'
-                giacenzaArticoloService.computeGiacenza(faa.getId().getArticoloId(), faa.getLotto(), faa.getScadenza(), faa.getQuantita(), Resource.FATTURA_ACCOMPAGNATORIA_ACQUISTO);
+                giacenzaArticoloService.computeGiacenza(faa.getId().getArticoloId(), faa.getLotto(), faa.getScadenza());
             } else {
                 log.info("FatturaAccompagnatoriaAcquistoArticolo not saved because quantity null or zero ({}) or prezzo zero ({})", faa.getQuantita(), faa.getPrezzo());
             }
@@ -171,7 +171,7 @@ public class FatturaAccompagnatoriaAcquistoService {
 
         for (FatturaAccompagnatoriaAcquistoArticolo fatturaAccompagnatoriaAcquistoArticolo:fatturaAccompagnatoriaAcquistoArticoli) {
             // compute 'giacenza articolo'
-            giacenzaArticoloService.computeGiacenza(fatturaAccompagnatoriaAcquistoArticolo.getId().getArticoloId(), fatturaAccompagnatoriaAcquistoArticolo.getLotto(), fatturaAccompagnatoriaAcquistoArticolo.getScadenza(), fatturaAccompagnatoriaAcquistoArticolo.getQuantita(), Resource.FATTURA_ACCOMPAGNATORIA_ACQUISTO);
+            giacenzaArticoloService.computeGiacenza(fatturaAccompagnatoriaAcquistoArticolo.getId().getArticoloId(), fatturaAccompagnatoriaAcquistoArticolo.getLotto(), fatturaAccompagnatoriaAcquistoArticolo.getScadenza());
         }
         for (FatturaAccompagnatoriaAcquistoIngrediente fatturaAccompagnatoriaAcquistoIngrediente:fatturaAccompagnatoriaAcquistoIngredienti) {
             // compute 'giacenza ingrediente'

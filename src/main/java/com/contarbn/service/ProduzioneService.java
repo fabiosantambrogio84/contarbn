@@ -13,6 +13,7 @@ import com.contarbn.util.BarcodeUtils;
 import com.contarbn.util.Constants;
 import com.contarbn.util.LottoUtils;
 import com.contarbn.util.Utils;
+import com.contarbn.util.enumeration.Operation;
 import com.contarbn.util.enumeration.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -159,7 +160,7 @@ public class ProduzioneService {
                 giacenzaIngredienteService.computeGiacenza(id, createdLotto, scadenzaProduzione, quantita, Resource.PRODUZIONE_SCORTA);
             } else {
                 // compute 'giacenza articolo'
-                giacenzaArticoloService.computeGiacenza(id, createdLotto, scadenzaProduzione, quantita, Resource.PRODUZIONE);
+                giacenzaArticoloService.computeGiacenza(id, createdLotto, scadenzaProduzione);
             }
 
         });
@@ -248,11 +249,21 @@ public class ProduzioneService {
     @Transactional
     public void delete(Long produzioneId){
         log.info("Deleting 'produzione' '{}'", produzioneId);
+
         Produzione produzione = produzioneRepository.findById(produzioneId).orElseThrow(ResourceNotFoundException::new);
         String tipologia = produzione.getTipologia();
 
         Set<ProduzioneConfezione> produzioneConfezioni = produzioneConfezioneService.findByProduzioneId(produzioneId);
+        Set<ProduzioneIngrediente> produzioneIngredienti = produzioneIngredienteService.findByProduzioneId(produzioneId);
+
+        produzioneIngredienteService.deleteByProduzioneId(produzioneId);
+        produzioneConfezioneService.deleteByProduzioneId(produzioneId);
+        produzioneRepository.deleteById(produzioneId);
+
         if(produzioneConfezioni != null && !produzioneConfezioni.isEmpty()){
+
+            Fornitore defaultFornitore = fornitoreService.getByRagioneSociale(Constants.DEFAULT_FORNITORE);
+
             for(ProduzioneConfezione produzioneConfezione : produzioneConfezioni){
                 Ricetta ricetta = ricettaRepository.findById(produzione.getRicetta().getId()).orElse(null);
                 Confezione confezione = confezioneService.getOne(produzioneConfezione.getId().getConfezioneId());
@@ -270,33 +281,27 @@ public class ProduzioneService {
                             quantita = quantitaBd.floatValue() * produzioneConfezione.getNumConfezioniProdotte();
                         }
 
-                        // compute 'giacenza ingrediente'
                         giacenzaIngredienteService.computeGiacenza(ingrediente.getId(), produzioneConfezione.getLotto(), produzione.getScadenza(), (quantita *-1 ), Resource.PRODUZIONE_SCORTA);
                     }
 
                 } else {
-                    String codiceArticolo = createCodiceArticolo(ricetta, confezione);
-                    Optional<Articolo> optionalArticolo = articoloService.getByCodice(codiceArticolo);
-                    if(optionalArticolo.isPresent()){
-                        Articolo articolo = optionalArticolo.get();
+                    Articolo articolo = produzioneConfezione.getArticolo();
+                    if(articolo != null){
 
-                        // compute 'giacenza articolo'
-                        giacenzaArticoloService.computeGiacenza(articolo.getId(), produzioneConfezione.getLotto(), produzione.getScadenza(), (produzioneConfezione.getNumConfezioniProdotte() != null ? (produzioneConfezione.getNumConfezioniProdotte()*-1) : 0f), Resource.PRODUZIONE);
+                        giacenzaArticoloService.createMovimentazioneManualeArticolo(articolo.getId(), produzioneConfezione.getLotto(), produzione.getScadenza(), produzioneConfezione.getNumConfezioniProdotte(), produzione.getQuantitaTotale(), Operation.DELETE, Resource.PRODUZIONE, produzione.getId(), String.valueOf(produzione.getCodice()), null, (defaultFornitore != null ? defaultFornitore.getRagioneSociale() : null));
+
+                        giacenzaArticoloService.computeGiacenza(articolo.getId(), produzioneConfezione.getLotto(), produzione.getScadenza());
                     }
                 }
             }
         }
 
-        Set<ProduzioneIngrediente> produzioneIngredienti = produzioneIngredienteService.findByProduzioneId(produzioneId);
-
-        for(ProduzioneIngrediente produzioneIngrediente : produzioneIngredienti){
-            // compute 'giacenza ingrediente'
-            giacenzaIngredienteService.computeGiacenza(produzioneIngrediente.getId().getIngredienteId(), produzioneIngrediente.getLotto(), produzioneIngrediente.getScadenza(), produzioneIngrediente.getQuantita()*-1, Resource.PRODUZIONE_INGREDIENTE);
+        if(produzioneIngredienti != null && !produzioneIngredienti.isEmpty()){
+            for(ProduzioneIngrediente produzioneIngrediente : produzioneIngredienti){
+                giacenzaIngredienteService.computeGiacenza(produzioneIngrediente.getId().getIngredienteId(), produzioneIngrediente.getLotto(), produzioneIngrediente.getScadenza(), produzioneIngrediente.getQuantita()*-1, Resource.PRODUZIONE_INGREDIENTE);
+            }
         }
 
-        produzioneIngredienteService.deleteByProduzioneId(produzioneId);
-        produzioneConfezioneService.deleteByProduzioneId(produzioneId);
-        produzioneRepository.deleteById(produzioneId);
         log.info("Deleted 'produzione' '{}'", produzioneId);
     }
 
@@ -346,6 +351,7 @@ public class ProduzioneService {
             articolo.setFornitore(fornitore);
             articolo.setData(dataProduzione);
             articolo.setQuantitaPredefinita(1f);
+            articolo.setUnitaMisura(unitaMisuraService.getByNome("pz"));
             articolo.setSitoWeb(Boolean.FALSE);
             articolo.setAttivo(Boolean.TRUE);
             articolo = articoloService.create(articolo);
