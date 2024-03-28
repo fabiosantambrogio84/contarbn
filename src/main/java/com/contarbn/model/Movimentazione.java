@@ -3,6 +3,7 @@ package com.contarbn.model;
 import lombok.Data;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 @Data
 public class Movimentazione {
@@ -19,6 +20,8 @@ public class Movimentazione {
 
     private String descrizione;
 
+    private Timestamp dataInserimento;
+
     @Override
     public String toString() {
 
@@ -29,6 +32,7 @@ public class Movimentazione {
                 ", pezzi: " + pezzi +
                 ", quantita: " + quantita +
                 ", descrizione: " + descrizione +
+                ", dataAggiornamento: " + dataInserimento +
                 "}";
 
     }

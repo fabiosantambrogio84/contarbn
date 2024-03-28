@@ -37,6 +37,7 @@ public class MovimentazioneManualeArticoloService {
         movimentazioneManualeArticolo.setPezzi(giacenzaArticolo.getPezzi());
         movimentazioneManualeArticolo.setQuantita(giacenzaArticolo.getQuantita());
         movimentazioneManualeArticolo.setOperation(Operation.CREATE.name());
+        movimentazioneManualeArticolo.setCompute(Boolean.TRUE);
         movimentazioneManualeArticolo.setDataInserimento(Timestamp.from(ZonedDateTime.now().toInstant()));
         movimentazioneManualeArticolo.setDataAggiornamento(Timestamp.from(ZonedDateTime.now().toInstant()));
 
@@ -59,6 +60,11 @@ public class MovimentazioneManualeArticoloService {
         movimentazioneManualeArticolo.setQuantita(quantita);
         movimentazioneManualeArticolo.setOperation(operation.name());
         movimentazioneManualeArticolo.setContext(resource.name());
+        if(Operation.CREATE.equals(operation)){
+            movimentazioneManualeArticolo.setCompute(Boolean.TRUE);
+        } else {
+            movimentazioneManualeArticolo.setCompute(Boolean.FALSE);
+        }
         movimentazioneManualeArticolo.setIdDocumento(idDocumento);
         movimentazioneManualeArticolo.setNumDocumento(numDocumento);
         movimentazioneManualeArticolo.setAnnoDocumento(annoDocumento);
@@ -84,7 +90,7 @@ public class MovimentazioneManualeArticoloService {
         if(movimentazioniManualiArticoli != null && !movimentazioniManualiArticoli.isEmpty()){
             if(scadenza != null){
                 movimentazioniManualiArticoli = movimentazioniManualiArticoli.stream()
-                        .filter(da -> (da.getScadenza() != null && da.getScadenza().toLocalDate().compareTo(scadenza.toLocalDate())==0)).collect(Collectors.toSet());
+                        .filter(da -> (da.getScadenza() != null && da.getScadenza().toLocalDate().compareTo(scadenza.toLocalDate())==0 && da.getCompute())).collect(Collectors.toSet());
             }
         }
         log.info("Retrieved '{}' 'movimentazioni manuali articoli'", movimentazioniManualiArticoli.size());

@@ -2,14 +2,15 @@ package com.contarbn.util.enumeration;
 
 import java.util.*;
 
-public enum CleanupAction {
+public enum OperationAction {
 
+    COMPUTE_GIACENZE_ARTICOLI("Ricalcola giacenze articoli"),
     DELETE_ORDINI_CLIENTI("Elimina ordini clienti evasi"),
     DELETE_ETICHETTE("Elimina etichette");
 
     private final String label;
 
-    CleanupAction(String label) {
+    OperationAction(String label) {
         this.label = label;
     }
 
@@ -19,7 +20,7 @@ public enum CleanupAction {
 
     public static List<Map<String, String>> getActions(){
         List<Map<String, String>> actions = new ArrayList<>();
-        Arrays.stream(CleanupAction.values()).forEach(ca -> {
+        Arrays.stream(OperationAction.values()).forEach(ca -> {
             Map<String, String> action = new HashMap<>();
             action.put("action", ca.name());
             action.put("label", ca.getLabel());

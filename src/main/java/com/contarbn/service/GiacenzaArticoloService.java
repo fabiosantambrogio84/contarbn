@@ -123,6 +123,7 @@ public class GiacenzaArticoloService {
         if(!movimentazioniArticolo.isEmpty()){
             movimentazioni = new ArrayList<>(movimentazioniArticolo);
             movimentazioni.sort(Comparator.comparing(Movimentazione::getData).reversed());
+            movimentazioni.sort(Comparator.comparing(Movimentazione::getDataInserimento).reversed());
         }
 
         result.put("articolo", giacenzaArticolo.getArticolo());
@@ -183,10 +184,20 @@ public class GiacenzaArticoloService {
         giacenzaArticoloRepository.save(giacenzaArticolo);
     }
 
-    public void computeGiacenzaBulk(Long[] idsArticoli){
+    public void computeGiacenzaBulk(Integer idArticoloFrom, Integer idArticoloTo){
+        Long idArticoloDa = idArticoloFrom != null ? idArticoloFrom.longValue() : -1;
+        Long idArticoloA = idArticoloTo != null ? idArticoloTo.longValue() : Long.MAX_VALUE;
+        List<GiacenzaArticolo> giacenzeArticoli = giacenzaArticoloRepository.findByArticoloIdFromAndArticoloIdTo(idArticoloDa, idArticoloA);
+
+        for(GiacenzaArticolo giacenzaArticolo : giacenzeArticoli){
+            computeGiacenza(giacenzaArticolo.getArticolo().getId(), giacenzaArticolo.getLotto(), giacenzaArticolo.getScadenza());
+        }
+    }
+
+    public void computeGiacenzaBulk(List<Long> idArticoli){
         Set<GiacenzaArticolo> giacenzeArticoli;
-        if(idsArticoli != null){
-            giacenzeArticoli = giacenzaArticoloRepository.findByArticoloIdIn(Arrays.asList(idsArticoli));
+        if(idArticoli != null && !idArticoli.isEmpty()){
+            giacenzeArticoli = giacenzaArticoloRepository.findByArticoloIdIn(idArticoli);
         } else {
             giacenzeArticoli = giacenzaArticoloRepository.findAll();
         }

@@ -5,7 +5,7 @@
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <Pattern>
-                %black(%d{ISO8601}) %highlight(%-5level) [%blue(%t)] %yellow(%C{1.}): %msg%n%throwable
+                %d{ISO8601} %highlight(%-5level) [%blue(%t)] %yellow(%C{1.}): %msg%n%throwable
             </Pattern>
         </encoder>
     </appender>
@@ -31,6 +31,11 @@
     </root>
 
     <logger name="com.contarbn.startup" additivity="false" level="info">
+        <appender-ref ref="RollingFile" />
+        <appender-ref ref="Console" />
+    </logger>
+
+    <logger name="com.contarbn.service.ScheduleService" additivity="false" level="info">
         <appender-ref ref="RollingFile" />
         <appender-ref ref="Console" />
     </logger>

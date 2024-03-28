@@ -1,6 +1,7 @@
 package com.contarbn.repository;
 
 import com.contarbn.model.GiacenzaArticolo;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
@@ -16,6 +17,9 @@ public interface GiacenzaArticoloRepository extends CrudRepository<GiacenzaArtic
     Set<GiacenzaArticolo> findByArticoloId(Long idArticolo);
 
     Set<GiacenzaArticolo> findByArticoloIdIn(List<Long> idArticoli);
+
+    @Query(value = "SELECT * FROM giacenza_articolo WHERE id_articolo >= ?1 and id_articolo <=?2 ORDER by id_articolo, lotto", nativeQuery = true)
+    List<GiacenzaArticolo> findByArticoloIdFromAndArticoloIdTo(Long idArticoloFrom, Long idArticoloTo);
 
     void deleteByArticoloId(Long idArticolo);
 

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 
 import java.sql.Date;
 import java.time.LocalDate;
@@ -70,6 +71,24 @@ public class ScheduleService {
         List<Etichetta> etichette = etichettaService.getEtichetteToDelete(1);
         etichette.forEach(e -> etichettaService.delete(e.getUuid()));
         log.info("Executed remove of old Etichette");
+    }
+
+    @Scheduled(cron = "${job.compute-giacenze.cron}", zone = "Europe/Rome")
+    public void computeGiacenze() {
+        StopWatch watch = new StopWatch();
+        watch.start();
+
+        log.info("Executing compute Giacenze");
+        try{
+            giacenzaArticoloService.computeGiacenzaBulk(null);
+
+            watch.stop();
+            log.info("Executed compute Giacenze in {} sec", watch.getTotalTimeSeconds());
+        } catch(Exception e){
+            watch.stop();
+            log.error("Error", e);
+            log.error("Error executing compute Giacenze. {} sec", watch.getTotalTimeSeconds());
+        }
     }
 
     /*

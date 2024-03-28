@@ -235,6 +235,7 @@ public class MovimentazioneService {
         movimentazione.setPezzi(ddtAcquistoArticolo.getNumeroPezzi());
         movimentazione.setQuantita(ddtAcquistoArticolo.getQuantita());
         movimentazione.setDescrizione(createDescrizione(ddtAcquistoArticolo, lotto, scadenza, articolo));
+        movimentazione.setDataInserimento(ddtAcquistoArticolo.getDataInserimento());
 
         return movimentazione;
     }
@@ -249,6 +250,7 @@ public class MovimentazioneService {
         movimentazione.setPezzi(ddtArticolo.getNumeroPezzi());
         movimentazione.setQuantita(ddtArticolo.getQuantita());
         movimentazione.setDescrizione(createDescrizione(ddtArticolo, lotto, scadenza, articolo));
+        movimentazione.setDataInserimento(ddtArticolo.getDataInserimento());
 
         return movimentazione;
     }
@@ -263,6 +265,7 @@ public class MovimentazioneService {
         movimentazione.setPezzi(fatturaAccompagnatoriaArticolo.getNumeroPezzi());
         movimentazione.setQuantita(fatturaAccompagnatoriaArticolo.getQuantita());
         movimentazione.setDescrizione(createDescrizione(fatturaAccompagnatoriaArticolo, lotto, scadenza, articolo));
+        movimentazione.setDataInserimento(fatturaAccompagnatoriaArticolo.getDataInserimento());
 
         return movimentazione;
     }
@@ -277,6 +280,7 @@ public class MovimentazioneService {
         movimentazione.setPezzi(ricevutaPrivatoArticolo.getNumeroPezzi());
         movimentazione.setQuantita(ricevutaPrivatoArticolo.getQuantita());
         movimentazione.setDescrizione(createDescrizione(ricevutaPrivatoArticolo, lotto, scadenza, articolo));
+        movimentazione.setDataInserimento(ricevutaPrivatoArticolo.getDataInserimento());
 
         return movimentazione;
     }
@@ -297,6 +301,7 @@ public class MovimentazioneService {
         movimentazione.setPezzi(pezzi);
         movimentazione.setQuantita(quantita);
         movimentazione.setDescrizione(createDescrizione(produzione, lotto, scadenza, pezzi, quantita, produzioneConfezione.getArticolo()));
+        movimentazione.setDataInserimento(produzione.getDataInserimento());
 
         return movimentazione;
     }
@@ -323,6 +328,7 @@ public class MovimentazioneService {
         movimentazione.setQuantita(movimentazioneManualeArticolo.getQuantita());
         movimentazione.setPezzi(movimentazioneManualeArticolo.getPezzi());
         movimentazione.setDescrizione(createDescrizione(movimentazioneManualeArticolo, lotto, articolo));
+        movimentazione.setDataInserimento(movimentazioneManualeArticolo.getDataInserimento());
 
         return movimentazione;
     }
@@ -487,8 +493,32 @@ public class MovimentazioneService {
 
     private String createDescrizione(MovimentazioneManualeArticolo movimentazioneManualeArticolo, String lotto, Articolo articolo){
 
+        String acquistoVendita = "Inserito/i <b>";
+        String descrizione = " (Inserimento manuale)";
+
+        Operation operation = StringUtils.isNotEmpty(movimentazioneManualeArticolo.getOperation()) ? Operation.valueOf(movimentazioneManualeArticolo.getOperation()) : Operation.CREATE;
+
+        if(Operation.DELETE.equals(operation)){
+            if(StringUtils.isNotEmpty(movimentazioneManualeArticolo.getContext())){
+                acquistoVendita = "Reinserito/i <b>";
+
+                Resource resource = Resource.valueOf(movimentazioneManualeArticolo.getContext());
+                if(Resource.DDT.equals(resource)){
+                    descrizione = " (Rimozione DDT n. "+movimentazioneManualeArticolo.getNumDocumento()+"/"+movimentazioneManualeArticolo.getAnnoDocumento()+")";
+                } else if(Resource.FATTURA_ACCOMPAGNATORIA.equals(resource)){
+                    descrizione = " (Rimozione Fattura accompagnatoria n. "+movimentazioneManualeArticolo.getNumDocumento()+"/"+movimentazioneManualeArticolo.getAnnoDocumento()+")";
+                } else if(Resource.RICEVUTA_PRIVATO.equals(resource)){
+                    descrizione = " (Rimozione Ricevuta privato n. "+movimentazioneManualeArticolo.getNumDocumento()+"/"+movimentazioneManualeArticolo.getAnnoDocumento()+")";
+                } else if(Resource.DDT_ACQUISTO.equals(resource)){
+                    descrizione = " (Rimozione DDT acquisto n. "+movimentazioneManualeArticolo.getNumDocumento()+" da "+movimentazioneManualeArticolo.getFornitoreDocumento()+")";
+                } else if(Resource.PRODUZIONE.equals(resource)) {
+                    descrizione = " (Rimozione Produzione n. "+movimentazioneManualeArticolo.getNumDocumento()+" da "+movimentazioneManualeArticolo.getFornitoreDocumento()+")";
+                }
+            }
+        }
+
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(createDescrizioneQuantita(articolo, "Inserito/i <b>", movimentazioneManualeArticolo.getPezzi(), movimentazioneManualeArticolo.getQuantita()));
+        stringBuilder.append(createDescrizioneQuantita(articolo, acquistoVendita, movimentazioneManualeArticolo.getPezzi(), movimentazioneManualeArticolo.getQuantita()));
         stringBuilder.append(" il ").append(simpleDateFormat.format(new Date(movimentazioneManualeArticolo.getDataInserimento().getTime())));
         stringBuilder.append(" lotto <b>").append(lotto).append("</b>");
         stringBuilder.append(" scadenza <b>");
@@ -498,7 +528,7 @@ public class MovimentazioneService {
             stringBuilder.append("ND");
         }
         stringBuilder.append("</b>");
-        stringBuilder.append(" (Inserimento manuale)");
+        stringBuilder.append(descrizione);
 
         return stringBuilder.toString();
     }

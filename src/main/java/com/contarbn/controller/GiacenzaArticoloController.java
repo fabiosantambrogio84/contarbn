@@ -85,11 +85,17 @@ public class GiacenzaArticoloController {
         giacenzaArticoloService.bulkDelete(idArticoli);
     }
 
-    @RequestMapping(method = POST, path = "/compute")
+    @RequestMapping(method = POST, path = "/operations/compute")
     @ResponseStatus(NO_CONTENT)
     @CrossOrigin
-    public void compute(@RequestBody final Long[] idsArticoli) {
+    public void compute(@RequestParam(name = "idArticoloFrom", required = false) Integer idArticoloFrom,
+                        @RequestParam(name = "idArticoloTo", required = false) Integer idArticoloTo,
+                        @RequestBody final List<Long> idArticoli) {
         log.info("Performing GET request for computing 'giacenze articolo'");
-        giacenzaArticoloService.computeGiacenzaBulk(idsArticoli);
+        if(idArticoli != null && !idArticoli.isEmpty()){
+            giacenzaArticoloService.computeGiacenzaBulk(idArticoli);
+        } else {
+            giacenzaArticoloService.computeGiacenzaBulk(idArticoloFrom, idArticoloTo);
+        }
     }
 }

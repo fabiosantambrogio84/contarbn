@@ -40,6 +40,9 @@ public class MovimentazioneManualeArticolo {
     @Column(name = "context")
     private String context;
 
+    @Column(name = "compute")
+    private Boolean compute;
+
     @Column(name = "id_documento")
     private Long idDocumento;
 

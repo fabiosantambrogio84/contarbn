@@ -2,6 +2,7 @@ package com.contarbn.service;
 
 import com.contarbn.model.Etichetta;
 import com.contarbn.model.OrdineCliente;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -9,17 +10,12 @@ import java.util.List;
 import java.util.Set;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class CleanupService {
 
     private final OrdineClienteService ordineClienteService;
     private final EtichettaService etichettaService;
-
-    public CleanupService(final OrdineClienteService ordineClienteService,
-                          final EtichettaService etichettaService){
-        this.ordineClienteService = ordineClienteService;
-        this.etichettaService = etichettaService;
-    }
 
     public void deleteEvasiAndExpiredOrdiniClienti(Integer days){
         log.info("Deleting expired and evasi Ordini Clienti");
