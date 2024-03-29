@@ -24,55 +24,6 @@ public class ScheduleService {
     private final GiacenzaIngredienteService giacenzaIngredienteService;
     private final EtichettaService etichettaService;
 
-    @Scheduled(cron = "0 30 13 * * ?", zone = "Europe/Rome")
-    public void deleteExpiredSconti() {
-        log.info("Executing remove of expired Sconti");
-        Date now = new Date(System.currentTimeMillis());
-        List<Long> expiredSconti = scontoService.getAll().stream().filter(s -> (s.getDataAl() != null && s.getDataAl().before(now))).map(Sconto::getId).collect(Collectors.toList());
-        expiredSconti.forEach(scontoService::delete);
-        log.info("Executed remove of expired Sconti");
-    }
-
-    @Scheduled(cron = "0 15 13 * * ?", zone = "Europe/Rome")
-    public void deleteEvasiAndExpiredOrdiniClienti(){
-        log.info("Executing remove of expired and evasi Ordini Clienti");
-        Set<OrdineCliente> expiredAndEvasiOrdiniClienti = ordineClienteService.getOrdiniClientiEvasiAndExpired(1);
-        expiredAndEvasiOrdiniClienti.forEach(oc -> ordineClienteService.delete(oc.getId()));
-        log.info("Executed remove of expired and evasi Ordini Clienti");
-    }
-
-    @Scheduled(cron = "0 0 13 * * ?", zone = "Europe/Rome")
-    public void deleteExpiredZeroGiacenze(){
-        log.info("Executing remove of expired and zero Giacenze");
-        LocalDate yesterday = LocalDate.now().minusDays(1);
-        log.info("Date to check: {}", yesterday);
-
-        Set<GiacenzaArticolo> giacenzeArticoli = giacenzaArticoloService.getAllNotAggregate();
-        if(giacenzeArticoli != null && !giacenzeArticoli.isEmpty()){
-            giacenzeArticoli.stream()
-                    .filter(g -> (g.getQuantita().equals(0f) && g.getScadenza() == null)||(g.getQuantita().equals(0f) && g.getScadenza() != null && g.getScadenza().toLocalDate().compareTo(yesterday)<0))
-                    .forEach(g -> giacenzaArticoloService.delete(g.getId()));
-        }
-        log.info("Deleted Giacenze Articoli");
-
-        Set<GiacenzaIngrediente> giacenzeIngredienti = giacenzaIngredienteService.getAllNotAggregate();
-        if(giacenzeIngredienti != null && !giacenzeIngredienti.isEmpty()){
-            giacenzeIngredienti.stream()
-                    .filter(g -> (g.getQuantita().equals(0f) && g.getScadenza() == null)||(g.getQuantita().equals(0f) && g.getScadenza() != null && g.getScadenza().toLocalDate().compareTo(yesterday)<0))
-                    .forEach(g -> giacenzaIngredienteService.delete(g.getId()));
-        }
-        log.info("Deleted Giacenze Ingredienti");
-        log.info("Executed remove of expired and zero Giacenze");
-    }
-
-    @Scheduled(cron = "0 0 9 * * ?", zone = "Europe/Rome")
-    public void deleteEtichette(){
-        log.info("Executing remove of old Etichette");
-        List<Etichetta> etichette = etichettaService.getEtichetteToDelete(1);
-        etichette.forEach(e -> etichettaService.delete(e.getUuid()));
-        log.info("Executed remove of old Etichette");
-    }
-
     @Scheduled(cron = "${job.compute-giacenze.cron}", zone = "Europe/Rome")
     public void computeGiacenze() {
         StopWatch watch = new StopWatch();
@@ -89,6 +40,82 @@ public class ScheduleService {
             log.error("Error", e);
             log.error("Error executing compute Giacenze. {} sec", watch.getTotalTimeSeconds());
         }
+    }
+
+    @Scheduled(cron = "${job.delete-etichette.cron}", zone = "Europe/Rome")
+    public void deleteEtichette(){
+        log.info("Executing remove of old Etichette");
+        List<Etichetta> etichette = etichettaService.getEtichetteToDelete(1);
+        etichette.forEach(e -> etichettaService.delete(e.getUuid()));
+        log.info("Executed remove of old Etichette");
+    }
+
+    @Scheduled(cron = "${job.delete-giacenze.cron}", zone = "Europe/Rome")
+    public void deleteGiacenzeExpiredZero(){
+        log.info("Executing remove of expired and zero Giacenze");
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+        log.info("Date to check: {}", yesterday);
+
+        Set<GiacenzaArticolo> giacenzeArticoli = giacenzaArticoloService.getAllNotAggregate();
+        if(giacenzeArticoli != null && !giacenzeArticoli.isEmpty()){
+            for(GiacenzaArticolo giacenzaArticolo : giacenzeArticoli){
+                Articolo articolo = giacenzaArticolo.getArticolo();
+                if(articolo != null){
+                    UnitaMisura unitaMisura = articolo.getUnitaMisura();
+                    if(unitaMisura != null){
+                        if("pz".equals(unitaMisura.getNome())){
+                            if (giacenzaArticolo.getPezzi() != null && giacenzaArticolo.getPezzi().equals(0f)) {
+                                if (giacenzaArticolo.getScadenza() != null) {
+                                    if (giacenzaArticolo.getScadenza().toLocalDate().compareTo(yesterday)<0) {
+                                        giacenzaArticoloService.delete(giacenzaArticolo.getId());
+                                    }
+                                } else {
+                                    giacenzaArticoloService.delete(giacenzaArticolo.getId());
+                                }
+                            }
+                        } else {
+                            if (giacenzaArticolo.getQuantita() != null && giacenzaArticolo.getQuantita().equals(0f)) {
+                                if (giacenzaArticolo.getScadenza() != null) {
+                                    if (giacenzaArticolo.getScadenza().toLocalDate().compareTo(yesterday)<0) {
+                                        giacenzaArticoloService.delete(giacenzaArticolo.getId());
+                                    }
+                                } else {
+                                    giacenzaArticoloService.delete(giacenzaArticolo.getId());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        log.info("Deleted Giacenze Articoli");
+
+        Set<GiacenzaIngrediente> giacenzeIngredienti = giacenzaIngredienteService.getAllNotAggregate();
+        if(giacenzeIngredienti != null && !giacenzeIngredienti.isEmpty()){
+            giacenzeIngredienti.stream()
+                    .filter(g -> (g.getQuantita().equals(0f) && g.getScadenza() == null)||(g.getQuantita().equals(0f) && g.getScadenza() != null && g.getScadenza().toLocalDate().compareTo(yesterday)<0))
+                    .forEach(g -> giacenzaIngredienteService.delete(g.getId()));
+        }
+        log.info("Deleted Giacenze Ingredienti");
+        log.info("Executed remove of expired and zero Giacenze");
+    }
+
+
+    @Scheduled(cron = "${job.delete-ordini-clienti.cron}", zone = "Europe/Rome")
+    public void deleteOrdiniClientiEvasiAndExpired(){
+        log.info("Executing remove of expired and evasi Ordini Clienti");
+        Set<OrdineCliente> expiredAndEvasiOrdiniClienti = ordineClienteService.getOrdiniClientiEvasiAndExpired(1);
+        expiredAndEvasiOrdiniClienti.forEach(oc -> ordineClienteService.delete(oc.getId()));
+        log.info("Executed remove of expired and evasi Ordini Clienti");
+    }
+
+    @Scheduled(cron = "${job.delete-sconti.cron}", zone = "Europe/Rome")
+    public void deleteScontiExpired() {
+        log.info("Executing remove of expired Sconti");
+        Date now = new Date(System.currentTimeMillis());
+        List<Long> expiredSconti = scontoService.getAll().stream().filter(s -> (s.getDataAl() != null && s.getDataAl().before(now))).map(Sconto::getId).collect(Collectors.toList());
+        expiredSconti.forEach(scontoService::delete);
+        log.info("Executed remove of expired Sconti");
     }
 
     /*
