@@ -65,13 +65,17 @@ public class RicevutaPrivatoArticoloService {
         return articoloService.getOne(articoloId);
     }
 
-    public Set<RicevutaPrivatoArticolo> getByArticoloIdAndLottoAndScadenza(Long idArticolo, String lotto, Date scadenza){
+    public Set<RicevutaPrivatoArticolo> getByArticoloIdAndLottoAndScadenza(Long idArticolo, String lotto, Date scadenza, Timestamp dataAggiornamento){
         log.info("Retrieving 'ricevuta privato articoli' by 'idArticolo' '{}', 'lotto' '{}' and 'scadenza' '{}'", idArticolo, lotto, scadenza);
         Set<RicevutaPrivatoArticolo> ricevutaPrivatoArticoli = ricevutaPrivatoArticoloRepository.findByArticoloIdAndLotto(idArticolo, lotto);
         if(ricevutaPrivatoArticoli != null && !ricevutaPrivatoArticoli.isEmpty()){
             if(scadenza != null){
                 ricevutaPrivatoArticoli = ricevutaPrivatoArticoli.stream()
                         .filter(rpa -> (rpa.getScadenza() != null && rpa.getScadenza().toLocalDate().compareTo(scadenza.toLocalDate())==0)).collect(Collectors.toSet());
+            }
+            if(dataAggiornamento != null){
+                ricevutaPrivatoArticoli = ricevutaPrivatoArticoli.stream()
+                        .filter(rpa -> rpa.getDataAggiornamento().after(dataAggiornamento)).collect(Collectors.toSet());
             }
         }
         log.info("Retrieved '{}' 'ricevuta privato articoli'", ricevutaPrivatoArticoli.size());

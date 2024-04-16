@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.Set;
@@ -33,6 +34,7 @@ public class MovimentazioneService {
     private final FatturaAccompagnatoriaArticoloService fatturaAccompagnatoriaArticoloService;
     private final RicevutaPrivatoArticoloService ricevutaPrivatoArticoloService;
     private final ProduzioneIngredienteService produzioneIngredienteService;
+    private final FatturaAccompagnatoriaAcquistoArticoloService fatturaAccompagnatoriaAcquistoArticoloService;
     private final FornitoreService fornitoreService;
     private final ArticoloRepository articoloRepository;
     private final IngredienteRepository ingredienteRepository;
@@ -42,32 +44,34 @@ public class MovimentazioneService {
     private final RicevutaPrivatoRepository ricevutaPrivatoRepository;
     private final ProduzioneRepository produzioneRepository;
     private final ProduzioneConfezioneRepository produzioneConfezioneRepository;
+    private final FatturaAccompagnatoriaAcquistoRepository fatturaAccompagnatoriaAcquistoRepository;
     private final MovimentazioneManualeArticoloService movimentazioneManualeArticoloService;
     private final MovimentazioneManualeIngredienteService movimentazioneManualeIngredienteService;
     private final ConfezioneService confezioneService;
 
-    public Set<Movimentazione> getMovimentazioniArticolo(Long idArticolo, String lotto, Date scadenza){
-        log.info("Retrieving 'movimentazioni' of articolo {}, lotto {}, scadenza {}", idArticolo, lotto, scadenza);
+    public Set<Movimentazione> getMovimentazioniArticolo(Long idArticolo, String lotto, Date scadenza, Timestamp dataAggiornamento){
+        log.info("Retrieving 'movimentazioni' of articolo {}, lotto {}, scadenza {}, data_aggiornamento {}", idArticolo, lotto, scadenza, dataAggiornamento);
 
         Set<Movimentazione> movimentazioni = new HashSet<>();
-        Set<DdtAcquistoArticolo> ddtAcquistoArticoli;
+
         Set<DdtArticolo> ddtArticoli;
         Set<FatturaAccompagnatoriaArticolo> fatturaAccompagnatoriaArticoli;
         Set<RicevutaPrivatoArticolo> ricevutaPrivatoArticoli;
+        Set<DdtAcquistoArticolo> ddtAcquistoArticoli;
+        Set<FatturaAccompagnatoriaAcquistoArticolo> fatturaAccompagnatoriaAcquistoArticoli;
         Set<ProduzioneConfezione> produzioneConfezioni;
         Set<MovimentazioneManualeArticolo> movimentazioniManualiArticoli;
 
         Articolo articolo = articoloRepository.findById(idArticolo).get();
 
-        ddtAcquistoArticoli = ddtAcquistoArticoloService.getByArticoloIdAndLottoAndScadenza(articolo.getId(), lotto, scadenza);
+        ddtArticoli = ddtArticoloService.getByArticoloIdAndLottoAndScadenza(articolo.getId(), lotto, scadenza, dataAggiornamento);
 
-        ddtArticoli = ddtArticoloService.getByArticoloIdAndLottoAndScadenza(articolo.getId(), lotto, scadenza);
+        fatturaAccompagnatoriaArticoli = fatturaAccompagnatoriaArticoloService.getByArticoloIdAndLottoAndScadenza(articolo.getId(), lotto, scadenza, dataAggiornamento);
 
-        fatturaAccompagnatoriaArticoli = fatturaAccompagnatoriaArticoloService.getByArticoloIdAndLottoAndScadenza(articolo.getId(), lotto, scadenza);
+        ricevutaPrivatoArticoli = ricevutaPrivatoArticoloService.getByArticoloIdAndLottoAndScadenza(articolo.getId(), lotto, scadenza, dataAggiornamento);
 
-        ricevutaPrivatoArticoli = ricevutaPrivatoArticoloService.getByArticoloIdAndLottoAndScadenza(articolo.getId(), lotto, scadenza);
+        ddtAcquistoArticoli = ddtAcquistoArticoloService.getByArticoloIdAndLottoAndScadenza(articolo.getId(), lotto, scadenza, dataAggiornamento);
 
-        // retrieve the set of 'ProduzioniConfezioni'
         produzioneConfezioni = produzioneConfezioneRepository.findByArticoloIdAndLottoProduzione(articolo.getId(), lotto);
         if(produzioneConfezioni != null && !produzioneConfezioni.isEmpty()){
             Set<Long> produzioniIds = new HashSet<>();
@@ -75,20 +79,30 @@ public class MovimentazioneService {
                 Produzione produzione = produzioneRepository.findById(pc.getId().getProduzioneId()).get();
                 if(scadenza != null){
                     if(produzione.getScadenza() != null && produzione.getScadenza().toLocalDate().compareTo(scadenza.toLocalDate())==0){
-                        produzioniIds.add(produzione.getId());
+                        if(dataAggiornamento != null){
+                            if(produzione.getDataAggiornamento().after(dataAggiornamento)){
+                                produzioniIds.add(produzione.getId());
+                            }
+                        } else {
+                            produzioniIds.add(produzione.getId());
+                        }
                     }
                 } else {
-                    produzioniIds.add(produzione.getId());
+                    if(dataAggiornamento != null){
+                        if(produzione.getDataAggiornamento().after(dataAggiornamento)){
+                            produzioniIds.add(produzione.getId());
+                        }
+                    } else {
+                        produzioniIds.add(produzione.getId());
+                    }
                 }
             });
             produzioneConfezioni = produzioneConfezioni.stream().filter(pc -> (produzioniIds.contains(pc.getId().getProduzioneId()))).collect(Collectors.toSet());
         }
 
-        movimentazioniManualiArticoli = movimentazioneManualeArticoloService.getByArticoloIdAndLottoAndScadenza(articolo.getId(), lotto, scadenza);
+        fatturaAccompagnatoriaAcquistoArticoli = fatturaAccompagnatoriaAcquistoArticoloService.getByArticoloIdAndLottoAndScadenza(articolo.getId(), lotto, scadenza, dataAggiornamento);
 
-        if(ddtAcquistoArticoli != null && !ddtAcquistoArticoli.isEmpty()){
-            ddtAcquistoArticoli.forEach(daa -> movimentazioni.add(create(daa, lotto, scadenza, articolo)));
-        }
+        movimentazioniManualiArticoli = movimentazioneManualeArticoloService.getByArticoloIdAndLottoAndScadenza(articolo.getId(), lotto, scadenza, dataAggiornamento);
 
         if(ddtArticoli != null && !ddtArticoli.isEmpty()){
             ddtArticoli.forEach(da -> movimentazioni.add(create(da, lotto, scadenza, articolo)));
@@ -102,11 +116,18 @@ public class MovimentazioneService {
             ricevutaPrivatoArticoli.forEach(rpa -> movimentazioni.add(create(rpa, lotto, scadenza, articolo)));
         }
 
+        if(ddtAcquistoArticoli != null && !ddtAcquistoArticoli.isEmpty()){
+            ddtAcquistoArticoli.forEach(daa -> movimentazioni.add(create(daa, lotto, scadenza, articolo)));
+        }
+
         if(produzioneConfezioni != null && !produzioneConfezioni.isEmpty()){
             produzioneConfezioni.forEach(pc -> movimentazioni.add(create(pc, lotto, scadenza)));
         }
 
-        // Create 'movimentazione' from 'MovimentazioneManualeArticolo'
+        if(fatturaAccompagnatoriaAcquistoArticoli != null && !fatturaAccompagnatoriaAcquistoArticoli.isEmpty()){
+            fatturaAccompagnatoriaAcquistoArticoli.forEach(faaa -> movimentazioni.add(create(faaa, lotto, scadenza, articolo)));
+        }
+
         if(movimentazioniManualiArticoli != null && !movimentazioniManualiArticoli.isEmpty()){
             movimentazioniManualiArticoli.forEach(mma -> movimentazioni.add(create(mma, lotto, articolo)));
         }
@@ -225,21 +246,6 @@ public class MovimentazioneService {
         return movimentazioni;
     }
 
-    private Movimentazione create(DdtAcquistoArticolo ddtAcquistoArticolo, String lotto, Date scadenza, Articolo articolo){
-        Movimentazione movimentazione = new Movimentazione();
-        //movimentazione.setIdGiacenza(giacenzaArticolo.getId());
-        movimentazione.setInputOutput(INPUT);
-        if(ddtAcquistoArticolo.getDdtAcquisto() != null){
-            movimentazione.setData(ddtAcquistoArticolo.getDdtAcquisto().getData());
-        }
-        movimentazione.setPezzi(ddtAcquistoArticolo.getNumeroPezzi());
-        movimentazione.setQuantita(ddtAcquistoArticolo.getQuantita());
-        movimentazione.setDescrizione(createDescrizione(ddtAcquistoArticolo, lotto, scadenza, articolo));
-        movimentazione.setDataInserimento(ddtAcquistoArticolo.getDataInserimento());
-
-        return movimentazione;
-    }
-
     private Movimentazione create(DdtArticolo ddtArticolo, String lotto, Date scadenza, Articolo articolo){
         Movimentazione movimentazione = new Movimentazione();
         //movimentazione.setIdGiacenza(giacenzaArticolo.getId());
@@ -285,6 +291,21 @@ public class MovimentazioneService {
         return movimentazione;
     }
 
+    private Movimentazione create(DdtAcquistoArticolo ddtAcquistoArticolo, String lotto, Date scadenza, Articolo articolo){
+        Movimentazione movimentazione = new Movimentazione();
+        //movimentazione.setIdGiacenza(giacenzaArticolo.getId());
+        movimentazione.setInputOutput(INPUT);
+        if(ddtAcquistoArticolo.getDdtAcquisto() != null){
+            movimentazione.setData(ddtAcquistoArticolo.getDdtAcquisto().getData());
+        }
+        movimentazione.setPezzi(ddtAcquistoArticolo.getNumeroPezzi());
+        movimentazione.setQuantita(ddtAcquistoArticolo.getQuantita());
+        movimentazione.setDescrizione(createDescrizione(ddtAcquistoArticolo, lotto, scadenza, articolo));
+        movimentazione.setDataInserimento(ddtAcquistoArticolo.getDataInserimento());
+
+        return movimentazione;
+    }
+
     private Movimentazione create(ProduzioneConfezione produzioneConfezione, String lotto, Date scadenza){
         Produzione produzione = produzioneRepository.findById(produzioneConfezione.getId().getProduzioneId()).get();
 
@@ -302,6 +323,21 @@ public class MovimentazioneService {
         movimentazione.setQuantita(quantita);
         movimentazione.setDescrizione(createDescrizione(produzione, lotto, scadenza, pezzi, quantita, produzioneConfezione.getArticolo()));
         movimentazione.setDataInserimento(produzione.getDataInserimento());
+
+        return movimentazione;
+    }
+
+    private Movimentazione create(FatturaAccompagnatoriaAcquistoArticolo fatturaAccompagnatoriaAcquistoArticolo, String lotto, Date scadenza, Articolo articolo){
+        Movimentazione movimentazione = new Movimentazione();
+        //movimentazione.setIdGiacenza(giacenzaArticolo.getId());
+        movimentazione.setInputOutput(INPUT);
+        if(fatturaAccompagnatoriaAcquistoArticolo.getFatturaAccompagnatoriaAcquisto() != null){
+            movimentazione.setData(fatturaAccompagnatoriaAcquistoArticolo.getFatturaAccompagnatoriaAcquisto().getData());
+        }
+        movimentazione.setPezzi(fatturaAccompagnatoriaAcquistoArticolo.getNumeroPezzi());
+        movimentazione.setQuantita(fatturaAccompagnatoriaAcquistoArticolo.getQuantita());
+        movimentazione.setDescrizione(createDescrizione(fatturaAccompagnatoriaAcquistoArticolo, lotto, scadenza, articolo));
+        movimentazione.setDataInserimento(fatturaAccompagnatoriaAcquistoArticolo.getDataInserimento());
 
         return movimentazione;
     }
@@ -349,31 +385,6 @@ public class MovimentazioneService {
         } else {
             stringBuilder.append(pezzi).append("</b>");
         }
-        return stringBuilder.toString();
-    }
-
-    private String createDescrizione(DdtAcquistoArticolo ddtAcquistoArticolo, String lotto, Date scadenza, Articolo articolo){
-        Fornitore fornitore = articolo.getFornitore();
-        DdtAcquisto ddtAcquisto = ddtAcquistoRepository.findById(ddtAcquistoArticolo.getId().getDdtAcquistoId()).get();
-
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(createDescrizioneQuantita(articolo, "Acquistato/i <b>", ddtAcquistoArticolo.getNumeroPezzi(), ddtAcquistoArticolo.getQuantita()));
-        stringBuilder.append(" il ").append(simpleDateFormat.format(ddtAcquisto.getData()));
-        stringBuilder.append(" lotto <b>").append(lotto).append("</b>");
-        stringBuilder.append(" scadenza <b>");
-        if(scadenza != null){
-            stringBuilder.append(simpleDateFormat.format(scadenza));
-        } else {
-            stringBuilder.append("ND");
-        }
-        stringBuilder.append("</b>");
-        stringBuilder.append(" (DDT acquisto n. ").append(ddtAcquisto.getNumero());
-        if(fornitore != null){
-            stringBuilder.append(" da ");
-            stringBuilder.append(fornitore.getRagioneSociale());
-        }
-        stringBuilder.append(")");
-
         return stringBuilder.toString();
     }
 
@@ -434,6 +445,31 @@ public class MovimentazioneService {
         return stringBuilder.toString();
     }
 
+    private String createDescrizione(DdtAcquistoArticolo ddtAcquistoArticolo, String lotto, Date scadenza, Articolo articolo){
+        Fornitore fornitore = articolo.getFornitore();
+        DdtAcquisto ddtAcquisto = ddtAcquistoRepository.findById(ddtAcquistoArticolo.getId().getDdtAcquistoId()).get();
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(createDescrizioneQuantita(articolo, "Acquistato/i <b>", ddtAcquistoArticolo.getNumeroPezzi(), ddtAcquistoArticolo.getQuantita()));
+        stringBuilder.append(" il ").append(simpleDateFormat.format(ddtAcquisto.getData()));
+        stringBuilder.append(" lotto <b>").append(lotto).append("</b>");
+        stringBuilder.append(" scadenza <b>");
+        if(scadenza != null){
+            stringBuilder.append(simpleDateFormat.format(scadenza));
+        } else {
+            stringBuilder.append("ND");
+        }
+        stringBuilder.append("</b>");
+        stringBuilder.append(" (DDT acquisto n. ").append(ddtAcquisto.getNumero());
+        if(fornitore != null){
+            stringBuilder.append(" da ");
+            stringBuilder.append(fornitore.getRagioneSociale());
+        }
+        stringBuilder.append(")");
+
+        return stringBuilder.toString();
+    }
+
     private String createDescrizione(Produzione produzione, String lotto, Date scadenza, Integer pezzi, Float quantita, Articolo articolo){
         Fornitore fornitore = fornitoreService.getByRagioneSociale(Constants.DEFAULT_FORNITORE);
 
@@ -482,6 +518,31 @@ public class MovimentazioneService {
             stringBuilder.append(" scorta");
         }
         stringBuilder.append(" n. ").append(produzione.getCodice());
+        if(fornitore != null){
+            stringBuilder.append(" da ");
+            stringBuilder.append(fornitore.getRagioneSociale());
+        }
+        stringBuilder.append(")");
+
+        return stringBuilder.toString();
+    }
+
+    private String createDescrizione(FatturaAccompagnatoriaAcquistoArticolo fatturaAccompagnatoriaAcquistoArticolo, String lotto, Date scadenza, Articolo articolo){
+        Fornitore fornitore = articolo.getFornitore();
+        FatturaAccompagnatoriaAcquisto fatturaAccompagnatoriaAcquisto = fatturaAccompagnatoriaAcquistoRepository.findById(fatturaAccompagnatoriaAcquistoArticolo.getId().getFatturaAccompagnatoriaAcquistoId()).get();
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(createDescrizioneQuantita(articolo, "Acquistato/i <b>", fatturaAccompagnatoriaAcquistoArticolo.getNumeroPezzi(), fatturaAccompagnatoriaAcquistoArticolo.getQuantita()));
+        stringBuilder.append(" il ").append(simpleDateFormat.format(fatturaAccompagnatoriaAcquisto.getData()));
+        stringBuilder.append(" lotto <b>").append(lotto).append("</b>");
+        stringBuilder.append(" scadenza <b>");
+        if(scadenza != null){
+            stringBuilder.append(simpleDateFormat.format(scadenza));
+        } else {
+            stringBuilder.append("ND");
+        }
+        stringBuilder.append("</b>");
+        stringBuilder.append(" (Fattura accompagnatoria n. ").append(fatturaAccompagnatoriaAcquisto.getNumero());
         if(fornitore != null){
             stringBuilder.append(" da ");
             stringBuilder.append(fornitore.getRagioneSociale());

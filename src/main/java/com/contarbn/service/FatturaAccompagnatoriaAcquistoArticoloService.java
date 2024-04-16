@@ -5,28 +5,25 @@ import com.contarbn.model.Articolo;
 import com.contarbn.model.FatturaAccompagnatoriaAcquistoArticolo;
 import com.contarbn.repository.FatturaAccompagnatoriaAcquistoArticoloRepository;
 import com.contarbn.util.AccountingUtils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class FatturaAccompagnatoriaAcquistoArticoloService {
 
     private final FatturaAccompagnatoriaAcquistoArticoloRepository fatturaAccompagnatoriaAcquistoArticoloRepository;
     private final ArticoloService articoloService;
-
-    @Autowired
-    public FatturaAccompagnatoriaAcquistoArticoloService(final FatturaAccompagnatoriaAcquistoArticoloRepository fatturaAccompagnatoriaAcquistoArticoloRepository,
-                                                         final ArticoloService articoloService){
-        this.fatturaAccompagnatoriaAcquistoArticoloRepository = fatturaAccompagnatoriaAcquistoArticoloRepository;
-        this.articoloService = articoloService;
-    }
 
     public Set<FatturaAccompagnatoriaAcquistoArticolo> findAll(){
         log.info("Retrieving the list of 'fattura accompagnatoria acquisto articoli'");
@@ -39,6 +36,23 @@ public class FatturaAccompagnatoriaAcquistoArticoloService {
         log.info("Retrieving the list of 'fattura accompagnatoria articoli' of 'fattura accompagnatoria acquisto' {}", idFatturaAccompagnatoriaAcquisto);
         Set<FatturaAccompagnatoriaAcquistoArticolo> fatturaAccompagnatoriaAcquistoArticoli = fatturaAccompagnatoriaAcquistoArticoloRepository.findByFatturaAccompagnatoriaAcquistoId(idFatturaAccompagnatoriaAcquisto);
         log.info("Retrieved {} 'fattura accompagnatoria articoli'", fatturaAccompagnatoriaAcquistoArticoli.size());
+        return fatturaAccompagnatoriaAcquistoArticoli;
+    }
+
+    public Set<FatturaAccompagnatoriaAcquistoArticolo> getByArticoloIdAndLottoAndScadenza(Long idArticolo, String lotto, Date scadenza, Timestamp dataAggiornamento){
+        log.info("Retrieving 'fattura accompagnatoria acquisto articoli' by 'idArticolo' '{}', 'lotto' '{}' and 'scadenza' '{}'", idArticolo, lotto, scadenza);
+        Set<FatturaAccompagnatoriaAcquistoArticolo> fatturaAccompagnatoriaAcquistoArticoli = fatturaAccompagnatoriaAcquistoArticoloRepository.findByArticoloIdAndLotto(idArticolo, lotto);
+        if(fatturaAccompagnatoriaAcquistoArticoli != null && !fatturaAccompagnatoriaAcquistoArticoli.isEmpty()){
+            if(scadenza != null){
+                fatturaAccompagnatoriaAcquistoArticoli = fatturaAccompagnatoriaAcquistoArticoli.stream()
+                        .filter(faa -> (faa.getScadenza() != null && faa.getScadenza().toLocalDate().compareTo(scadenza.toLocalDate())==0)).collect(Collectors.toSet());
+            }
+            if(dataAggiornamento != null){
+                fatturaAccompagnatoriaAcquistoArticoli = fatturaAccompagnatoriaAcquistoArticoli.stream()
+                        .filter(faa -> faa.getDataAggiornamento().after(dataAggiornamento)).collect(Collectors.toSet());
+            }
+        }
+        log.info("Retrieved '{}' 'fattura accompagnatoria acquisto articoli'", fatturaAccompagnatoriaAcquistoArticoli.size());
         return fatturaAccompagnatoriaAcquistoArticoli;
     }
 

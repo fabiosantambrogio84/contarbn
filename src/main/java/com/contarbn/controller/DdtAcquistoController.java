@@ -5,8 +5,7 @@ import com.contarbn.model.DdtAcquisto;
 import com.contarbn.model.Fornitore;
 import com.contarbn.model.beans.DdtAcquistoRicercaLotto;
 import com.contarbn.service.DdtAcquistoService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,11 +18,10 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
+@Slf4j
 @RestController
 @RequestMapping(path="/ddts-acquisto")
 public class DdtAcquistoController {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(DdtAcquistoController.class);
 
     private final DdtAcquistoService ddtAcquistoService;
 
@@ -36,8 +34,8 @@ public class DdtAcquistoController {
     @CrossOrigin
     public Set<DdtAcquisto> getAll(@RequestParam(name = "numero", required = false) String numero,
                                     @RequestParam(name = "fornitore", required = false) String fornitore) {
-        LOGGER.info("Performing GET request for retrieving list of 'ddts acquisto'");
-        LOGGER.info("Request params: numero {}, fornitore {}", numero, fornitore);
+        log.info("Performing GET request for retrieving list of 'ddts acquisto'");
+        log.info("Request params: numero {}, fornitore {}", numero, fornitore);
 
         Predicate<DdtAcquisto> isDdtAcquistoNumeroEquals = ddtAcquisto -> {
             if(numero != null){
@@ -70,8 +68,8 @@ public class DdtAcquistoController {
     @RequestMapping(method = GET, path = "/search-lotto")
     @CrossOrigin
     public Set<DdtAcquistoRicercaLotto> getAllByLotto(@RequestParam(name = "lotto") String lotto) {
-        LOGGER.info("Performing GET request for retrieving list of 'ddts acquisto' filtered by lotto");
-        LOGGER.info("Request params:lotto {}",lotto);
+        log.info("Performing GET request for retrieving list of 'ddts acquisto' filtered by lotto");
+        log.info("Request params:lotto {}",lotto);
 
         return ddtAcquistoService.getAllByLotto(lotto);
     }
@@ -79,7 +77,7 @@ public class DdtAcquistoController {
     @RequestMapping(method = GET, path = "/{ddtAcquistoId}")
     @CrossOrigin
     public DdtAcquisto getOne(@PathVariable final Long ddtAcquistoId) {
-        LOGGER.info("Performing GET request for retrieving 'ddt acquisto' '{}'", ddtAcquistoId);
+        log.info("Performing GET request for retrieving 'ddt acquisto' '{}'", ddtAcquistoId);
         return ddtAcquistoService.getOne(ddtAcquistoId);
     }
 
@@ -87,14 +85,14 @@ public class DdtAcquistoController {
     @ResponseStatus(CREATED)
     @CrossOrigin
     public DdtAcquisto create(@RequestBody final DdtAcquisto ddtAcquisto){
-        LOGGER.info("Performing POST request for creating 'ddt acquisto'");
+        log.info("Performing POST request for creating 'ddt acquisto'");
         return ddtAcquistoService.create(ddtAcquisto);
     }
 
     @RequestMapping(method = PUT, path = "/{ddtAcquistoId}")
     @CrossOrigin
     public DdtAcquisto update(@PathVariable final Long ddtAcquistoId, @RequestBody final DdtAcquisto ddtAcquisto){
-        LOGGER.info("Performing PUT request for updating 'ddt acquisto' '{}'", ddtAcquistoId);
+        log.info("Performing PUT request for updating 'ddt acquisto' '{}'", ddtAcquistoId);
         if (!Objects.equals(ddtAcquistoId, ddtAcquisto.getId())) {
             throw new CannotChangeResourceIdException();
         }
@@ -106,8 +104,7 @@ public class DdtAcquistoController {
     @CrossOrigin
     public void delete(@PathVariable final Long ddtAcquistoId,
                        @RequestParam(name = "modificaGiacenze", required = false) Boolean modificaGiacenze){
-        LOGGER.info("Performing DELETE request for deleting 'ddt acquisto' '{}'", ddtAcquistoId);
-        LOGGER.info("Request params: modificaGiacenze={}", modificaGiacenze);
+        log.info("Performing DELETE request for deleting 'ddt acquisto' '{}', modificaGiacenze={}", ddtAcquistoId, modificaGiacenze);
         ddtAcquistoService.delete(ddtAcquistoId, (modificaGiacenze != null ? modificaGiacenze : Boolean.FALSE));
     }
 

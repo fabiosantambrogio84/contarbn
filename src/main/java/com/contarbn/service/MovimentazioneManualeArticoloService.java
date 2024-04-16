@@ -16,6 +16,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -30,51 +31,62 @@ public class MovimentazioneManualeArticoloService {
     public MovimentazioneManualeArticolo create(GiacenzaArticolo giacenzaArticolo){
         log.info("Creating 'movimentazione manuale articolo'");
 
-        MovimentazioneManualeArticolo movimentazioneManualeArticolo = new MovimentazioneManualeArticolo();
-        movimentazioneManualeArticolo.setArticolo(giacenzaArticolo.getArticolo());
-        movimentazioneManualeArticolo.setLotto(giacenzaArticolo.getLotto());
-        movimentazioneManualeArticolo.setScadenza(giacenzaArticolo.getScadenza());
-        movimentazioneManualeArticolo.setPezzi(giacenzaArticolo.getPezzi());
-        movimentazioneManualeArticolo.setQuantita(giacenzaArticolo.getQuantita());
-        movimentazioneManualeArticolo.setOperation(Operation.CREATE.name());
-        movimentazioneManualeArticolo.setCompute(Boolean.TRUE);
-        movimentazioneManualeArticolo.setDataInserimento(Timestamp.from(ZonedDateTime.now().toInstant()));
-        movimentazioneManualeArticolo.setDataAggiornamento(Timestamp.from(ZonedDateTime.now().toInstant()));
+        MovimentazioneManualeArticolo createdMovimentazioneManualeArticolo = null;
+        if(giacenzaArticolo.getArticolo() != null){
+            MovimentazioneManualeArticolo movimentazioneManualeArticolo = new MovimentazioneManualeArticolo();
+            movimentazioneManualeArticolo.setArticolo(giacenzaArticolo.getArticolo());
+            movimentazioneManualeArticolo.setLotto(giacenzaArticolo.getLotto());
+            movimentazioneManualeArticolo.setScadenza(giacenzaArticolo.getScadenza());
+            movimentazioneManualeArticolo.setPezzi(giacenzaArticolo.getPezzi());
+            movimentazioneManualeArticolo.setQuantita(giacenzaArticolo.getQuantita());
+            movimentazioneManualeArticolo.setOperation(Operation.CREATE.name());
+            movimentazioneManualeArticolo.setContext(Resource.GIACENZA_ARTICOLO.name());
+            movimentazioneManualeArticolo.setCompute(Boolean.TRUE);
+            movimentazioneManualeArticolo.setDataInserimento(Timestamp.from(ZonedDateTime.now().toInstant()));
+            movimentazioneManualeArticolo.setDataAggiornamento(Timestamp.from(ZonedDateTime.now().toInstant()));
 
-        MovimentazioneManualeArticolo createdMovimentazioneManualeArticolo = movimentazioneManualeArticoloRepository.save(movimentazioneManualeArticolo);
+            createdMovimentazioneManualeArticolo = movimentazioneManualeArticoloRepository.save(movimentazioneManualeArticolo);
 
-        log.info("Created 'movimentazione manuale articolo' '{}'", createdMovimentazioneManualeArticolo);
+            log.info("Created 'movimentazione manuale articolo' '{}'", createdMovimentazioneManualeArticolo);
+
+        } else {
+            log.error("Error creating 'movimentazione manuale articolo': articolo null");
+        }
         return createdMovimentazioneManualeArticolo;
     }
 
     public void create(Long idArticolo, String lotto, Date scadenza, Integer pezzi, Float quantita, Operation operation, Resource resource, Long idDocumento, String numDocumento, Integer annoDocumento, String fornitoreDocumento){
         log.info("Creating 'movimentazione manuale articolo' operation {} on {}", operation.name(), resource.name());
 
-        MovimentazioneManualeArticolo movimentazioneManualeArticolo = new MovimentazioneManualeArticolo();
-        Articolo articolo = new Articolo();
-        articolo.setId(idArticolo);
-        movimentazioneManualeArticolo.setArticolo(articolo);
-        movimentazioneManualeArticolo.setLotto(lotto);
-        movimentazioneManualeArticolo.setScadenza(scadenza);
-        movimentazioneManualeArticolo.setPezzi(pezzi);
-        movimentazioneManualeArticolo.setQuantita(quantita);
-        movimentazioneManualeArticolo.setOperation(operation.name());
-        movimentazioneManualeArticolo.setContext(resource.name());
-        if(Operation.CREATE.equals(operation)){
-            movimentazioneManualeArticolo.setCompute(Boolean.TRUE);
-        } else {
-            movimentazioneManualeArticolo.setCompute(Boolean.FALSE);
-        }
-        movimentazioneManualeArticolo.setIdDocumento(idDocumento);
-        movimentazioneManualeArticolo.setNumDocumento(numDocumento);
-        movimentazioneManualeArticolo.setAnnoDocumento(annoDocumento);
-        if(StringUtils.isNotEmpty(fornitoreDocumento)){
-            movimentazioneManualeArticolo.setFornitoreDocumento(fornitoreDocumento);
-        }
-        movimentazioneManualeArticolo.setDataInserimento(Timestamp.from(ZonedDateTime.now().toInstant()));
-        movimentazioneManualeArticolo.setDataAggiornamento(Timestamp.from(ZonedDateTime.now().toInstant()));
+        if(idArticolo != null){
+            MovimentazioneManualeArticolo movimentazioneManualeArticolo = new MovimentazioneManualeArticolo();
+            Articolo articolo = new Articolo();
+            articolo.setId(idArticolo);
+            movimentazioneManualeArticolo.setArticolo(articolo);
+            movimentazioneManualeArticolo.setLotto(lotto);
+            movimentazioneManualeArticolo.setScadenza(scadenza);
+            movimentazioneManualeArticolo.setPezzi(pezzi);
+            movimentazioneManualeArticolo.setQuantita(quantita);
+            movimentazioneManualeArticolo.setOperation(operation.name());
+            movimentazioneManualeArticolo.setContext(resource.name());
+            if(Operation.CREATE.equals(operation)){
+                movimentazioneManualeArticolo.setCompute(Boolean.TRUE);
+            } else {
+                movimentazioneManualeArticolo.setCompute(Boolean.FALSE);
+            }
+            movimentazioneManualeArticolo.setIdDocumento(idDocumento);
+            movimentazioneManualeArticolo.setNumDocumento(numDocumento);
+            movimentazioneManualeArticolo.setAnnoDocumento(annoDocumento);
+            if(StringUtils.isNotEmpty(fornitoreDocumento)){
+                movimentazioneManualeArticolo.setFornitoreDocumento(fornitoreDocumento);
+            }
+            movimentazioneManualeArticolo.setDataInserimento(Timestamp.from(ZonedDateTime.now().toInstant()));
+            movimentazioneManualeArticolo.setDataAggiornamento(Timestamp.from(ZonedDateTime.now().toInstant()));
 
-        movimentazioneManualeArticoloRepository.save(movimentazioneManualeArticolo);
+            movimentazioneManualeArticoloRepository.save(movimentazioneManualeArticolo);
+        } else {
+            log.error("Error creating 'movimentazione manuale articolo': id_articolo null");
+        }
     }
 
     @Transactional
@@ -84,17 +96,26 @@ public class MovimentazioneManualeArticoloService {
         log.info("Bulk deleted all the specified 'movimentazioni manuali articolo");
     }
 
-    public Set<MovimentazioneManualeArticolo> getByArticoloIdAndLottoAndScadenza(Long idArticolo, String lotto, Date scadenza){
+    public Set<MovimentazioneManualeArticolo> getByArticoloIdAndLottoAndScadenza(Long idArticolo, String lotto, Date scadenza, Timestamp dataAggiornamento){
         log.info("Retrieving 'movimentazioni manuali articoli' by 'idArticolo' '{}', 'lotto' '{}' and 'scadenza' '{}'", idArticolo, lotto, scadenza);
         Set<MovimentazioneManualeArticolo> movimentazioniManualiArticoli = movimentazioneManualeArticoloRepository.findByArticoloIdAndLotto(idArticolo, lotto);
         if(movimentazioniManualiArticoli != null && !movimentazioniManualiArticoli.isEmpty()){
             if(scadenza != null){
                 movimentazioniManualiArticoli = movimentazioniManualiArticoli.stream()
-                        .filter(da -> (da.getScadenza() != null && da.getScadenza().toLocalDate().compareTo(scadenza.toLocalDate())==0 && da.getCompute())).collect(Collectors.toSet());
+                        .filter(mma -> (mma.getScadenza() != null && mma.getScadenza().toLocalDate().compareTo(scadenza.toLocalDate())==0 && mma.getCompute())).collect(Collectors.toSet());
             }
+            if(dataAggiornamento != null){
+                movimentazioniManualiArticoli = movimentazioniManualiArticoli.stream()
+                        .filter(mma -> mma.getDataAggiornamento().after(dataAggiornamento)).collect(Collectors.toSet());
+            }
+
         }
         log.info("Retrieved '{}' 'movimentazioni manuali articoli'", movimentazioniManualiArticoli.size());
         return movimentazioniManualiArticoli;
+    }
+
+    public Optional<MovimentazioneManualeArticolo> findLastByOperationAndContext(Operation operation, Resource resource, Long idArticolo, String lotto, Date scadenza){
+        return movimentazioneManualeArticoloRepository.findLastByOperationAndContext(operation, resource, idArticolo, lotto, scadenza);
     }
 
 }

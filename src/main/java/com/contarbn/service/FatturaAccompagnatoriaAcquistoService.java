@@ -6,9 +6,10 @@ import com.contarbn.model.*;
 import com.contarbn.repository.FatturaAccompagnatoriaAcquistoRepository;
 import com.contarbn.repository.PagamentoRepository;
 import com.contarbn.util.Utils;
+import com.contarbn.util.enumeration.Operation;
 import com.contarbn.util.enumeration.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -20,6 +21,7 @@ import java.time.ZonedDateTime;
 import java.util.*;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class FatturaAccompagnatoriaAcquistoService {
 
@@ -32,29 +34,6 @@ public class FatturaAccompagnatoriaAcquistoService {
     private final GiacenzaArticoloService giacenzaArticoloService;
     private final GiacenzaIngredienteService giacenzaIngredienteService;
     private final PagamentoRepository pagamentoRepository;
-    private final SimpleDateFormat simpleDateFormat;
-
-    @Autowired
-    public FatturaAccompagnatoriaAcquistoService(final FatturaAccompagnatoriaAcquistoRepository fatturaAccompagnatoriaAcquistoRepository,
-                                                 final FatturaAccompagnatoriaAcquistoArticoloService fatturaAccompagnatoriaAcquistoArticoloService,
-                                                 final FatturaAccompagnatoriaAcquistoIngredienteService fatturaAccompagnatoriaAcquistoIngredienteService,
-                                                 final FatturaAccompagnatoriaAcquistoTotaleService fatturaAccompagnatoriaAcquistoTotaleService,
-                                                 final StatoFatturaService statoFatturaService,
-                                                 final TipoFatturaService tipoFatturaService,
-                                                 final GiacenzaArticoloService giacenzaArticoloService,
-                                                 final GiacenzaIngredienteService giacenzaIngredienteService,
-                                                 final PagamentoRepository pagamentoRepository){
-        this.fatturaAccompagnatoriaAcquistoRepository = fatturaAccompagnatoriaAcquistoRepository;
-        this.fatturaAccompagnatoriaAcquistoArticoloService = fatturaAccompagnatoriaAcquistoArticoloService;
-        this.fatturaAccompagnatoriaAcquistoIngredienteService = fatturaAccompagnatoriaAcquistoIngredienteService;
-        this.fatturaAccompagnatoriaAcquistoTotaleService = fatturaAccompagnatoriaAcquistoTotaleService;
-        this.statoFatturaService = statoFatturaService;
-        this.tipoFatturaService = tipoFatturaService;
-        this.giacenzaArticoloService = giacenzaArticoloService;
-        this.giacenzaIngredienteService = giacenzaIngredienteService;
-        this.pagamentoRepository = pagamentoRepository;
-        simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    }
 
     public Set<FatturaAccompagnatoriaAcquisto> getAll(){
         log.info("Retrieving the list of 'fatture accompagnatorie acquisto'");
@@ -129,6 +108,8 @@ public class FatturaAccompagnatoriaAcquistoService {
     public FatturaAccompagnatoriaAcquisto patch(Map<String,Object> patchFatturaAccompagnatoriaAcquisto) throws Exception{
         log.info("Patching 'fattura accompagnatoria acquisto'");
 
+        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
         Long id = Long.valueOf((Integer) patchFatturaAccompagnatoriaAcquisto.get("id"));
         FatturaAccompagnatoriaAcquisto fatturaAccompagnatoriaAcquisto = fatturaAccompagnatoriaAcquistoRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
         for(String key : patchFatturaAccompagnatoriaAcquisto.keySet()){
@@ -157,8 +138,10 @@ public class FatturaAccompagnatoriaAcquistoService {
     }
 
     @Transactional
-    public void delete(Long fatturaAccompagnatoriaAcquistoId){
+    public void delete(Long fatturaAccompagnatoriaAcquistoId, Boolean modificaGiacenze){
         log.info("Deleting 'fattura accompagnatoria acquisto' '{}'", fatturaAccompagnatoriaAcquistoId);
+
+        FatturaAccompagnatoriaAcquisto fatturaAccompagnatoriaAcquisto = getOne(fatturaAccompagnatoriaAcquistoId);
 
         Set<FatturaAccompagnatoriaAcquistoArticolo> fatturaAccompagnatoriaAcquistoArticoli = fatturaAccompagnatoriaAcquistoArticoloService.findByFatturaAccompagnatoriaAcquistoId(fatturaAccompagnatoriaAcquistoId);
         Set<FatturaAccompagnatoriaAcquistoIngrediente> fatturaAccompagnatoriaAcquistoIngredienti = fatturaAccompagnatoriaAcquistoIngredienteService.findByFatturaAccompagnatoriaAcquistoId(fatturaAccompagnatoriaAcquistoId);
@@ -170,12 +153,18 @@ public class FatturaAccompagnatoriaAcquistoService {
         fatturaAccompagnatoriaAcquistoRepository.deleteById(fatturaAccompagnatoriaAcquistoId);
 
         for (FatturaAccompagnatoriaAcquistoArticolo fatturaAccompagnatoriaAcquistoArticolo:fatturaAccompagnatoriaAcquistoArticoli) {
-            // compute 'giacenza articolo'
-            giacenzaArticoloService.computeGiacenza(fatturaAccompagnatoriaAcquistoArticolo.getId().getArticoloId(), fatturaAccompagnatoriaAcquistoArticolo.getLotto(), fatturaAccompagnatoriaAcquistoArticolo.getScadenza());
+
+            giacenzaArticoloService.createMovimentazioneManualeArticolo(fatturaAccompagnatoriaAcquistoArticolo.getId().getArticoloId(), fatturaAccompagnatoriaAcquistoArticolo.getLotto(), fatturaAccompagnatoriaAcquistoArticolo.getScadenza(), fatturaAccompagnatoriaAcquistoArticolo.getNumeroPezzi(), fatturaAccompagnatoriaAcquistoArticolo.getQuantita(), Operation.DELETE, Resource.FATTURA_ACCOMPAGNATORIA_ACQUISTO, fatturaAccompagnatoriaAcquisto.getId(), fatturaAccompagnatoriaAcquisto.getNumero(), null, (fatturaAccompagnatoriaAcquisto.getFornitore() != null ? fatturaAccompagnatoriaAcquisto.getFornitore().getRagioneSociale() : null));
+
+            if(modificaGiacenze.equals(Boolean.TRUE)) {
+                giacenzaArticoloService.computeGiacenza(fatturaAccompagnatoriaAcquistoArticolo.getId().getArticoloId(), fatturaAccompagnatoriaAcquistoArticolo.getLotto(), fatturaAccompagnatoriaAcquistoArticolo.getScadenza());
+            }
         }
         for (FatturaAccompagnatoriaAcquistoIngrediente fatturaAccompagnatoriaAcquistoIngrediente:fatturaAccompagnatoriaAcquistoIngredienti) {
-            // compute 'giacenza ingrediente'
-            giacenzaIngredienteService.computeGiacenza(fatturaAccompagnatoriaAcquistoIngrediente.getId().getIngredienteId(), fatturaAccompagnatoriaAcquistoIngrediente.getLotto(), fatturaAccompagnatoriaAcquistoIngrediente.getScadenza(), fatturaAccompagnatoriaAcquistoIngrediente.getQuantita(), Resource.FATTURA_ACCOMPAGNATORIA_ACQUISTO);
+
+            if(modificaGiacenze.equals(Boolean.TRUE)) {
+                giacenzaIngredienteService.computeGiacenza(fatturaAccompagnatoriaAcquistoIngrediente.getId().getIngredienteId(), fatturaAccompagnatoriaAcquistoIngrediente.getLotto(), fatturaAccompagnatoriaAcquistoIngrediente.getScadenza(), fatturaAccompagnatoriaAcquistoIngrediente.getQuantita(), Resource.FATTURA_ACCOMPAGNATORIA_ACQUISTO);
+            }
         }
 
         log.info("Deleted 'fattura accompagnatoria acquisto' '{}'", fatturaAccompagnatoriaAcquistoId);

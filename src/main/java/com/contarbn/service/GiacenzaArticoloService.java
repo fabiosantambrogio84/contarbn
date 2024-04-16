@@ -4,6 +4,7 @@ import com.contarbn.exception.ResourceNotFoundException;
 import com.contarbn.model.Articolo;
 import com.contarbn.model.GiacenzaArticolo;
 import com.contarbn.model.Movimentazione;
+import com.contarbn.model.MovimentazioneManualeArticolo;
 import com.contarbn.model.beans.SortOrder;
 import com.contarbn.model.views.VGiacenzaArticolo;
 import com.contarbn.repository.GiacenzaArticoloRepository;
@@ -67,17 +68,20 @@ public class GiacenzaArticoloService {
     public GiacenzaArticolo create(GiacenzaArticolo giacenzaArticolo){
         log.info("Creating 'giacenza articolo'");
 
-        movimentazioneManualeArticoloService.create(giacenzaArticolo);
+        if(giacenzaArticolo != null && giacenzaArticolo.getArticolo() != null){
+            movimentazioneManualeArticoloService.create(giacenzaArticolo);
 
-        computeGiacenza(giacenzaArticolo.getArticolo().getId(), giacenzaArticolo.getLotto(), giacenzaArticolo.getScadenza());
+            computeGiacenza(giacenzaArticolo.getArticolo().getId(), giacenzaArticolo.getLotto(), giacenzaArticolo.getScadenza());
 
-        log.info("Created 'giacenza articolo' '{}'", giacenzaArticolo);
+            log.info("Created 'giacenza articolo' '{}'", giacenzaArticolo);
+        } else {
+            log.error("Error creating 'giacenza articolo': articolo null");
+        }
         return giacenzaArticolo;
     }
 
     @Transactional
     public void createMovimentazioneManualeArticolo(Long idArticolo, String lotto, Date scadenza, Integer pezzi, Float quantita, Operation operation, Resource resource, Long idDocumento, String numDocumento, Integer annoDocumento, String fornitoreDocumento){
-
         movimentazioneManualeArticoloService.create(idArticolo, lotto, scadenza, pezzi, quantita, operation, resource, idDocumento, numDocumento, annoDocumento, fornitoreDocumento);
     }
 
@@ -85,9 +89,10 @@ public class GiacenzaArticoloService {
     public List<GiacenzaArticolo> updateBulk(List<GiacenzaArticolo> giacenzeArticolo){
         log.info("Updating bulk 'giacenza articolo'");
 
-        giacenzeArticolo.forEach(ga -> ga.setDataAggiornamento(Timestamp.from(ZonedDateTime.now().toInstant())));
+        giacenzeArticolo.stream().filter(ga -> ga.getArticolo() != null).forEach(ga -> ga.setDataAggiornamento(Timestamp.from(ZonedDateTime.now().toInstant())));
 
-        giacenzaArticoloRepository.saveAll(giacenzeArticolo);
+        Iterable<GiacenzaArticolo> giacenzeArticoloSaved = giacenzaArticoloRepository.saveAll(giacenzeArticolo);
+        giacenzeArticoloSaved.forEach(ga -> movimentazioneManualeArticoloService.create(ga.getArticolo().getId(), ga.getLotto(), ga.getScadenza(), ga.getPezzi(), ga.getQuantita(), Operation.UPDATE, Resource.GIACENZA_ARTICOLO, null, null, null, null));
 
         log.info("Updated bulk 'giacenza articolo'");
         return giacenzeArticolo;
@@ -118,7 +123,7 @@ public class GiacenzaArticoloService {
         List<Movimentazione> movimentazioni = new ArrayList<>();
         Set<Movimentazione> movimentazioniArticolo = new HashSet<>();
         if(giacenzeArticoli != null && !giacenzeArticoli.isEmpty()){
-            giacenzeArticoli.forEach(ga -> movimentazioniArticolo.addAll(movimentazioneService.getMovimentazioniArticolo(ga.getArticolo().getId(), ga.getLotto(), ga.getScadenza())));
+            giacenzeArticoli.forEach(ga -> movimentazioniArticolo.addAll(movimentazioneService.getMovimentazioniArticolo(ga.getArticolo().getId(), ga.getLotto(), ga.getScadenza(), null)));
         }
         if(!movimentazioniArticolo.isEmpty()){
             movimentazioni = new ArrayList<>(movimentazioniArticolo);
@@ -139,6 +144,10 @@ public class GiacenzaArticoloService {
     public void computeGiacenza(Long idArticolo, String lotto, Date scadenza){
         log.info("Compute 'giacenza articolo' for idArticolo '{}', lotto '{}',scadenza '{}'", idArticolo, lotto, scadenza);
 
+        //Integer startPezzi = 0;
+        //Float startQuantita = 0f;
+        Timestamp startDataAggiornamento = null;
+
         log.info("Retrieving 'giacenza articolo' of articolo '{}' and lotto '{}'", idArticolo, lotto);
         Optional<GiacenzaArticolo> giacenzaOptional = Optional.empty();
         GiacenzaArticolo giacenzaArticolo;
@@ -151,7 +160,14 @@ public class GiacenzaArticoloService {
             }
         }
 
-        Set<Movimentazione> movimentazioni = movimentazioneService.getMovimentazioniArticolo(idArticolo, lotto, scadenza);
+        //Optional<MovimentazioneManualeArticolo> updatedMovimentazioneManualeArticolo = movimentazioneManualeArticoloService.findLastByOperationAndContext(Operation.UPDATE, Resource.GIACENZA_ARTICOLO, idArticolo, lotto, scadenza);
+        //if(updatedMovimentazioneManualeArticolo.isPresent()){
+            //startPezzi = updatedMovimentazioneManualeArticolo.get().getPezzi();
+            //startQuantita = updatedMovimentazioneManualeArticolo.get().getQuantita();
+            //startDataAggiornamento = updatedMovimentazioneManualeArticolo.get().getDataAggiornamento();
+        //}
+
+        Set<Movimentazione> movimentazioni = movimentazioneService.getMovimentazioniArticolo(idArticolo, lotto, scadenza, startDataAggiornamento);
 
         Map<String, Object> quantitaAndPezzi = computeQuantitaAndPezzi(movimentazioni);
         int pezzi = (Integer)quantitaAndPezzi.get("pezzi");

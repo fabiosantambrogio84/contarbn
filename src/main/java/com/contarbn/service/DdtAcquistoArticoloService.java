@@ -5,9 +5,8 @@ import com.contarbn.model.Articolo;
 import com.contarbn.model.DdtAcquistoArticolo;
 import com.contarbn.repository.DdtAcquistoArticoloRepository;
 import com.contarbn.util.Utils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -17,61 +16,56 @@ import java.time.ZonedDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
+@RequiredArgsConstructor
 @Service
 public class DdtAcquistoArticoloService {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(DdtAcquistoArticoloService.class);
 
     private final DdtAcquistoArticoloRepository ddtAcquistoArticoloRepository;
 
     private final ArticoloService articoloService;
 
-    @Autowired
-    public DdtAcquistoArticoloService(final DdtAcquistoArticoloRepository ddtAcquistoArticoloRepository, final ArticoloService articoloService){
-        this.ddtAcquistoArticoloRepository = ddtAcquistoArticoloRepository;
-        this.articoloService = articoloService;
-    }
-
     public Set<DdtAcquistoArticolo> findAll(){
-        LOGGER.info("Retrieving the list of 'ddt acquisto articoli'");
+        log.info("Retrieving the list of 'ddt acquisto articoli'");
         Set<DdtAcquistoArticolo> ddtAcquistoArticoli = ddtAcquistoArticoloRepository.findAll();
-        LOGGER.info("Retrieved {} 'ddt acquisto articoli'", ddtAcquistoArticoli.size());
+        log.info("Retrieved {} 'ddt acquisto articoli'", ddtAcquistoArticoli.size());
         return ddtAcquistoArticoli;
     }
 
     public Set<DdtAcquistoArticolo> findByDdtAcquistoId(Long idDdtAcquisto){
-        LOGGER.info("Retrieving the list of 'ddt acquisto articoli' of 'ddtAcquisto' {}", idDdtAcquisto);
+        log.info("Retrieving the list of 'ddt acquisto articoli' of 'ddtAcquisto' {}", idDdtAcquisto);
         Set<DdtAcquistoArticolo> ddtAcquistoArticoli = ddtAcquistoArticoloRepository.findByDdtAcquistoId(idDdtAcquisto);
-        LOGGER.info("Retrieved {} 'ddt acquisto articoli'", ddtAcquistoArticoli.size());
+        log.info("Retrieved {} 'ddt acquisto articoli'", ddtAcquistoArticoli.size());
         return ddtAcquistoArticoli;
     }
 
     public DdtAcquistoArticolo create(DdtAcquistoArticolo ddtAcquistoArticolo){
-        LOGGER.info("Creating 'ddt acquistoarticolo'");
+        log.info("Creating 'ddt acquistoarticolo'");
         ddtAcquistoArticolo.setDataInserimento(Timestamp.from(ZonedDateTime.now().toInstant()));
+        ddtAcquistoArticolo.setDataAggiornamento(Timestamp.from(ZonedDateTime.now().toInstant()));
         ddtAcquistoArticolo.setImponibile(computeImponibile(ddtAcquistoArticolo));
 
         DdtAcquistoArticolo createdDdtAcquistoArticolo = ddtAcquistoArticoloRepository.save(ddtAcquistoArticolo);
-        LOGGER.info("Created 'ddt articolo' '{}'", createdDdtAcquistoArticolo);
+        log.info("Created 'ddt articolo' '{}'", createdDdtAcquistoArticolo);
         return createdDdtAcquistoArticolo;
     }
 
     public DdtAcquistoArticolo update(DdtAcquistoArticolo ddtAcquistoArticolo){
-        LOGGER.info("Updating 'ddt acquisto articolo'");
+        log.info("Updating 'ddt acquisto articolo'");
         DdtAcquistoArticolo ddtAcquistoArticoloCurrent = ddtAcquistoArticoloRepository.findById(ddtAcquistoArticolo.getId()).orElseThrow(ResourceNotFoundException::new);
         ddtAcquistoArticolo.setDataInserimento(ddtAcquistoArticoloCurrent.getDataInserimento());
         ddtAcquistoArticolo.setDataAggiornamento(Timestamp.from(ZonedDateTime.now().toInstant()));
         ddtAcquistoArticolo.setImponibile(computeImponibile(ddtAcquistoArticolo));
 
         DdtAcquistoArticolo updatedDdtAcquistoArticolo = ddtAcquistoArticoloRepository.save(ddtAcquistoArticolo);
-        LOGGER.info("Updated 'ddt acquisto articolo' '{}'", updatedDdtAcquistoArticolo);
+        log.info("Updated 'ddt acquisto articolo' '{}'", updatedDdtAcquistoArticolo);
         return updatedDdtAcquistoArticolo;
     }
 
     public void deleteByDdtAcquistoId(Long ddtAcquistoId){
-        LOGGER.info("Deleting 'ddt acquisto articolo' by 'ddt' '{}'", ddtAcquistoId);
+        log.info("Deleting 'ddt acquisto articolo' by 'ddt' '{}'", ddtAcquistoId);
         ddtAcquistoArticoloRepository.deleteByDdtAcquistoId(ddtAcquistoId);
-        LOGGER.info("Deleted 'ddt acquisto articolo' by 'ddt' '{}'", ddtAcquistoId);
+        log.info("Deleted 'ddt acquisto articolo' by 'ddt' '{}'", ddtAcquistoId);
     }
 
     public Articolo getArticolo(DdtAcquistoArticolo ddtAcquistoArticolo){
@@ -79,16 +73,20 @@ public class DdtAcquistoArticoloService {
         return articoloService.getOne(articoloId);
     }
 
-    public Set<DdtAcquistoArticolo> getByArticoloIdAndLottoAndScadenza(Long idArticolo, String lotto, Date scadenza){
-        LOGGER.info("Retrieving 'ddt acquisto articoli' by 'idArticolo' '{}', 'lotto' '{}' and 'scadenza' '{}'", idArticolo, lotto, scadenza);
+    public Set<DdtAcquistoArticolo> getByArticoloIdAndLottoAndScadenza(Long idArticolo, String lotto, Date scadenza, Timestamp dataAggiornamento){
+        log.info("Retrieving 'ddt acquisto articoli' by 'idArticolo' '{}', 'lotto' '{}' and 'scadenza' '{}'", idArticolo, lotto, scadenza);
         Set<DdtAcquistoArticolo> ddtAcquistoArticoli = ddtAcquistoArticoloRepository.findByArticoloIdAndLotto(idArticolo, lotto);
         if(ddtAcquistoArticoli != null && !ddtAcquistoArticoli.isEmpty()){
             if(scadenza != null){
                 ddtAcquistoArticoli = ddtAcquistoArticoli.stream()
                         .filter(daa -> (daa.getDataScadenza() != null && daa.getDataScadenza().toLocalDate().compareTo(scadenza.toLocalDate())==0)).collect(Collectors.toSet());
             }
+            if(dataAggiornamento != null){
+                ddtAcquistoArticoli = ddtAcquistoArticoli.stream()
+                        .filter(daa -> daa.getDataAggiornamento().after(dataAggiornamento)).collect(Collectors.toSet());
+            }
         }
-        LOGGER.info("Retrieved '{}' 'ddt acquisto articoli'", ddtAcquistoArticoli.size());
+        log.info("Retrieved '{}' 'ddt acquisto articoli'", ddtAcquistoArticoli.size());
         return ddtAcquistoArticoli;
     }
 

@@ -12,6 +12,7 @@ public enum Resource {
     FATTURA_ACCOMPAGNATORIA("fattura accompagnatoria", "fattura-accompagnatoria"),
     FATTURA_ACCOMPAGNATORIA_ACQUISTO("fattura accompagnatoria acquisto", "fattura-accompagnatoria-acquisto"),
     FORNITORE("fornitore", ""),
+    GIACENZA_ARTICOLO("giacenza articolo", ""),
     MOVIMENTAZIONE_MANUALE_ARTICOLO("movimentazione manuale articolo", ""),
     MOVIMENTAZIONE_MANUALE_INGREDIENTE("movimentazione manuale ingrediente", ""),
     NOTA_ACCREDITO("nota accredito", ""),

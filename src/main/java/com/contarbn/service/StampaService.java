@@ -3,10 +3,7 @@ package com.contarbn.service;
 import com.contarbn.model.*;
 import com.contarbn.model.beans.DittaInfoSingleton;
 import com.contarbn.model.reports.*;
-import com.contarbn.model.views.VDdt;
-import com.contarbn.model.views.VDocumentoAcquisto;
-import com.contarbn.model.views.VFattura;
-import com.contarbn.model.views.VGiacenzaIngrediente;
+import com.contarbn.model.views.*;
 import com.contarbn.util.AccountingUtils;
 import com.contarbn.util.Constants;
 import com.contarbn.util.Utils;
@@ -34,6 +31,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static java.util.Comparator.naturalOrder;
+import static java.util.stream.Collectors.groupingBy;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -59,6 +57,7 @@ public class StampaService {
     private final FatturaAcquistoService fatturaAcquistoService;
     private final FatturaAccompagnatoriaAcquistoService fatturaAccompagnatoriaAcquistoService;
     private final SchedaTecnicaService schedaTecnicaService;
+    private final GiacenzaArticoloService giacenzaArticoloService;
 
     private List<VGiacenzaIngrediente> getGiacenzeIngredienti(String ids){
         log.info("Retrieving the list of 'giacenze-ingredienti' with id in '{}' for creating pdf file", ids);
@@ -1381,6 +1380,32 @@ public class StampaService {
         return schedaTecnica;
     }
 
+    private List<VGiacenzaArticoloDataSource> getGiacenzeArticoliDataSources(String articolo, Boolean attivo, Integer idFornitore, String lotto, java.sql.Date scadenza, Boolean scaduto){
+        log.info("Retrieving the list of 'giacenze-articoli' for creating pdf file");
+
+        List<VGiacenzaArticoloDataSource> giacenzeArticoliDataSources = new ArrayList<>();
+
+        List<VGiacenzaArticolo> vGiacenzaArticoli = giacenzaArticoloService.getAllByFilters(-1, null, null, null, articolo, attivo, idFornitore, lotto, scadenza, scaduto);
+
+        if(!vGiacenzaArticoli.isEmpty()){
+            vGiacenzaArticoli.forEach(vGiacenzaArticolo -> {
+                VGiacenzaArticoloDataSource vGiacenzaArticoloDataSource = new VGiacenzaArticoloDataSource();
+                vGiacenzaArticoloDataSource.setArticolo(vGiacenzaArticolo.getArticolo());
+                vGiacenzaArticoloDataSource.setAttivo(vGiacenzaArticolo.getAttivo() ? "si" : "no");
+                vGiacenzaArticoloDataSource.setFornitore(vGiacenzaArticolo.getFornitore());
+                vGiacenzaArticoloDataSource.setUdm(vGiacenzaArticolo.getUnitaMisura());
+                vGiacenzaArticoloDataSource.setQuantita(vGiacenzaArticolo.getQuantitaResult() != null ? Utils.roundQuantity(BigDecimal.valueOf(vGiacenzaArticolo.getQuantitaResult())) : BigDecimal.ZERO);
+                vGiacenzaArticoloDataSource.setCosto(vGiacenzaArticolo.getPrezzoAcquisto() != null ? vGiacenzaArticolo.getPrezzoAcquisto() : BigDecimal.ZERO);
+                vGiacenzaArticoloDataSource.setTotale(vGiacenzaArticolo.getTotale() != null ? Utils.roundPrice(BigDecimal.valueOf(vGiacenzaArticolo.getTotale())) : BigDecimal.ZERO);
+
+                giacenzeArticoliDataSources.add(vGiacenzaArticoloDataSource);
+            });
+        }
+
+        log.info("Retrieved {} 'giacenze-articoli'", giacenzeArticoliDataSources.size());
+        return giacenzeArticoliDataSources;
+    }
+
     public byte[] generateDdt(Long idDdt) throws Exception{
 
         // retrieve the Ddt
@@ -2665,6 +2690,66 @@ public class StampaService {
         schedaTecnicaService.patch(patchedSchedaTecnica);
 
         return result;
+    }
+
+    public byte[] generateGiacenzeArticoli(String articolo, Boolean attivo, Integer idFornitore, String lotto, java.sql.Date scadenza, Boolean scaduto) throws Exception{
+
+        List<VGiacenzaArticoloDataSource> giacenzeArticoliDataSources = getGiacenzeArticoliDataSources(articolo, attivo, idFornitore, lotto, scadenza, scaduto);
+
+        BigDecimal totalePz = BigDecimal.ZERO;
+        BigDecimal totaleKg = BigDecimal.ZERO;
+        BigDecimal totaleEuroPz = BigDecimal.ZERO;
+        BigDecimal totaleEuroKg = BigDecimal.ZERO;
+        BigDecimal totaleEuro = BigDecimal.ZERO;
+        List<VGiacenzaArticoloDataSource> giacenzeArticoliDataSourcesPz = new ArrayList<>();
+        List<VGiacenzaArticoloDataSource> giacenzeArticoliDataSourcesKg = new ArrayList<>();
+
+        Map<String, List<VGiacenzaArticoloDataSource>> giacenzeArticoliDataSourcesGrouped = giacenzeArticoliDataSources
+                .stream()
+                .collect(groupingBy(VGiacenzaArticoloDataSource::getUdm));
+
+        for(String udm : giacenzeArticoliDataSourcesGrouped.keySet()){
+            if(udm.equalsIgnoreCase("pz")){
+                giacenzeArticoliDataSourcesPz = giacenzeArticoliDataSourcesGrouped.get(udm);
+            } else if(udm.equalsIgnoreCase("kg")){
+                giacenzeArticoliDataSourcesKg = giacenzeArticoliDataSourcesGrouped.get(udm);
+            }
+        }
+
+        for(VGiacenzaArticoloDataSource giacenzaArticoloPzDataSource: giacenzeArticoliDataSourcesPz){
+            totalePz = totalePz.add(giacenzaArticoloPzDataSource.getQuantita());
+            totaleEuroPz = totaleEuroPz.add(giacenzaArticoloPzDataSource.getTotale());
+        }
+        for(VGiacenzaArticoloDataSource giacenzaArticoloKgDataSource: giacenzeArticoliDataSourcesKg){
+            totaleKg = totaleKg.add(giacenzaArticoloKgDataSource.getQuantita());
+            totaleEuroKg = totaleEuroKg.add(giacenzaArticoloKgDataSource.getTotale());
+        }
+        totalePz = Utils.roundQuantity(totalePz);
+        totaleKg = Utils.roundQuantity(totaleKg);
+        totaleEuroPz = Utils.roundPrice(totaleEuroPz);
+        totaleEuroKg = Utils.roundPrice(totaleEuroKg);
+        totaleEuro = Utils.roundPrice(totaleEuro.add(totaleEuroPz).add(totaleEuroKg));
+
+        final InputStream stream = this.getClass().getResourceAsStream(Constants.JASPER_REPORT_GIACENZE_ARTICOLI);
+
+        JRBeanCollectionDataSource giacenzaArticoliPzCollectionDataSource = new JRBeanCollectionDataSource(giacenzeArticoliDataSourcesPz);
+        JRBeanCollectionDataSource giacenzaArticoliKgCollectionDataSource = new JRBeanCollectionDataSource(giacenzeArticoliDataSourcesKg);
+
+        // create report parameters
+        Map<String, Object> parameters = createParameters();
+
+        // add data to parameters
+        parameters.put("giacenzaArticoliTitle", "Giacenze articoli");
+        parameters.put("totalePz", totalePz);
+        parameters.put("totaleKg", totaleKg);
+        parameters.put("totaleEuroPz", totaleEuroPz);
+        parameters.put("totaleEuroKg", totaleEuroKg);
+        parameters.put("totaleEuro", totaleEuro);
+        parameters.put("giacenzaArticoliPzCollection", giacenzaArticoliPzCollectionDataSource);
+        parameters.put("giacenzaArticoliKgCollection", giacenzaArticoliKgCollectionDataSource);
+
+        // create report
+        return JasperRunManager.runReportToPdf(stream, parameters, new JREmptyDataSource());
     }
 
     public static HttpHeaders createHttpHeaders(String fileName){

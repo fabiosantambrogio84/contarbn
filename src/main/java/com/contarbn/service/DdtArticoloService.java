@@ -1,12 +1,11 @@
 package com.contarbn.service;
 
-import com.contarbn.exception.ResourceNotFoundException;
 import com.contarbn.model.*;
 import com.contarbn.repository.DdtArticoloOrdineClienteRepository;
 import com.contarbn.repository.DdtArticoloRepository;
 import com.contarbn.util.AccountingUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +17,10 @@ import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
+@RequiredArgsConstructor
 @Service
 public class DdtArticoloService {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(DdtArticoloService.class);
 
     private static final String CONTEXT_CREATE_DDT = "create_ddt";
     private static final String CONTEXT_DELETE_DDT = "delete_ddt";
@@ -31,34 +30,23 @@ public class DdtArticoloService {
     private final DdtArticoloOrdineClienteRepository ddtArticoloOrdineClienteRepository;
     private final OrdineClienteService ordineClienteService;
 
-    @Autowired
-    public DdtArticoloService(final DdtArticoloRepository ddtArticoloRepository,
-                              final ArticoloService articoloService,
-                              final DdtArticoloOrdineClienteRepository ddtArticoloOrdineClienteRepository,
-                              final OrdineClienteService ordineClienteService){
-        this.ddtArticoloRepository = ddtArticoloRepository;
-        this.articoloService = articoloService;
-        this.ddtArticoloOrdineClienteRepository = ddtArticoloOrdineClienteRepository;
-        this.ordineClienteService = ordineClienteService;
-    }
-
     public Set<DdtArticolo> findAll(){
-        LOGGER.info("Retrieving the list of 'ddt articoli'");
+        log.info("Retrieving the list of 'ddt articoli'");
         Set<DdtArticolo> ddtArticoli = ddtArticoloRepository.findAll();
-        LOGGER.info("Retrieved {} 'ddt articoli'", ddtArticoli.size());
+        log.info("Retrieved {} 'ddt articoli'", ddtArticoli.size());
         return ddtArticoli;
     }
 
     public Set<DdtArticolo> findByDdtId(Long idDdt){
-        LOGGER.info("Retrieving the list of 'ddt articoli' of 'ddt' {}", idDdt);
+        log.info("Retrieving the list of 'ddt articoli' of 'ddt' {}", idDdt);
         Set<DdtArticolo> ddtArticoli = ddtArticoloRepository.findByDdtId(idDdt);
-        LOGGER.info("Retrieved {} 'ddt articoli'", ddtArticoli.size());
+        log.info("Retrieved {} 'ddt articoli'", ddtArticoli.size());
         return ddtArticoli;
     }
 
     @Transactional
     public DdtArticolo create(DdtArticolo ddtArticolo){
-        LOGGER.info("Creating 'ddt articolo'");
+        log.info("Creating 'ddt articolo'");
         ddtArticolo.setDataInserimento(Timestamp.from(ZonedDateTime.now().toInstant()));
         ddtArticolo.setImponibile(computeImponibile(ddtArticolo));
         ddtArticolo.setCosto(computeCosto(ddtArticolo));
@@ -69,7 +57,7 @@ public class DdtArticoloService {
         DdtArticolo createdDdtArticolo = ddtArticoloRepository.save(ddtArticolo);
 
         /*if(idOrdiniClienti != null && !idOrdiniClienti.isEmpty()){
-            LOGGER.info("Creating 'ddt articoli ordini clienti'");
+            log.info("Creating 'ddt articoli ordini clienti'");
             for (Long idOrdineCliente: idOrdiniClienti) {
                 DdtArticoloOrdineClienteKey ddtArticoloOrdineClienteKey = new DdtArticoloOrdineClienteKey();
                 ddtArticoloOrdineClienteKey.setDdtId(createdDdtArticolo.getId().getDdtId());
@@ -83,19 +71,19 @@ public class DdtArticoloService {
 
                 ddtArticoloOrdineClienteRepository.save(ddtArticoloOrdineCliente);
             }
-            LOGGER.info("Created 'ddt articoli ordini clienti'");
+            log.info("Created 'ddt articoli ordini clienti'");
         }*/
 
-        LOGGER.info("Created 'ddt articolo' '{}'", createdDdtArticolo);
+        log.info("Created 'ddt articolo' '{}'", createdDdtArticolo);
         return createdDdtArticolo;
     }
 
     @Transactional
     public void deleteByDdtId(Long ddtId){
-        LOGGER.info("Deleting 'ddt articolo' by 'ddt' '{}'", ddtId);
+        log.info("Deleting 'ddt articolo' by 'ddt' '{}'", ddtId);
         ddtArticoloRepository.deleteByDdtId(ddtId);
         ddtArticoloOrdineClienteRepository.deleteByIdDdtId(ddtId);
-        LOGGER.info("Deleted 'ddt articolo' by 'ddt' '{}'", ddtId);
+        log.info("Deleted 'ddt articolo' by 'ddt' '{}'", ddtId);
     }
 
     public Articolo getArticolo(DdtArticolo ddtArticolo){
@@ -103,22 +91,21 @@ public class DdtArticoloService {
         return articoloService.getOne(articoloId);
     }
 
-    public Set<DdtArticolo> getByArticoloIdAndLottoAndScadenza(Long idArticolo, String lotto, Date scadenza){
-        LOGGER.info("Retrieving 'ddt articoli' by 'idArticolo' '{}', 'lotto' '{}' and 'scadenza' '{}'", idArticolo, lotto, scadenza);
+    public Set<DdtArticolo> getByArticoloIdAndLottoAndScadenza(Long idArticolo, String lotto, Date scadenza, Timestamp dataAggiornamento){
+        log.info("Retrieving 'ddt articoli' by 'idArticolo' '{}', 'lotto' '{}' and 'scadenza' '{}'", idArticolo, lotto, scadenza);
         Set<DdtArticolo> ddtArticoli = ddtArticoloRepository.findByArticoloIdAndLotto(idArticolo, lotto);
         if(ddtArticoli != null && !ddtArticoli.isEmpty()){
             if(scadenza != null){
                 ddtArticoli = ddtArticoli.stream()
                         .filter(da -> (da.getScadenza() != null && da.getScadenza().toLocalDate().compareTo(scadenza.toLocalDate())==0)).collect(Collectors.toSet());
             }
+            if(dataAggiornamento != null){
+                ddtArticoli = ddtArticoli.stream()
+                        .filter(da -> da.getDataAggiornamento().after(dataAggiornamento)).collect(Collectors.toSet());
+            }
         }
-        LOGGER.info("Retrieved '{}' 'ddt articoli'", ddtArticoli.size());
+        log.info("Retrieved '{}' 'ddt articoli'", ddtArticoli.size());
         return ddtArticoli;
-    }
-
-    @Transactional
-    public void updateOrdineClienteFromCreateDdt(Long idDdt){
-        updateOrdineCliente(idDdt, CONTEXT_CREATE_DDT);
     }
 
     @Transactional
@@ -127,7 +114,7 @@ public class DdtArticoloService {
     }
 
     private void updateOrdineCliente(Long idDdt, String context){
-        LOGGER.info("Updating 'numeroPezziDaEvadere' of 'OrdiniClientiArticoli' related to ddt '{}'", idDdt);
+        log.info("Updating 'numeroPezziDaEvadere' of 'OrdiniClientiArticoli' related to ddt '{}'", idDdt);
 
         Set<Long> idOrdiniClienti = new HashSet<>();
         Map<DdtArticoloKey, Integer> ddtArticoliPezziRemaining = new HashMap<>();
@@ -136,7 +123,7 @@ public class DdtArticoloService {
         List<DdtArticoloOrdineCliente> ddtArticoliOrdiniClienti = ddtArticoloOrdineClienteRepository.findAllByIdDdtId(idDdt);
         if(ddtArticoliOrdiniClienti != null && !ddtArticoliOrdiniClienti.isEmpty()){
             for(DdtArticoloOrdineCliente ddtArticoloOrdineCliente : ddtArticoliOrdiniClienti){
-                LOGGER.info("'DdtArticoloOrdineCliente' {}", ddtArticoloOrdineCliente);
+                log.info("'DdtArticoloOrdineCliente' {}", ddtArticoloOrdineCliente);
 
                 // add the id of the 'OrdineCliente' to the set of ordini-clienti to compute stato
                 Long idOrdineCliente = ddtArticoloOrdineCliente.getId().getOrdineClienteId();
@@ -153,10 +140,10 @@ public class DdtArticoloService {
                 Optional<DdtArticolo> optionalDdtArticolo = ddtArticoloRepository.findById(ddtArticoloKey);
                 if(optionalDdtArticolo.isPresent()){
                     ddtArticolo = optionalDdtArticolo.get();
-                    LOGGER.info("Retrieved 'ddtArticolo' {}", ddtArticolo);
+                    log.info("Retrieved 'ddtArticolo' {}", ddtArticolo);
                 } else {
                     String message = "Unable to retrieve 'DdtArticolo' from key '"+ddtArticoloKey+"'";
-                    LOGGER.error(message);
+                    log.error(message);
                     throw new RuntimeException(message);
                 }
 
@@ -169,9 +156,9 @@ public class DdtArticoloService {
                 OrdineClienteArticolo ordineClienteArticolo = null;
                 try{
                     ordineClienteArticolo = ordineClienteService.getOrdineClienteArticolo(ordineClienteArticoloKey);
-                    LOGGER.info("Retrieved 'ordineClienteArticolo' {}", ordineClienteArticolo);
+                    log.info("Retrieved 'ordineClienteArticolo' {}", ordineClienteArticolo);
                 } catch(Exception e){
-                    LOGGER.error("Unable to retrieve 'OrdineClienteArticolo' from key '{}'", ordineClienteArticoloKey);
+                    log.error("Unable to retrieve 'OrdineClienteArticolo' from key '{}'", ordineClienteArticoloKey);
                     throw e;
                 }
 
@@ -179,16 +166,16 @@ public class DdtArticoloService {
                 Integer numeroPezziDaEvadere = ordineClienteArticolo.getNumeroPezziDaEvadere();
                 Integer newNumeroPezziDaEvadere = computeOrdineClienteArticoloNewPezziDaEvadere(context, numeroPezzi, numeroPezziDaEvadere, ordineClienteArticolo.getNumeroPezziOrdinati(), ddtArticoliPezziRemaining, ddtArticoloKey);
 
-                LOGGER.info("Updating 'OrdineClienteArticolo' with id '{}' setting 'numeroPezziDaEvadere' equals to {}", ordineClienteArticolo.getId(), newNumeroPezziDaEvadere);
+                log.info("Updating 'OrdineClienteArticolo' with id '{}' setting 'numeroPezziDaEvadere' equals to {}", ordineClienteArticolo.getId(), newNumeroPezziDaEvadere);
                 ordineClienteArticolo.setNumeroPezziDaEvadere(newNumeroPezziDaEvadere);
                 ordineClienteService.saveOrdineClienteArticolo(ordineClienteArticolo);
-                LOGGER.info("Updated 'OrdineClienteArticolo' with id '{}' setting 'numeroPezziDaEvadere' equals to {}", ordineClienteArticolo.getId(), newNumeroPezziDaEvadere);
+                log.info("Updated 'OrdineClienteArticolo' with id '{}' setting 'numeroPezziDaEvadere' equals to {}", ordineClienteArticolo.getId(), newNumeroPezziDaEvadere);
             }
 
         } else {
-            LOGGER.info("No 'DdtArticoloOrdineCliente' rows found for ddt '{}'", idDdt);
+            log.info("No 'DdtArticoloOrdineCliente' rows found for ddt '{}'", idDdt);
         }
-        LOGGER.info("Updated 'numeroPezziDaEvadere' of 'OrdiniClientiArticoli' related to ddt '{}'", idDdt);
+        log.info("Updated 'numeroPezziDaEvadere' of 'OrdiniClientiArticoli' related to ddt '{}'", idDdt);
 
         // compute stato for all 'OrdiniClienti'
         if(idOrdiniClienti != null && !idOrdiniClienti.isEmpty()){
@@ -199,13 +186,13 @@ public class DdtArticoloService {
     }
 
     private Integer computeOrdineClienteArticoloNewPezziDaEvadere(String context, Integer pezzi, Integer pezziDaEvadere, Integer pezziOrdinati, Map<DdtArticoloKey, Integer> ddtArticoliPezziRemaining, DdtArticoloKey ddtArticoloKey){
-        LOGGER.info("Computing 'newPezziDaEvadere' for context {}, pezzi {}, pezziDaEvadere {}, pezziOrdinati {}", context, pezzi, pezziDaEvadere, pezziOrdinati);
+        log.info("Computing 'newPezziDaEvadere' for context {}, pezzi {}, pezziDaEvadere {}, pezziOrdinati {}", context, pezzi, pezziDaEvadere, pezziOrdinati);
 
         Integer newNumeroPezziDaEvadere = null;
         if(context.equals(CONTEXT_CREATE_DDT)){
             newNumeroPezziDaEvadere = pezziDaEvadere - pezzi;
             if(newNumeroPezziDaEvadere < 0){
-                LOGGER.info("Context {}: pezzi da evadere {} - pezzi {} less than 0", context, pezziDaEvadere, pezzi);
+                log.info("Context {}: pezzi da evadere {} - pezzi {} less than 0", context, pezziDaEvadere, pezzi);
                 newNumeroPezziDaEvadere = 0;
                 ddtArticoliPezziRemaining.putIfAbsent(ddtArticoloKey, Math.abs(pezziDaEvadere - pezzi));
             }
@@ -213,11 +200,11 @@ public class DdtArticoloService {
             newNumeroPezziDaEvadere = pezziDaEvadere + pezzi;
             if(newNumeroPezziDaEvadere > pezziOrdinati){
                 newNumeroPezziDaEvadere = pezziOrdinati;
-                LOGGER.info("Context {}: pezzi da evadere {} + pezzi {} greater than pezzi ordinati {}", context, pezziDaEvadere, pezzi, pezziOrdinati);
+                log.info("Context {}: pezzi da evadere {} + pezzi {} greater than pezzi ordinati {}", context, pezziDaEvadere, pezzi, pezziOrdinati);
                 ddtArticoliPezziRemaining.putIfAbsent(ddtArticoloKey, Math.abs(pezziOrdinati-pezzi));
             }
         }
-        LOGGER.info("Context {}: pezzi: {}, pezzi da evadere {} pezzi ordinati {}, nuovi pezzi da evadere {}", context, pezzi, pezziDaEvadere, pezziOrdinati, newNumeroPezziDaEvadere);
+        log.info("Context {}: pezzi: {}, pezzi da evadere {} pezzi ordinati {}, nuovi pezzi da evadere {}", context, pezzi, pezziDaEvadere, pezziOrdinati, newNumeroPezziDaEvadere);
         return newNumeroPezziDaEvadere;
     }
 

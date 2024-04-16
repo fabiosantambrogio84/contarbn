@@ -475,4 +475,29 @@ public class StampaController {
                 .contentType(MediaType.parseMediaType(Constants.MEDIA_TYPE_APPLICATION_PDF))
                 .body(resource);
     }
+
+    @RequestMapping(method = GET, path = "/giacenze-articoli")
+    @CrossOrigin
+    public ResponseEntity<Resource> printGiacenzeArticoli(@RequestParam(name = "articolo", required = false) String articolo,
+                                                          @RequestParam(name = "attivo", required = false) Boolean attivo,
+                                                          @RequestParam(name = "idFornitore", required = false) Integer idFornitore,
+                                                          @RequestParam(name = "lotto", required = false) String lotto,
+                                                          @RequestParam(name = "scadenza", required = false) Date scadenza,
+                                                          @RequestParam(name = "scaduto", required = false) Boolean scaduto) throws Exception{
+        log.info("Creating pdf for list of 'giacenze-articoli'");
+        log.info("Request params: articolo {}, attivo {}, idFornitore {}, lotto {}, scadenza {}, scaduto {}", articolo, attivo, idFornitore, lotto, scadenza, scaduto);
+
+        // create report
+        byte[] reportBytes = stampaService.generateGiacenzeArticoli(articolo, attivo, idFornitore, lotto, scadenza, scaduto);
+
+        ByteArrayResource resource = new ByteArrayResource(reportBytes);
+
+        log.info("Successfully create pdf for 'giacenze-articoli'");
+
+        return ResponseEntity.ok()
+                .headers(StampaService.createHttpHeaders("giacenze-articoli.pdf"))
+                .contentLength(reportBytes.length)
+                .contentType(MediaType.parseMediaType(Constants.MEDIA_TYPE_APPLICATION_PDF))
+                .body(resource);
+    }
 }

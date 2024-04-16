@@ -9,6 +9,7 @@ encoding/fattura_accompagnatoria_acquisto.jrxml=UTF-8
 encoding/fattura_acquisto.jrxml=UTF-8
 encoding/fatture.jrxml=UTF-8
 encoding/fatture_commercianti.jrxml=UTF-8
+encoding/giacenze_articoli.jrxml=UTF-8
 encoding/giacenze_ingredienti.jrxml=UTF-8
 encoding/header.jrxml=UTF-8
 encoding/listino.jrxml=UTF-8

@@ -55,9 +55,10 @@ public class FatturaAccompagnatoriaAcquistoController {
     @RequestMapping(method = DELETE, path = "/{fatturaAccompagnatoriaAcquistoId}")
     @ResponseStatus(NO_CONTENT)
     @CrossOrigin
-    public void delete(@PathVariable final Long fatturaAccompagnatoriaAcquistoId){
-        log.info("Performing DELETE request for deleting 'fattura accompagnatoria acquisto' '{}'", fatturaAccompagnatoriaAcquistoId);
-        fatturaAccompagnatoriaAcquistoService.delete(fatturaAccompagnatoriaAcquistoId);
+    public void delete(@PathVariable final Long fatturaAccompagnatoriaAcquistoId,
+                       @RequestParam(name = "modificaGiacenze", required = false) Boolean modificaGiacenze){
+        log.info("Performing DELETE request for deleting 'fattura accompagnatoria acquisto' '{}', modificaGiacenze={}", fatturaAccompagnatoriaAcquistoId, modificaGiacenze);
+        fatturaAccompagnatoriaAcquistoService.delete(fatturaAccompagnatoriaAcquistoId, (modificaGiacenze != null ? modificaGiacenze : Boolean.FALSE));
     }
 
 }

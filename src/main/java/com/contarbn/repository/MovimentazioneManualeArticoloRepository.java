@@ -1,12 +1,13 @@
 package com.contarbn.repository;
 
 import com.contarbn.model.MovimentazioneManualeArticolo;
+import com.contarbn.repository.custom.MovimentazioneManualeArticoloCustomRepository;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 import java.util.Set;
 
-public interface MovimentazioneManualeArticoloRepository extends CrudRepository<MovimentazioneManualeArticolo, Long> {
+public interface MovimentazioneManualeArticoloRepository extends CrudRepository<MovimentazioneManualeArticolo, Long>, MovimentazioneManualeArticoloCustomRepository {
 
     @Override
     Set<MovimentazioneManualeArticolo> findAll();

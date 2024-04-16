@@ -8,6 +8,7 @@ import com.contarbn.repository.PagamentoRepository;
 import com.contarbn.util.Utils;
 import com.contarbn.util.enumeration.Operation;
 import com.contarbn.util.enumeration.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class FatturaAccompagnatoriaService {
 
@@ -32,23 +34,6 @@ public class FatturaAccompagnatoriaService {
     private final TipoFatturaService tipoFatturaService;
     private final GiacenzaArticoloService giacenzaArticoloService;
     private final PagamentoRepository pagamentoRepository;
-
-    @Autowired
-    public FatturaAccompagnatoriaService(final FatturaAccompagnatoriaRepository fatturaAccompagnatoriaRepository,
-                                         final FatturaAccompagnatoriaArticoloService fatturaAccompagnatoriaArticoloService,
-                                         final FatturaAccompagnatoriaTotaleService fatturaAccompagnatoriaTotaleService,
-                                         final StatoFatturaService statoFatturaService,
-                                         final TipoFatturaService tipoFatturaService,
-                                         final GiacenzaArticoloService giacenzaArticoloService,
-                                         final PagamentoRepository pagamentoRepository){
-        this.fatturaAccompagnatoriaRepository = fatturaAccompagnatoriaRepository;
-        this.fatturaAccompagnatoriaArticoloService = fatturaAccompagnatoriaArticoloService;
-        this.fatturaAccompagnatoriaTotaleService = fatturaAccompagnatoriaTotaleService;
-        this.statoFatturaService = statoFatturaService;
-        this.tipoFatturaService = tipoFatturaService;
-        this.giacenzaArticoloService = giacenzaArticoloService;
-        this.pagamentoRepository = pagamentoRepository;
-    }
 
     public Set<FatturaAccompagnatoria> getAll(){
         log.info("Retrieving the list of 'fatture accompagnatorie'");

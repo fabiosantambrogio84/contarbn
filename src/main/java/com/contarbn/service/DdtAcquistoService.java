@@ -112,22 +112,22 @@ public class DdtAcquistoService {
         ddtAcquistoArticoli.forEach(daa -> {
             daa.getId().setDdtAcquistoId(updatedDdtAcquisto.getId());
             daa.getId().setUuid(UUID.randomUUID().toString());
+            ddtAcquistoArticoloService.create(daa);
 
             if(modificaGiacenze != null && modificaGiacenze.equals(Boolean.TRUE)){
                 // compute 'giacenza articolo'
                 giacenzaArticoloService.computeGiacenza(daa.getId().getArticoloId(), daa.getLotto(), daa.getDataScadenza());
             }
-            ddtAcquistoArticoloService.create(daa);
         });
         ddtAcquistoIngredienti.forEach(dai -> {
             dai.getId().setDdtAcquistoId(updatedDdtAcquisto.getId());
             dai.getId().setUuid(UUID.randomUUID().toString());
+            ddtAcquistoIngredienteService.create(dai);
 
             if(modificaGiacenze != null && modificaGiacenze.equals(Boolean.TRUE)){
                 // compute 'giacenza ingrediente'
                 giacenzaIngredienteService.computeGiacenza(dai.getId().getIngredienteId(), dai.getLotto(), dai.getDataScadenza(), dai.getQuantita(), Resource.DDT_ACQUISTO);
             }
-            ddtAcquistoIngredienteService.create(dai);
         });
 
         computeTotali(updatedDdtAcquisto, ddtAcquistoArticoli, ddtAcquistoIngredienti);
@@ -178,7 +178,6 @@ public class DdtAcquistoService {
             if(modificaGiacenze.equals(Boolean.TRUE)){
                 giacenzaArticoloService.computeGiacenza(ddtAcquistoArticolo.getId().getArticoloId(), ddtAcquistoArticolo.getLotto(), ddtAcquistoArticolo.getDataScadenza());
             }
-
         }
 
         for (DdtAcquistoIngrediente ddtAcquistoIngrediente:ddtAcquistoIngredienti) {

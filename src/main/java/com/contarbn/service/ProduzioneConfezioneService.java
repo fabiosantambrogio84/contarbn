@@ -2,22 +2,18 @@ package com.contarbn.service;
 
 import com.contarbn.model.ProduzioneConfezione;
 import com.contarbn.repository.ProduzioneConfezioneRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class ProduzioneConfezioneService {
 
     private final ProduzioneConfezioneRepository produzioneConfezioneRepository;
-
-    @Autowired
-    public ProduzioneConfezioneService(final ProduzioneConfezioneRepository produzioneConfezioneRepository){
-        this.produzioneConfezioneRepository = produzioneConfezioneRepository;
-    }
 
     public Set<ProduzioneConfezione> findAll(){
         log.info("Retrieving the list of 'produzione confezioni'");
