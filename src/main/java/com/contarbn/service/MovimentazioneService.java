@@ -355,7 +355,7 @@ public class MovimentazioneService {
                 Resource resource = Resource.valueOf(movimentazioneManualeArticolo.getContext());
                 if(Resource.DDT.equals(resource) || Resource.FATTURA_ACCOMPAGNATORIA.equals(resource) || Resource.RICEVUTA_PRIVATO.equals(resource)){
                     movimentazione.setInputOutput(INPUT);
-                } else if(Resource.DDT_ACQUISTO.equals(resource) || Resource.PRODUZIONE.equals(resource)){
+                } else if(Resource.DDT_ACQUISTO.equals(resource) || Resource.PRODUZIONE.equals(resource) || Resource.FATTURA_ACCOMPAGNATORIA_ACQUISTO.equals(resource)){
                     movimentazione.setInputOutput(OUTPUT);
                 }
             }
@@ -542,7 +542,7 @@ public class MovimentazioneService {
             stringBuilder.append("ND");
         }
         stringBuilder.append("</b>");
-        stringBuilder.append(" (Fattura accompagnatoria n. ").append(fatturaAccompagnatoriaAcquisto.getNumero());
+        stringBuilder.append(" (Fattura accompagnatoria acquisto n. ").append(fatturaAccompagnatoriaAcquisto.getNumero());
         if(fornitore != null){
             stringBuilder.append(" da ");
             stringBuilder.append(fornitore.getRagioneSociale());
@@ -574,6 +574,8 @@ public class MovimentazioneService {
                     descrizione = " (Rimozione DDT acquisto n. "+movimentazioneManualeArticolo.getNumDocumento()+" da "+movimentazioneManualeArticolo.getFornitoreDocumento()+")";
                 } else if(Resource.PRODUZIONE.equals(resource)) {
                     descrizione = " (Rimozione Produzione n. "+movimentazioneManualeArticolo.getNumDocumento()+" da "+movimentazioneManualeArticolo.getFornitoreDocumento()+")";
+                } else if(Resource.FATTURA_ACCOMPAGNATORIA_ACQUISTO.equals(resource)){
+                    descrizione = " (Rimozione Fattura accompagnatoria acquisto n. "+movimentazioneManualeArticolo.getNumDocumento()+" da "+movimentazioneManualeArticolo.getFornitoreDocumento()+")";
                 }
             }
         }
