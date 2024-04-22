@@ -16,7 +16,6 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -100,9 +99,11 @@ public class MovimentazioneManualeArticoloService {
         log.info("Retrieving 'movimentazioni manuali articoli' by 'idArticolo' '{}', 'lotto' '{}' and 'scadenza' '{}'", idArticolo, lotto, scadenza);
         Set<MovimentazioneManualeArticolo> movimentazioniManualiArticoli = movimentazioneManualeArticoloRepository.findByArticoloIdAndLotto(idArticolo, lotto);
         if(movimentazioniManualiArticoli != null && !movimentazioniManualiArticoli.isEmpty()){
+            movimentazioniManualiArticoli = movimentazioniManualiArticoli.stream().filter(MovimentazioneManualeArticolo::getCompute).collect(Collectors.toSet());
+
             if(scadenza != null){
                 movimentazioniManualiArticoli = movimentazioniManualiArticoli.stream()
-                        .filter(mma -> (mma.getScadenza() != null && mma.getScadenza().toLocalDate().compareTo(scadenza.toLocalDate())==0 && mma.getCompute())).collect(Collectors.toSet());
+                        .filter(mma -> (mma.getScadenza() != null && mma.getScadenza().toLocalDate().compareTo(scadenza.toLocalDate())==0)).collect(Collectors.toSet());
             }
             if(dataAggiornamento != null){
                 movimentazioniManualiArticoli = movimentazioniManualiArticoli.stream()
@@ -110,12 +111,8 @@ public class MovimentazioneManualeArticoloService {
             }
 
         }
-        log.info("Retrieved '{}' 'movimentazioni manuali articoli'", movimentazioniManualiArticoli.size());
+        log.info("Retrieved '{}' 'movimentazioni manuali articoli'", movimentazioniManualiArticoli != null ? movimentazioniManualiArticoli.size() : 0);
         return movimentazioniManualiArticoli;
-    }
-
-    public Optional<MovimentazioneManualeArticolo> findLastByOperationAndContext(Operation operation, Resource resource, Long idArticolo, String lotto, Date scadenza){
-        return movimentazioneManualeArticoloRepository.findLastByOperationAndContext(operation, resource, idArticolo, lotto, scadenza);
     }
 
 }
