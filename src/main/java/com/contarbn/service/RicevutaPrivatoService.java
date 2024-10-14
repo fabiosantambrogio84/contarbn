@@ -68,14 +68,12 @@ public class RicevutaPrivatoService {
         return progressivo;
     }
 
-    /*
     public List<RicevutaPrivato> getByDataGreaterThanEqual(Date data){
         log.info("Retrieving 'ricevute privato' with 'data' greater or equals to '{}'", data);
         List<RicevutaPrivato> ricevutePrivato = ricevutaPrivatoRepository.findByDataGreaterThanEqualOrderByProgressivoDesc(data);
         log.info("Retrieved {} 'ricevute privato' with 'data' greater or equals to '{}'", ricevutePrivato.size(), data);
         return ricevutePrivato;
     }
-    */
 
     @Transactional
     public RicevutaPrivato create(RicevutaPrivato ricevutaPrivato){

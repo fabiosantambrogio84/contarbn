@@ -128,20 +128,17 @@ public class OrdineFornitore {
 
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder();
 
-        result.append("{");
-        result.append("id: " + id);
-        result.append(", progressivo: " + progressivo);
-        result.append(", annoContabile: " + annoContabile);
-        result.append(", fornitore: " + fornitore);
-        result.append(", note: " + note);
-        result.append(", emailInviata: " + emailInviata);
-        result.append(", dataInvioEmail: " + dataInvioEmail);
-        result.append(", dataInserimento: " + dataInserimento);
-        result.append(", dataAggiornamento: " + dataAggiornamento);
-        result.append("}");
-
-        return result.toString();
+        return "{" +
+                "id: " + id +
+                ", progressivo: " + progressivo +
+                ", annoContabile: " + annoContabile +
+                ", fornitore: " + fornitore +
+                ", note: " + note +
+                ", emailInviata: " + emailInviata +
+                ", dataInvioEmail: " + dataInvioEmail +
+                ", dataInserimento: " + dataInserimento +
+                ", dataAggiornamento: " + dataAggiornamento +
+                "}";
     }
 }

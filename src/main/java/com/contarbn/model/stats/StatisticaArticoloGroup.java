@@ -1,7 +1,10 @@
 package com.contarbn.model.stats;
 
+import lombok.Data;
+
 import java.math.BigDecimal;
 
+@Data
 public class StatisticaArticoloGroup {
 
     private String codice;
@@ -16,68 +19,16 @@ public class StatisticaArticoloGroup {
 
     private BigDecimal totaleVendutoMedio;
 
-    public String getCodice() {
-        return codice;
-    }
-
-    public void setCodice(String codice) {
-        this.codice = codice;
-    }
-
-    public String getDescrizione() {
-        return descrizione;
-    }
-
-    public void setDescrizione(String descrizione) {
-        this.descrizione = descrizione;
-    }
-
-    public Integer getNumeroRighe() {
-        return numeroRighe;
-    }
-
-    public void setNumeroRighe(Integer numeroRighe) {
-        this.numeroRighe = numeroRighe;
-    }
-
-    public BigDecimal getTotaleVenduto() {
-        return totaleVenduto;
-    }
-
-    public void setTotaleVenduto(BigDecimal totaleVenduto) {
-        this.totaleVenduto = totaleVenduto;
-    }
-
-    public BigDecimal getTotaleQuantitaVenduta() {
-        return totaleQuantitaVenduta;
-    }
-
-    public void setTotaleQuantitaVenduta(BigDecimal totaleQuantitaVenduta) {
-        this.totaleQuantitaVenduta = totaleQuantitaVenduta;
-    }
-
-    public BigDecimal getTotaleVendutoMedio() {
-        return totaleVendutoMedio;
-    }
-
-    public void setTotaleVendutoMedio(BigDecimal totaleVendutoMedio) {
-        this.totaleVendutoMedio = totaleVendutoMedio;
-    }
-
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder();
 
-        result.append("{");
-        result.append("codice: " + codice);
-        result.append(", descrizione: " + descrizione);
-        result.append(", totaleVenduto: " + totaleVenduto);
-        result.append(", totaleQuantitaVenduta: " + totaleQuantitaVenduta);
-        result.append(", numeroRighe: " + numeroRighe);
-        result.append(", totaleVendutoMedio: " + totaleVendutoMedio);
-        result.append("}");
-
-        return result.toString();
-
+        return "{" +
+                "codice: " + codice +
+                ", descrizione: " + descrizione +
+                ", totaleVenduto: " + totaleVenduto +
+                ", totaleQuantitaVenduta: " + totaleQuantitaVenduta +
+                ", numeroRighe: " + numeroRighe +
+                ", totaleVendutoMedio: " + totaleVendutoMedio +
+                "}";
     }
 }

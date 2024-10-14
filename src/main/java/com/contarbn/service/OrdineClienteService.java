@@ -11,9 +11,9 @@ import com.contarbn.repository.OrdineClienteRepository;
 import com.contarbn.repository.views.VOrdineClienteArticoloDaEvadereRepository;
 import com.contarbn.repository.views.VOrdineClienteArticoloRepository;
 import com.contarbn.util.enumeration.Resource;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -26,10 +26,10 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+@Slf4j
+@RequiredArgsConstructor
 @Service
 public class OrdineClienteService {
-
-    private final static Logger LOGGER = LoggerFactory.getLogger(OrdineClienteService.class);
 
     private final OrdineClienteRepository ordineClienteRepository;
     private final OrdineClienteArticoloService ordineClienteArticoloService;
@@ -39,34 +39,18 @@ public class OrdineClienteService {
     private final VOrdineClienteArticoloRepository vOrdineClienteArticoloRepository;
     private final VOrdineClienteArticoloDaEvadereRepository vOrdineClienteArticoloDaEvadereRepository;
 
-    public OrdineClienteService(final OrdineClienteRepository ordineClienteRepository,
-                                final OrdineClienteArticoloService ordineClienteArticoloService,
-                                final StatoOrdineService statoOrdineService,
-                                final ListinoPrezzoService listinoPrezzoService,
-                                final DdtArticoloOrdineClienteRepository ddtArticoloOrdineClienteRepository,
-                                final VOrdineClienteArticoloRepository vOrdineClienteArticoloRepository,
-                                final VOrdineClienteArticoloDaEvadereRepository vOrdineClienteArticoloDaEvadereRepository){
-        this.ordineClienteRepository = ordineClienteRepository;
-        this.ordineClienteArticoloService = ordineClienteArticoloService;
-        this.statoOrdineService = statoOrdineService;
-        this.listinoPrezzoService = listinoPrezzoService;
-        this.ddtArticoloOrdineClienteRepository = ddtArticoloOrdineClienteRepository;
-        this.vOrdineClienteArticoloRepository = vOrdineClienteArticoloRepository;
-        this.vOrdineClienteArticoloDaEvadereRepository = vOrdineClienteArticoloDaEvadereRepository;
-    }
-
     public Set<OrdineCliente> getAll(){
-        LOGGER.info("Retrieving the list of 'ordini clienti'");
+        log.info("Retrieving the list of 'ordini clienti'");
         Set<OrdineCliente> ordiniClienti = ordineClienteRepository.findAllByOrderByAnnoContabileDescProgressivoDesc();
-        LOGGER.info("Retrieved {} 'ordini clienti'", ordiniClienti.size());
+        log.info("Retrieved {} 'ordini clienti'", ordiniClienti.size());
         return ordiniClienti;
     }
 
     public OrdineCliente getOne(Long ordineClienteId){
-        LOGGER.info("Retrieving 'ordineCliente' '{}'", ordineClienteId);
+        log.info("Retrieving 'ordineCliente' '{}'", ordineClienteId);
         OrdineCliente ordineCliente = ordineClienteRepository.findById(ordineClienteId).orElseThrow(ResourceNotFoundException::new);
-        LOGGER.info("Retrieved 'ordineCliente' '{}'", ordineCliente);
-        LOGGER.info("Setting prices...");
+        log.info("Retrieved 'ordineCliente' '{}'", ordineCliente);
+        log.info("Setting prices...");
         Listino listino = ordineCliente.getCliente().getListino();
         if(listino != null){
             List<ListinoPrezzo> listiniPrezzi = listinoPrezzoService.getByListinoId(listino.getId());
@@ -78,12 +62,12 @@ public class OrdineClienteService {
                 ordineCliente.getOrdineClienteArticoli().forEach(a -> a.setPrezzo(articoloPrezzoMap.get(a.getId().getArticoloId())));
             }
         }
-        LOGGER.info("Prices successfully set");
+        log.info("Prices successfully set");
         return ordineCliente;
     }
 
     public Set<OrdineCliente> getByIdClienteAndIdPuntoConsegnaAndDataConsegnaLessOrEqualAndIdStatoNot(Long idCliente, Long idPuntoConsegna, Date dataConsegna, Long idStato){
-        LOGGER.info("Retrieving the list of 'ordini clienti' with idCliente '{}', idPuntoConsegna '{}', dataConsegna <= '{}', idStato '{}'", idCliente, idPuntoConsegna, dataConsegna, idStato);
+        log.info("Retrieving the list of 'ordini clienti' with idCliente '{}', idPuntoConsegna '{}', dataConsegna <= '{}', idStato '{}'", idCliente, idPuntoConsegna, dataConsegna, idStato);
         Set<OrdineCliente> ordiniClienti = ordineClienteRepository.findByClienteIdAndPuntoConsegnaId(idCliente, idPuntoConsegna);
 
         Predicate<OrdineCliente> isOrdineClienteDataConsegnaLessOrEquals = ordineCliente -> {
@@ -106,7 +90,7 @@ public class OrdineClienteService {
 
         ordiniClienti = ordiniClienti.stream().filter(isOrdineClienteDataConsegnaLessOrEquals.and(isOrdineClienteStatoNotEquals)).collect(Collectors.toSet());
 
-        LOGGER.info("Retrieved {} 'ordini clienti'", ordiniClienti.size());
+        log.info("Retrieved {} 'ordini clienti'", ordiniClienti.size());
         return ordiniClienti;
     }
 
@@ -116,10 +100,10 @@ public class OrdineClienteService {
 
     public Set<OrdineCliente> getOrdiniClientiEvasiAndExpired(Integer days){
         Integer finalDays = days != null ? days : 1;
-        LOGGER.info("Retrieving the list of 'ordini clienti' with stato 'EVASO' and expired (dataConsegna <= now-{})", days);
+        log.info("Retrieving the list of 'ordini clienti' with stato 'EVASO' and expired (dataConsegna <= now-{})", days);
         Set<OrdineCliente> ordiniClienti = ordineClienteRepository.findByStatoOrdineId(statoOrdineService.getEvaso().getId());
         ordiniClienti = ordiniClienti.stream().filter(oc -> oc.getDataConsegna().compareTo(Date.valueOf(LocalDate.now().minusDays(finalDays)))<=0).collect(Collectors.toSet());
-        LOGGER.info("Retrieved {} 'ordini clienti'", ordiniClienti.size());
+        log.info("Retrieved {} 'ordini clienti'", ordiniClienti.size());
         return ordiniClienti;
     }
 
@@ -148,7 +132,7 @@ public class OrdineClienteService {
 
     @Transactional
     public OrdineCliente create(OrdineCliente ordineCliente){
-        LOGGER.info("Creating 'ordineCliente'");
+        log.info("Creating 'ordineCliente'");
 
         Integer progressivo = ordineCliente.getProgressivo();
         if(progressivo == null){
@@ -171,13 +155,13 @@ public class OrdineClienteService {
         });
 
         ordineClienteRepository.save(createdOrdineCliente);
-        LOGGER.info("Created 'ordineCliente' '{}'", createdOrdineCliente);
+        log.info("Created 'ordineCliente' '{}'", createdOrdineCliente);
         return createdOrdineCliente;
     }
 
     @Transactional
     public OrdineCliente update(OrdineCliente ordineCliente){
-        LOGGER.info("Updating 'ordineCliente'");
+        log.info("Updating 'ordineCliente'");
 
         Integer progressivo = ordineCliente.getProgressivo();
         if(progressivo.equals(null)){
@@ -196,17 +180,18 @@ public class OrdineClienteService {
         ordineCliente.setDataAggiornamento(Timestamp.from(ZonedDateTime.now().toInstant()));
 
         OrdineCliente updatedOrdineCliente = ordineClienteRepository.save(ordineCliente);
-        ordineClienteArticoli.stream().forEach(oca -> {
+        ordineClienteArticoli.forEach(oca -> {
             oca.getId().setOrdineClienteId(updatedOrdineCliente.getId());
+            oca.setDataAggiornamento(Timestamp.from(ZonedDateTime.now().toInstant()));
             ordineClienteArticoloService.create(oca);
         });
-        LOGGER.info("Updated 'ordineCliente' '{}'", updatedOrdineCliente);
+        log.info("Updated 'ordineCliente' '{}'", updatedOrdineCliente);
         return updatedOrdineCliente;
     }
 
     @Transactional
     public OrdineCliente patch(Map<String,Object> patchOrdineCliente){
-        LOGGER.info("Patching 'ordineCliente'");
+        log.info("Patching 'ordineCliente'");
 
         Long id = Long.valueOf((Integer) patchOrdineCliente.get("id"));
         OrdineCliente ordineCliente = ordineClienteRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
@@ -241,22 +226,22 @@ public class OrdineClienteService {
         });
         OrdineCliente patchedOrdineCliente = ordineClienteRepository.save(ordineCliente);
 
-        LOGGER.info("Patched 'ordineCliente' '{}'", patchedOrdineCliente);
+        log.info("Patched 'ordineCliente' '{}'", patchedOrdineCliente);
         return patchedOrdineCliente;
     }
 
     @Transactional
     public void delete(Long ordineClienteId){
-        LOGGER.info("Deleting 'ordineCliente' '{}'", ordineClienteId);
+        log.info("Deleting 'ordineCliente' '{}'", ordineClienteId);
         ddtArticoloOrdineClienteRepository.deleteByOrdineClienteId(ordineClienteId);
         ordineClienteArticoloService.deleteByOrdineClienteId(ordineClienteId);
         ordineClienteRepository.deleteById(ordineClienteId);
-        LOGGER.info("Deleted 'ordineCliente' '{}'", ordineClienteId);
+        log.info("Deleted 'ordineCliente' '{}'", ordineClienteId);
     }
 
     @Transactional
     public List<OrdineClienteAggregate> updateAggregate(List<OrdineClienteAggregate> ordiniClientiAggregati){
-        LOGGER.info("Updating {} 'ordini-clienti aggregate'", ordiniClientiAggregati.size());
+        log.info("Updating {} 'ordini-clienti aggregate'", ordiniClientiAggregati.size());
 
         if(ordiniClientiAggregati != null && !ordiniClientiAggregati.isEmpty()){
 
@@ -280,15 +265,15 @@ public class OrdineClienteService {
                     OrdineClienteArticolo ordineClienteArticolo = null;
                     try{
                         ordineClienteArticolo = getOrdineClienteArticolo(ordineClienteArticoloKey);
-                        LOGGER.info("Retrieved 'ordineClienteArticolo' {}", ordineClienteArticolo);
+                        log.info("Retrieved 'ordineClienteArticolo' {}", ordineClienteArticolo);
                     } catch(Exception e){
-                        LOGGER.error("Unable to retrieve 'OrdineClienteArticolo' from key '{}'", ordineClienteArticoloKey);
+                        log.error("Unable to retrieve 'OrdineClienteArticolo' from key '{}'", ordineClienteArticoloKey);
                         throw e;
                     }
 
                     Integer numPezziOrdinati = ordineClienteArticolo.getNumeroPezziOrdinati();
 
-                    LOGGER.info("Numero pezzi ordinati: {}, numero pezzi evasi {}", numPezziOrdinati, numPezziEvasi);
+                    log.info("Numero pezzi ordinati: {}, numero pezzi evasi {}", numPezziOrdinati, numPezziEvasi);
 
                     int newNumPezziDaEvadere = numPezziOrdinati - numPezziEvasi;
                     if(newNumPezziDaEvadere > 0){
@@ -303,7 +288,7 @@ public class OrdineClienteService {
                     ordineClienteArticolo.setNumeroPezziDaEvadere(newNumPezziDaEvadere);
                     ordineClienteArticolo.setIdDdts(ordineClienteAggregate.getIdsDdts());
 
-                    LOGGER.info("Updating ordine cliente {}, articolo {} setting 'numPezziDaEvadere'={}", idOrdineCliente, ordineClienteAggregate.getIdArticolo(), newNumPezziDaEvadere);
+                    log.info("Updating ordine cliente {}, articolo {} setting 'numPezziDaEvadere'={}", idOrdineCliente, ordineClienteAggregate.getIdArticolo(), newNumPezziDaEvadere);
                     saveOrdineClienteArticolo(ordineClienteArticolo);
                 }
             }
@@ -322,7 +307,7 @@ public class OrdineClienteService {
                 }
             }
         }
-        LOGGER.info("Updated {} 'ordini-clienti aggregate'", ordiniClientiAggregati.size());
+        log.info("Updated {} 'ordini-clienti aggregate'", ordiniClientiAggregati.size());
         return ordiniClientiAggregati;
     }
 
@@ -342,7 +327,7 @@ public class OrdineClienteService {
     }
 
     public void computeStatoOrdineCliente(Long idOrdineCliente){
-        LOGGER.info("Computing stato of 'OrdineCliente' {}", idOrdineCliente);
+        log.info("Computing stato of 'OrdineCliente' {}", idOrdineCliente);
         OrdineCliente ordineCliente = getOne(idOrdineCliente);
         Set<OrdineClienteArticolo> ordineClienteArticoli = ordineClienteArticoloService.getOrdineClienteArticoli(idOrdineCliente);
         if(ordineClienteArticoli != null && !ordineClienteArticoli.isEmpty()){
@@ -356,13 +341,13 @@ public class OrdineClienteService {
                     statoOrdine = statoOrdineService.getParzialmenteEvaso();
                 }
             }
-            LOGGER.info("Setting stato {} to 'OrdineCliente' {}", statoOrdine.getCodice(), idOrdineCliente);
+            log.info("Setting stato {} to 'OrdineCliente' {}", statoOrdine.getCodice(), idOrdineCliente);
             ordineCliente.setStatoOrdine(statoOrdine);
             ordineClienteRepository.save(ordineCliente);
-            LOGGER.info("Set stato {} to 'OrdineCliente' {}", statoOrdine.getCodice(), idOrdineCliente);
+            log.info("Set stato {} to 'OrdineCliente' {}", statoOrdine.getCodice(), idOrdineCliente);
         }
 
-        LOGGER.info("Computed stato of 'OrdineCliente' {}", idOrdineCliente);
+        log.info("Computed stato of 'OrdineCliente' {}", idOrdineCliente);
     }
 
     public List<VOrdineFornitoreArticolo> getArticoliForOrdineFornitore(Long idFornitore, Date dataFrom, Date dataTo){
