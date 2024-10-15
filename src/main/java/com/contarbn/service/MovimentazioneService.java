@@ -76,7 +76,7 @@ public class MovimentazioneService {
         if(produzioneConfezioni != null && !produzioneConfezioni.isEmpty()){
             Set<Long> produzioniIds = new HashSet<>();
             produzioneConfezioni.forEach(pc -> {
-                Produzione produzione = produzioneRepository.findById(pc.getId().getProduzioneId()).get();
+                Produzione produzione = produzioneRepository.findById(pc.getProduzione().getId()).get();
                 if(scadenza != null){
                     if(produzione.getScadenza() != null && produzione.getScadenza().toLocalDate().compareTo(scadenza.toLocalDate())==0){
                         if(dataAggiornamento != null){
@@ -97,7 +97,7 @@ public class MovimentazioneService {
                     }
                 }
             });
-            produzioneConfezioni = produzioneConfezioni.stream().filter(pc -> (produzioniIds.contains(pc.getId().getProduzioneId()))).collect(Collectors.toSet());
+            produzioneConfezioni = produzioneConfezioni.stream().filter(pc -> (produzioniIds.contains(pc.getProduzione().getId()))).collect(Collectors.toSet());
         }
 
         fatturaAccompagnatoriaAcquistoArticoli = fatturaAccompagnatoriaAcquistoArticoloService.getByArticoloIdAndLottoAndScadenza(articolo.getId(), lotto, scadenza, dataAggiornamento);
@@ -157,7 +157,7 @@ public class MovimentazioneService {
         if(produzioneConfezioni != null && !produzioneConfezioni.isEmpty()){
             Set<Long> produzioniIds = new HashSet<>();
             produzioneConfezioni.forEach(pc -> {
-                Produzione produzione = produzioneRepository.findById(pc.getId().getProduzioneId()).get();
+                Produzione produzione = produzioneRepository.findById(pc.getProduzione().getId()).get();
                 if(giacenzaIngrediente.getScadenza() != null){
                     if(produzione.getScadenza() != null && produzione.getScadenza().toLocalDate().compareTo(giacenzaIngrediente.getScadenza().toLocalDate())==0){
                         produzioniIds.add(produzione.getId());
@@ -166,7 +166,7 @@ public class MovimentazioneService {
                     produzioniIds.add(produzione.getId());
                 }
             });
-            produzioneConfezioni = produzioneConfezioni.stream().filter(pc -> (produzioniIds.contains(pc.getId().getProduzioneId()))).collect(Collectors.toSet());
+            produzioneConfezioni = produzioneConfezioni.stream().filter(pc -> (produzioniIds.contains(pc.getProduzione().getId()))).collect(Collectors.toSet());
         }
 
         // retrieve the set of 'MovimentazioneManualeIngrediente'
@@ -207,8 +207,8 @@ public class MovimentazioneService {
         // Create 'movimentazione' from 'ProduzioneConfezione'
         if(produzioneConfezioni != null && !produzioneConfezioni.isEmpty()){
             produzioneConfezioni.forEach(pc -> {
-                Produzione produzione = produzioneRepository.findById(pc.getId().getProduzioneId()).get();
-                Confezione confezione = confezioneService.getOne(pc.getId().getConfezioneId());
+                Produzione produzione = produzioneRepository.findById(pc.getProduzione().getId()).get();
+                Confezione confezione = confezioneService.getOne(pc.getConfezione().getId());
 
                 float quantita = 0f;
                 if(confezione.getPeso() != null){
@@ -307,7 +307,7 @@ public class MovimentazioneService {
     }
 
     private Movimentazione create(ProduzioneConfezione produzioneConfezione, String lotto, Date scadenza){
-        Produzione produzione = produzioneRepository.findById(produzioneConfezione.getId().getProduzioneId()).get();
+        Produzione produzione = produzioneRepository.findById(produzioneConfezione.getProduzione().getId()).get();
 
         Movimentazione movimentazione = new Movimentazione();
         //movimentazione.setIdGiacenza(giacenzaArticolo.getId());

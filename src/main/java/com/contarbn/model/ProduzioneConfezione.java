@@ -11,25 +11,27 @@ import java.io.Serializable;
 @Table(name = "produzione_confezione")
 public class ProduzioneConfezione implements Serializable {
 
-    private static final long serialVersionUID = -7611851738261520234L;
+    private static final long serialVersionUID = -231309074009870289L;
 
-    @EmbeddedId
-    ProduzioneConfezioneKey id;
+    @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne
-    @MapsId("id_produzione")
     @JoinColumn(name = "id_produzione")
     @JsonIgnoreProperties("produzioneConfezioni")
     private Produzione produzione;
 
     @ManyToOne
-    @MapsId("id_confezione")
     @JoinColumn(name = "id_confezione")
     @JsonIgnoreProperties("produzioneConfezioni")
     private Confezione confezione;
 
     @Column(name = "num_confezioni")
     private Integer numConfezioni;
+
+    @Column(name = "barcode")
+    private String barcode;
 
     @Column(name = "lotto")
     private String lotto;
@@ -58,9 +60,11 @@ public class ProduzioneConfezione implements Serializable {
     public String toString() {
 
         return "{" +
-                "produzioneId: " + id.produzioneId +
-                ", confezioneId: " + id.confezioneId +
+                "id: " + id +
+                ", produzioneId: " + produzione.getId() +
+                ", confezioneId: " + confezione.getId() +
                 ", numConfezioni: " + numConfezioni +
+                ", barcode: " + barcode +
                 ", lotto: " + lotto +
                 ", lotto2: " + lotto2 +
                 ", lottoProduzione: " + lottoProduzione +

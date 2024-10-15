@@ -105,7 +105,10 @@ public class VProduzioneCustomRepositoryImpl implements VProduzioneCustomReposit
                     vProduzione.setBarcodeEan128((String)queryResult[18]);
                 }
                 if(queryResult[19] != null){
-                    vProduzione.setIdSchedaTecnica(((Integer)queryResult[19]).longValue());
+                    vProduzione.setIdProduzioneConfezione(((Integer)queryResult[19]).longValue());
+                }
+                if(queryResult[20] != null){
+                    vProduzione.setIdSchedaTecnica(((Integer)queryResult[20]).longValue());
                 }
                 result.add(vProduzione);
             }

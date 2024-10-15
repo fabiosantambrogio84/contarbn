@@ -74,6 +74,9 @@ public class VProduzione {
     @Column(name = "barcode_ean_128")
     private String barcodeEan128;
 
+    @Column(name = "id_produzione_confezione")
+    private Long idProduzioneConfezione;
+
     @Column(name = "id_scheda_tecnica")
     private Long idSchedaTecnica;
 

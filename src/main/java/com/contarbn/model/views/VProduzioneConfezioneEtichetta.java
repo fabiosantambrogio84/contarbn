@@ -12,12 +12,15 @@ import java.sql.Date;
 @Data
 @EqualsAndHashCode()
 @Entity
-@Table(name = "v_produzione_etichetta")
-public class VProduzioneEtichetta {
+@Table(name = "v_produzione_confezione_etichetta")
+public class VProduzioneConfezioneEtichetta {
 
     @Id
     @Column(name = "id")
     private Long id;
+
+    @Column(name = "id_produzione")
+    private Long idProduzione;
 
     @Column(name = "lotto")
     private String lotto;
@@ -46,6 +49,12 @@ public class VProduzioneEtichetta {
     @Column(name = "barcode_ean_128")
     private String barcodeEan128;
 
+    @Column(name = "peso_kg")
+    private Float pesoKg;
+
+    @Column(name = "lotto_confezione")
+    private String lottoConfezione;
+
     @Override
     public String toString() {
 
@@ -60,6 +69,8 @@ public class VProduzioneEtichetta {
                 ", conservazione: " + conservazione +
                 ", barcodeEan13: " + barcodeEan13 +
                 ", barcodeEan128: " + barcodeEan128 +
+                ", pesoKg: " + pesoKg +
+                ", lottoConfezione: " + lottoConfezione +
                 "}";
     }
 }

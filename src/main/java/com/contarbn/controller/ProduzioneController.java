@@ -1,10 +1,11 @@
 package com.contarbn.controller;
 
+import com.contarbn.model.Articolo;
 import com.contarbn.model.Produzione;
 import com.contarbn.model.ProduzioneConfezione;
 import com.contarbn.model.beans.PageResponse;
 import com.contarbn.model.views.VProduzione;
-import com.contarbn.model.views.VProduzioneEtichetta;
+import com.contarbn.model.views.VProduzioneConfezioneEtichetta;
 import com.contarbn.service.ProduzioneService;
 import com.contarbn.util.ResponseUtils;
 import com.contarbn.util.Utils;
@@ -61,6 +62,14 @@ public class ProduzioneController {
         return produzioneService.getOne(produzioneId);
     }
 
+    @RequestMapping(method = GET, path = "/check-articolo")
+    @CrossOrigin
+    public Articolo checkArticolo(@RequestParam(name = "codiceRicetta") String codiceRicetta,
+                                  @RequestParam(name = "idConfezione") Long idConfezione) {
+        log.info("Performing GET request for checking if articolo for 'codiceRicetta' '{}' and 'idConfezione' '{}' exists", codiceRicetta, idConfezione);
+        return produzioneService.checkArticolo(codiceRicetta, idConfezione);
+    }
+
     @RequestMapping(method = POST)
     @ResponseStatus(CREATED)
     @CrossOrigin
@@ -68,18 +77,6 @@ public class ProduzioneController {
         log.info("Performing POST request for creating 'produzione'");
         return produzioneService.create(produzione);
     }
-
-    /*
-    @RequestMapping(method = PUT, path = "/{produzioneId}")
-    @CrossOrigin
-    public Produzione update(@PathVariable final Long produzioneId, @RequestBody final Produzione produzione){
-        log.info("Performing PUT request for updating 'produzione' '{}'", produzioneId);
-        if (!Objects.equals(produzioneId, produzione.getId())) {
-            throw new CannotChangeResourceIdException();
-        }
-        return produzioneService.update(produzione);
-    }
-    */
 
     @RequestMapping(method = DELETE, path = "/{produzioneId}")
     @ResponseStatus(NO_CONTENT)
@@ -96,10 +93,10 @@ public class ProduzioneController {
         return produzioneService.getProduzioneConfezioni(produzioneId);
     }
 
-    @RequestMapping(method = GET, path = "/{produzioneId}/etichetta")
+    @RequestMapping(method = GET, path = "/etichetta")
     @CrossOrigin
-    public VProduzioneEtichetta getProduzioneEtichetta(@PathVariable final Long produzioneId) {
-        log.info("Performing GET request for retrieving data for 'etichetta' of 'produzione' '{}'", produzioneId);
-        return produzioneService.getProduzioneEtichetta(produzioneId);
+    public VProduzioneConfezioneEtichetta getProduzioneConfezioneEtichetta(@RequestParam(name = "idProduzioneConfezione") Long idProduzioneConfezione) {
+        log.info("Performing GET request for retrieving data for 'etichetta' of 'produzione-confezione' '{}'", idProduzioneConfezione);
+        return produzioneService.getProduzioneConfezioneEtichetta(idProduzioneConfezione);
     }
 }

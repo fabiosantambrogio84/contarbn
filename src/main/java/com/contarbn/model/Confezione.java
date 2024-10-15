@@ -119,7 +119,7 @@ public class Confezione {
 
         result.append("{");
         result.append("id: " + id);
-        result.append("codice: " + codice);
+        result.append(", codice: " + codice);
         result.append(", tipo: " + tipo);
         result.append(", peso: " + peso);
         result.append(", prezzo: " + prezzo);

@@ -4,10 +4,10 @@ import com.contarbn.exception.ResourceNotFoundException;
 import com.contarbn.model.*;
 import com.contarbn.model.beans.SortOrder;
 import com.contarbn.model.views.VProduzione;
-import com.contarbn.model.views.VProduzioneEtichetta;
+import com.contarbn.model.views.VProduzioneConfezioneEtichetta;
 import com.contarbn.repository.ProduzioneRepository;
 import com.contarbn.repository.RicettaRepository;
-import com.contarbn.repository.views.VProduzioneEtichettaRepository;
+import com.contarbn.repository.views.VProduzioneConfezioneEtichettaRepository;
 import com.contarbn.repository.views.VProduzioneRepository;
 import com.contarbn.util.BarcodeUtils;
 import com.contarbn.util.Constants;
@@ -39,7 +39,7 @@ public class ProduzioneService {
 
     private final ProduzioneRepository produzioneRepository;
     private final VProduzioneRepository vProduzioneRepository;
-    private final VProduzioneEtichettaRepository vProduzioneEtichettaRepository;
+    private final VProduzioneConfezioneEtichettaRepository vProduzioneConfezioneEtichettaRepository;
     private final ProduzioneIngredienteService produzioneIngredienteService;
     private final ProduzioneConfezioneService produzioneConfezioneService;
     private final GiacenzaArticoloService giacenzaArticoloService;
@@ -80,6 +80,14 @@ public class ProduzioneService {
         return produzione;
     }
 
+    public Articolo checkArticolo(String codiceRicetta, Long idConfezione){
+        Confezione confezione = confezioneService.getOne(idConfezione);
+        Ricetta ricetta = new Ricetta();
+        ricetta.setCodice(codiceRicetta);
+        String codiceArticolo = createCodiceArticolo(ricetta, confezione);
+        return articoloService.getByCodice(codiceArticolo).orElse(null);
+    }
+
     @Transactional
     public Produzione create(Produzione produzione){
         log.info("Creating 'produzione'");
@@ -114,7 +122,7 @@ public class ProduzioneService {
         final String createdLotto = createdProduzione.getLotto();
         final double quantitaTotale = createdProduzione.getProduzioneIngredienti().stream().mapToDouble(ProduzioneIngrediente::getQuantita).sum();
 
-        createdProduzione.getProduzioneIngredienti().stream().forEach(pi -> {
+        createdProduzione.getProduzioneIngredienti().forEach(pi -> {
             pi.setPercentuale(Utils.computePercentuale(pi.getQuantita(), (float) quantitaTotale));
             pi.getId().setProduzioneId(produzioneId);
             pi.getId().setUuid(UUID.randomUUID().toString());
@@ -125,14 +133,18 @@ public class ProduzioneService {
             giacenzaIngredienteService.computeGiacenza(pi.getId().getIngredienteId(), pi.getLotto(), pi.getScadenza(), pi.getQuantita(), Resource.PRODUZIONE_INGREDIENTE);
         });
 
-        createdProduzione.getProduzioneConfezioni().stream().forEach(pc -> {
-            pc.getId().setProduzioneId(produzioneId);
+        createdProduzione.getProduzioneConfezioni().forEach(pc -> {
+            Confezione confezione = confezioneService.getOne(pc.getConfezione().getId());
+            pc.setConfezione(confezione);
+
+            Produzione produzioneTmp = new Produzione();
+            produzioneTmp.setId(produzioneId);
+            pc.setProduzione(produzioneTmp);
             pc.setLottoProduzione(createdLotto);
 
             Long id;
             float quantita = 0f;
             if(tipologia.equals("SCORTA")){
-                Confezione confezione = confezioneService.getOne(pc.getId().getConfezioneId());
 
                 // create, or retrieve, the associated Ingrediente
                 Ingrediente ingrediente = getOrCreateIngrediente(confezione, idRicetta);
@@ -266,7 +278,7 @@ public class ProduzioneService {
 
             for(ProduzioneConfezione produzioneConfezione : produzioneConfezioni){
                 Ricetta ricetta = ricettaRepository.findById(produzione.getRicetta().getId()).orElse(null);
-                Confezione confezione = confezioneService.getOne(produzioneConfezione.getId().getConfezioneId());
+                Confezione confezione = confezioneService.getOne(produzioneConfezione.getConfezione().getId());
 
                 if(tipologia.equals("SCORTA")){
                     String codiceIngrediente = createCodiceIngrediente(ricetta, confezione);
@@ -320,11 +332,11 @@ public class ProduzioneService {
         return produzioneConfezioni;
     }
 
-    public VProduzioneEtichetta getProduzioneEtichetta(Long produzioneId){
-        log.info("Retrieving data for 'etichetta' of 'produzione' '{}'", produzioneId);
-        VProduzioneEtichetta vProduzioneEtichetta = vProduzioneEtichettaRepository.findById(produzioneId).orElseThrow(ResourceNotFoundException::new);
-        log.info("Retrieved data for 'etichetta' of 'produzione' '{}'", vProduzioneEtichetta);
-        return vProduzioneEtichetta;
+    public VProduzioneConfezioneEtichetta getProduzioneConfezioneEtichetta(Long idProduzioneConfezione){
+        log.info("Retrieving data for 'etichetta' of 'produzione-confezione' '{}'", idProduzioneConfezione);
+        VProduzioneConfezioneEtichetta vProduzioneConfezioneEtichetta = vProduzioneConfezioneEtichettaRepository.findById(idProduzioneConfezione).orElseThrow(ResourceNotFoundException::new);
+        log.info("Retrieved data for 'etichetta' of 'produzione-confezione' '{}'", vProduzioneConfezioneEtichetta);
+        return vProduzioneConfezioneEtichetta;
     }
 
     private Articolo getOrCreateArticolo(ProduzioneConfezione produzioneConfezione, Long idRicetta, Date dataProduzione){
@@ -337,7 +349,7 @@ public class ProduzioneService {
         Fornitore fornitore = fornitoreService.getByRagioneSociale(Constants.DEFAULT_FORNITORE);
 
         // retrieve Confezione
-        Confezione confezione = confezioneService.getOne(produzioneConfezione.getId().getConfezioneId());
+        Confezione confezione = confezioneService.getOne(produzioneConfezione.getConfezione().getId());
 
         String codiceArticolo = createCodiceArticolo(ricetta, confezione);
 
