@@ -342,36 +342,31 @@ public class ProduzioneService {
     private Articolo getOrCreateArticolo(ProduzioneConfezione produzioneConfezione, Long idRicetta, Date dataProduzione){
         log.info("Creating or retrieving associated 'articolo'...");
 
-        // retrieve Ricetta
+        Articolo articolo = produzioneConfezione.getArticolo();
+        if(articolo != null){
+            return articoloService.getOne(articolo.getId());
+        }
+
         Ricetta ricetta = ricettaRepository.findById(idRicetta).orElse(null);
 
-        // retrieve default Fornitore
         Fornitore fornitore = fornitoreService.getByRagioneSociale(Constants.DEFAULT_FORNITORE);
 
-        // retrieve Confezione
         Confezione confezione = confezioneService.getOne(produzioneConfezione.getConfezione().getId());
 
         String codiceArticolo = createCodiceArticolo(ricetta, confezione);
 
-        Optional<Articolo> optionalArticolo = articoloService.getByCodice(codiceArticolo);
-        Articolo articolo;
-
-        if(!optionalArticolo.isPresent()){
-            articolo = new Articolo();
-            articolo.setCodice(codiceArticolo);
-            articolo.setDescrizione(createDescrizioneArticolo(ricetta, confezione));
-            articolo.setFornitore(fornitore);
-            articolo.setData(dataProduzione);
-            articolo.setQuantitaPredefinita(1f);
-            articolo.setUnitaMisura(unitaMisuraService.getByNome("pz"));
-            articolo.setSitoWeb(Boolean.FALSE);
-            articolo.setAttivo(Boolean.TRUE);
-            articolo = articoloService.create(articolo);
-            log.info("Created 'articolo' '{}' from produzione", articolo);
-        } else {
-            log.info("Retrieved 'articolo' with 'codice' '{}'", codiceArticolo);
-            articolo = optionalArticolo.get();
-        }
+        articolo = new Articolo();
+        articolo.setCodice(codiceArticolo);
+        articolo.setDescrizione(createDescrizioneArticolo(ricetta, confezione));
+        articolo.setBarcode(produzioneConfezione.getBarcode());
+        articolo.setFornitore(fornitore);
+        articolo.setData(dataProduzione);
+        articolo.setQuantitaPredefinita(1f);
+        articolo.setUnitaMisura(unitaMisuraService.getByNome("pz"));
+        articolo.setSitoWeb(Boolean.FALSE);
+        articolo.setAttivo(Boolean.TRUE);
+        articolo = articoloService.create(articolo);
+        log.info("Created 'articolo' '{}' from produzione", articolo);
 
         return articolo;
     }

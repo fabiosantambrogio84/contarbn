@@ -190,7 +190,7 @@ public class ArticoloService {
         articolo.setScadenzaGiorniAllarme(articolo.getScadenzaGiorniAllarme() != null ? articolo.getScadenzaGiorniAllarme() : Constants.DEFAULT_ARTICOLO_SCADENZA_GIORNI);
         Articolo updatedArticolo = articoloRepository.save(articolo);
 
-        if(!updatedArticolo.getPrezzoListinoBase().equals(prezzoListinoBaseCurrent)){
+        if(updatedArticolo.getPrezzoListinoBase() != null && !updatedArticolo.getPrezzoListinoBase().equals(prezzoListinoBaseCurrent)){
             // compute 'listini prezzi'
             listinoPrezzoService.computeListiniPrezziForArticolo(updatedArticolo);
         }
