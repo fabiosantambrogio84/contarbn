@@ -7,7 +7,6 @@ import com.contarbn.service.ArticoloService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Comparator;
@@ -84,6 +83,14 @@ public class ArticoloController {
                                           @RequestParam(name = "attivo", required = false) Boolean active) {
         log.info("Performing GET request for retrieving 'articolo' with codice like '{}' and active '{}'", codice, active);
         return articoloService.getByCodiceLike(codice, active);
+    }
+
+    @RequestMapping(method = GET, path = "/next-barcode")
+    @CrossOrigin
+    public String getNextBarcode(@RequestParam(name = "idFornitore") Long idFornitore,
+                                 @RequestParam(name = "completeBarcode") Integer completeBarcode) {
+        log.info("Performing GET request for retrieving next barcode filtering by 'idFornitore' {} and 'completeBarcode' {}", idFornitore, completeBarcode);
+        return articoloService.getNextBarcode(idFornitore, completeBarcode);
     }
 
     @RequestMapping(method = POST)

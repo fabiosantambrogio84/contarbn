@@ -103,6 +103,10 @@ public class ArticoloService {
         return articoloRepository.findByCodiceLike(codice + "%", Utils.getActiveValues(active));
     }
 
+    public String getNextBarcode(Long idFornitore, Integer completeBarcode){
+        return articoloRepository.findNextBarcode(idFornitore, completeBarcode);
+    }
+
     public Articolo create(Articolo articolo){
         log.info("Creating 'articolo'");
 
