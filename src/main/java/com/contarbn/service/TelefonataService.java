@@ -5,8 +5,7 @@ import com.contarbn.model.OrdineCliente;
 import com.contarbn.model.Telefonata;
 import com.contarbn.repository.TelefonataRepository;
 import com.contarbn.util.enumeration.GiornoSettimana;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +14,9 @@ import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.*;
 
+@Slf4j
 @Service
 public class TelefonataService {
-
-    private final static Logger LOGGER = LoggerFactory.getLogger(TelefonataService.class);
 
     private final TelefonataRepository telefonataRepository;
 
@@ -32,21 +30,21 @@ public class TelefonataService {
     }
 
     public List<Telefonata> getAll(){
-        LOGGER.info("Retrieving the list of 'telefonate'");
+        log.info("Retrieving the list of 'telefonate'");
         List<Telefonata> telefonate = telefonataRepository.findAll();
-        LOGGER.info("Retrieved {} 'telefonate'", telefonate.size());
+        log.info("Retrieved {} 'telefonate'", telefonate.size());
         return telefonate;
     }
 
     public Telefonata getOne(Long telefonataId){
-        LOGGER.info("Retrieving 'telefonata' '{}'", telefonataId);
+        log.info("Retrieving 'telefonata' '{}'", telefonataId);
         Telefonata telefonata = telefonataRepository.findById(telefonataId).orElseThrow(ResourceNotFoundException::new);
-        LOGGER.info("Retrieved 'telefonata' '{}'", telefonata);
+        log.info("Retrieved 'telefonata' '{}'", telefonata);
         return telefonata;
     }
 
     public Telefonata create(Telefonata telefonata){
-        LOGGER.info("Creating 'telefonata'");
+        log.info("Creating 'telefonata'");
         telefonata.setDataInserimento(Timestamp.from(ZonedDateTime.now().toInstant()));
         if(telefonata.getGiornoOrdinale() == null){
             telefonata.setGiornoOrdinale(GiornoSettimana.getValueByLabel(telefonata.getGiorno()));
@@ -55,22 +53,22 @@ public class TelefonataService {
             telefonata.setGiornoConsegnaOrdinale(GiornoSettimana.getValueByLabel(telefonata.getGiornoConsegna()));
         }
         Telefonata createdTelefonata = telefonataRepository.save(telefonata);
-        LOGGER.info("Created 'telefonata' '{}'", createdTelefonata);
+        log.info("Created 'telefonata' '{}'", createdTelefonata);
 
         return telefonata;
     }
 
     public Telefonata update(Telefonata telefonata){
-        LOGGER.info("Updating 'telefonata'");
+        log.info("Updating 'telefonata'");
         Telefonata telefonataCurrent = telefonataRepository.findById(telefonata.getId()).orElseThrow(ResourceNotFoundException::new);
         telefonata.setDataInserimento(telefonataCurrent.getDataInserimento());
         Telefonata updatedTelefonata = telefonataRepository.save(telefonata);
-        LOGGER.info("Updated 'telefonata' '{}'", updatedTelefonata);
+        log.info("Updated 'telefonata' '{}'", updatedTelefonata);
         return updatedTelefonata;
     }
 
     public Telefonata patch(Map<String,Object> patchTelefonata){
-        LOGGER.info("Patching 'telefonata'");
+        log.info("Patching 'telefonata'");
 
         Long idTelefonata = Long.valueOf((Integer) patchTelefonata.get("idTelefonata"));
         Boolean eseguito = (Boolean)patchTelefonata.get("eseguito");
@@ -82,43 +80,43 @@ public class TelefonataService {
         }
         Telefonata patchedTelefonata = telefonataRepository.save(telefonata);
 
-        LOGGER.info("Patched 'telefonata' '{}'", patchedTelefonata);
+        log.info("Patched 'telefonata' '{}'", patchedTelefonata);
         return patchedTelefonata;
     }
 
     public void updateAfterDeletePuntoConsegna(Long puntoConsegnaId){
-        LOGGER.info("Updating 'telefonate' after delete of 'puntoConsegna' '{}'", puntoConsegnaId);
+        log.info("Updating 'telefonate' after delete of 'puntoConsegna' '{}'", puntoConsegnaId);
         telefonataRepository.findByPuntoConsegnaId(puntoConsegnaId).stream().forEach(t -> {
             t.setPuntoConsegna(null);
             update(t);
         });
-        LOGGER.info("Update 'telefonate' after delete of 'puntoConsegna' '{}'", puntoConsegnaId);
+        log.info("Update 'telefonate' after delete of 'puntoConsegna' '{}'", puntoConsegnaId);
     }
 
     @Transactional
     public void delete(Long telefonataId){
-        LOGGER.info("Deleting 'telefonata' '{}'", telefonataId);
+        log.info("Deleting 'telefonata' '{}'", telefonataId);
         deleteOrdiniClienti(telefonataId);
         telefonataRepository.deleteById(telefonataId);
-        LOGGER.info("Deleted 'telefonata' '{}'", telefonataId);
+        log.info("Deleted 'telefonata' '{}'", telefonataId);
     }
 
     public void deleteByClienteId(Long clienteId){
-        LOGGER.info("Deleting all 'telefonate' of 'cliente' '{}'", clienteId);
+        log.info("Deleting all 'telefonate' of 'cliente' '{}'", clienteId);
         telefonataRepository.deleteByClienteId(clienteId);
-        LOGGER.info("Deleted all 'telefonate' of 'cliente' '{}'", clienteId);
+        log.info("Deleted all 'telefonate' of 'cliente' '{}'", clienteId);
     }
 
     @Transactional
     public void bulkDelete(List<Long> telefonateIds){
-        LOGGER.info("Bulk deleting all the specified 'telefonate (number of elements to delete: {})'", telefonateIds.size());
+        log.info("Bulk deleting all the specified 'telefonate (number of elements to delete: {})'", telefonateIds.size());
         if(!telefonateIds.isEmpty()){
             for(Long idTelefonata : telefonateIds){
                 deleteOrdiniClienti(idTelefonata);
             }
         }
         telefonataRepository.deleteByIdIn(telefonateIds);
-        LOGGER.info("Bulk deleted all the specified 'telefonate");
+        log.info("Bulk deleted all the specified 'telefonate");
     }
 
     public void bulkSetEseguito(List<Long> telefonateIds, Boolean eseguito){

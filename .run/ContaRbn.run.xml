@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="ContaRbn" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="contarbn" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.contarbn.Application" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

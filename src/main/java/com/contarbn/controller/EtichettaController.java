@@ -1,16 +1,22 @@
 package com.contarbn.controller;
 
+import com.contarbn.model.request.EtichettaRequest;
 import com.contarbn.service.EtichettaService;
+import com.contarbn.util.Constants;
+import com.contarbn.util.Utils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.sql.Date;
 import java.util.Map;
 
-import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.web.bind.annotation.RequestMethod.*;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @Slf4j
 @RestController
@@ -23,39 +29,34 @@ public class EtichettaController {
         this.etichettaService = etichettaService;
     }
 
-    @RequestMapping(method = POST, path="/genera")
-    @ResponseStatus(CREATED)
+    @RequestMapping(method = POST, path="/stampa")
+    @ResponseStatus(OK)
     @CrossOrigin
-    public Map<String, String> generate(@RequestParam(value = "idProduzione", required = false) Long idProduzione,
-                        @RequestParam("articolo") String articolo,
-                        @RequestParam("ingredienti") String ingredienti,
-                        @RequestParam("ingredienti2") String ingredienti2,
-                        @RequestParam("conservazione") String conservazione,
-                        @RequestParam("valoriNutrizionali") String valoriNutrizionali,
-                        @RequestParam("dataConsumazione") Date dataConsumazione,
-                        @RequestParam("lotto") String lotto,
-                        @RequestParam("peso") Double peso,
-                        @RequestParam("disposizioniComune") String disposizioniComune,
-                        @RequestParam("footer") String footer,
-                        @RequestParam(value = "barcodeEan13File", required = false) MultipartFile barcodeEan13File,
-                        @RequestParam(value = "barcodeEan128File", required = false) MultipartFile barcodeEan128File,
-                        @RequestParam(value = "barcodeEan13", required = false) String barcodeEan13,
-                        @RequestParam(value = "barcodeEan128", required = false) String barcodeEan128,
-                        @RequestParam(value = "bollinoFile", required = false) MultipartFile bollinoFile) throws Exception{
-        log.info("Performing POST request for generating 'etichetta'");
+    public void stampa(@RequestBody final EtichettaRequest etichettaRequest) throws Exception{
+        log.info("Performing POST request for printing 'etichetta'");
 
-        Map<String, String> result = etichettaService.generate(idProduzione, articolo, ingredienti, ingredienti2, conservazione, valoriNutrizionali, dataConsumazione, lotto, peso, disposizioniComune, footer, barcodeEan13File, barcodeEan128File, barcodeEan13, barcodeEan128, bollinoFile);
+        etichettaService.stampa(etichettaRequest);
 
-        log.info("Successfully generated 'etichetta'");
-
-        return result;
+        log.info("Successfully printed 'etichetta'");
     }
 
-    @RequestMapping(method = GET, path = "/{etichettaId}")
+    @RequestMapping(method = POST, path = "/download")
+    @ResponseStatus(OK)
     @CrossOrigin
-    public String getHtml(@PathVariable final String etichettaId) {
-        log.info("Performing GET request for retrieving 'etichetta' '{}' as html", etichettaId);
-        return etichettaService.get(etichettaId).getHtml();
+    public ResponseEntity<Resource> download(@RequestBody final EtichettaRequest etichettaRequest) throws Exception {
+        log.info("Performing POST request for downloading 'etichetta'");
+
+        Map<String, Object> result = etichettaService.generate(etichettaRequest.getArticolo(), etichettaRequest.getIngredienti(), etichettaRequest.getTracce(), etichettaRequest.getConservazione(), etichettaRequest.getValoriNutrizionali(), etichettaRequest.getDataConsumazione(), etichettaRequest.getLotto(), etichettaRequest.getPeso(), etichettaRequest.getBarcodeEan13(), etichettaRequest.getBarcodeEan128(), etichettaRequest.getIdDispositivo());
+
+        byte[] fileContent = (byte[])result.get("fileContent");
+
+        ByteArrayResource resource = new ByteArrayResource(fileContent);
+
+        return ResponseEntity.ok()
+                .headers(Utils.createHttpHeaders((String)result.get("fileName")))
+                .contentLength(fileContent.length)
+                .contentType(MediaType.parseMediaType(Constants.MEDIA_TYPE_APPLICATION_TXT))
+                .body(resource);
     }
 
     @RequestMapping(method = DELETE, path = "/{etichettaId}")

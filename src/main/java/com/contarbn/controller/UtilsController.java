@@ -1,5 +1,7 @@
 package com.contarbn.controller;
 
+import com.contarbn.model.Dispositivo;
+import com.contarbn.service.DispositivoService;
 import com.contarbn.service.UtilsService;
 import com.contarbn.util.enumeration.*;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.sql.Date;
 import java.util.*;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -21,6 +22,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 public class UtilsController {
 
     private final UtilsService utilsService;
+    private final DispositivoService dispositivoService;
 
     @RequestMapping(method = GET, path = "/province")
     @CrossOrigin
@@ -48,6 +50,13 @@ public class UtilsController {
     public List<HashMap> getGiorniSettimana() {
         log.info("Performing GET request for retrieving list of 'giorni-settimana'");
         return GiornoSettimana.giorni();
+    }
+
+    @RequestMapping(method = GET, path = "/tipologie-dispositivi")
+    @CrossOrigin
+    public List<TipologiaDispositivo> getTipologieDispositivo() {
+        log.info("Performing GET request for retrieving list of 'tipologie-dispositivi'");
+        return Arrays.asList(TipologiaDispositivo.values());
     }
 
     @RequestMapping(method = GET, path = "/tipologie-ordini")
@@ -95,5 +104,12 @@ public class UtilsController {
     public List<Map<String, Object>> getStatisticheOpzioni() {
         log.info("Performing GET request for retrieving list of 'statistiche opzioni'");
         return StatisticaOpzione.getAll();
+    }
+
+    @RequestMapping(method = GET, path = "/stampanti")
+    @CrossOrigin
+    public List<Dispositivo> getStampanti(@RequestParam(name = "attivo", required = false) Boolean active) {
+        log.info("Performing GET request for retrieving list of 'dispositivo' of tipo 'STAMPANTE' and active '{}'", active);
+        return dispositivoService.getByTipoAndAttivo(TipologiaDispositivo.STAMPANTE, active);
     }
 }

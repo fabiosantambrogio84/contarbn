@@ -4,6 +4,7 @@ import com.contarbn.model.beans.SortOrder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
+import org.springframework.http.HttpHeaders;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -15,6 +16,15 @@ import java.util.*;
 
 @Slf4j
 public class Utils {
+
+    public static HttpHeaders createHttpHeaders(String fileName){
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename="+fileName);
+        headers.add(HttpHeaders.CACHE_CONTROL, Constants.HTTP_HEADER_CACHE_CONTROL_VALUE);
+        headers.add(HttpHeaders.PRAGMA, Constants.HTTP_HEADER_PRAGMA_VALUE);
+        headers.add(HttpHeaders.EXPIRES, Constants.HTTP_HEADER_EXPIRES_VALUE);
+        return headers;
+    }
 
     public static List<Integer> getActiveValues(Boolean active){
         List<Integer> activeValues;

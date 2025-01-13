@@ -4,17 +4,16 @@ public enum LabelPlaceholder {
 
     ARTICOLO("${articolo}"),
     INGREDIENTI("${ingredienti}"),
-    INGREDIENTI_2("${ingredienti2}"),
+    TRACCE("${tracce}"),
     CONSERVAZIONE("${conservazione}"),
     VALORI_NUTRIZIONALI("${valoriNutrizionali}"),
-    CONSUMAZIONE("${consumazione}"),
-    BARCODE_EAN_13("${barcodeEan13}"),
-    BARCODE_EAN_128("${barcodeEan128}"),
-    DISPOSIZIONI_COMUNE("${disposizioniComune}"),
-    FOOTER("${footer}"),
-    BOLLINO("${bollino}");
+    CONSUMAZIONE("01/01/1970"),
+    LOTTO("${lotto}"),
+    PESO("${peso}"),
+    BARCODE_EAN_13("0000000000000"),
+    BARCODE_EAN_128("123456789012");
 
-    private String placeholder;
+    private final String placeholder;
 
     LabelPlaceholder(String placeholder) {
         this.placeholder = placeholder;

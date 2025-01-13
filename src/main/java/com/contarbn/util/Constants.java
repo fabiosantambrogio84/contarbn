@@ -66,7 +66,7 @@ public interface Constants {
     String JASPER_REPORT_BOLLINO_IMAGE_PATH = "/jasper_reports/bollino.png";
     String JASPER_REPORT_HEADER_SUBREPORT_PATH = "/jasper_reports/header.jasper";
 
-    String LABEL_TEMPLATE = "/label_generation/template.html";
+    String LABEL_TEMPLATE = "/label_generation/template.zpl";
 
     String MEDIA_TYPE_APPLICATION_PDF = "application/pdf";
     String MEDIA_TYPE_APPLICATION_XML = "application/xml";

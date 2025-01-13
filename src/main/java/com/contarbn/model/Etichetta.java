@@ -28,11 +28,14 @@ public class Etichetta {
     @Column(name = "peso")
     private BigDecimal peso;
 
-    @Column(name = "html")
-    private String html;
-
     @Column(name = "filename")
     private String filename;
+
+    @Column(name = "file_content")
+    private byte[] fileContent;
+
+    @Column(name = "id_dispositivo")
+    private Long idDispositivo;
 
     @Column(name = "data_inserimento")
     private Timestamp dataInserimento;
@@ -46,7 +49,7 @@ public class Etichetta {
                 ", lotto: " + lotto +
                 ", peso: " + peso +
                 ", filename: " + filename +
-                ", html: " + html +
+                ", idDispositivo: " + idDispositivo +
                 ", dataInserimento: " + dataInserimento +
                 "}";
     }
