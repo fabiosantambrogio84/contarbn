@@ -10,7 +10,6 @@ import com.contarbn.util.enumeration.Operation;
 import com.contarbn.util.enumeration.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -130,6 +129,7 @@ public class FatturaAccompagnatoriaService {
         fatturaAccompagnatoria.setStatoFattura(statoFatturaService.getDaPagare());
         fatturaAccompagnatoria.setTipoFattura(tipoFatturaService.getAccompagnatoria());
         fatturaAccompagnatoria.setSpeditoAde(false);
+        fatturaAccompagnatoria.setConsegnato(Boolean.FALSE);
         fatturaAccompagnatoria.setDataInserimento(Timestamp.from(ZonedDateTime.now().toInstant()));
 
         log.info(fatturaAccompagnatoria.getScannerLog());

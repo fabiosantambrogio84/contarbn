@@ -99,6 +99,7 @@ public class RicevutaPrivatoService {
 
         ricevutaPrivato.setStatoRicevutaPrivato(statoRicevutaPrivatoService.getDaPagare());
         ricevutaPrivato.setSpeditoAde(false);
+        ricevutaPrivato.setConsegnato(Boolean.FALSE);
         ricevutaPrivato.setDataInserimento(Timestamp.from(ZonedDateTime.now().toInstant()));
 
         log.info(ricevutaPrivato.getScannerLog());

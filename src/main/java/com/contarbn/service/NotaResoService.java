@@ -10,8 +10,7 @@ import com.contarbn.repository.NotaResoRepository;
 import com.contarbn.repository.PagamentoRepository;
 import com.contarbn.util.Utils;
 import com.contarbn.util.enumeration.Resource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,10 +20,9 @@ import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.*;
 
+@Slf4j
 @Service
 public class NotaResoService {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(NotaResoService.class);
 
     private final NotaResoRepository notaResoRepository;
     private final NotaResoTotaleService notaResoTotaleService;
@@ -44,16 +42,16 @@ public class NotaResoService {
     }
 
     public Set<NotaReso> getAll(){
-        LOGGER.info("Retrieving the list of 'note reso'");
+        log.info("Retrieving the list of 'note reso'");
         Set<NotaReso> noteReso = notaResoRepository.findAllByOrderByAnnoDescProgressivoDesc();
-        LOGGER.info("Retrieved {} 'note reso'", noteReso.size());
+        log.info("Retrieved {} 'note reso'", noteReso.size());
         return noteReso;
     }
 
     public NotaReso getOne(Long notaResoId){
-        LOGGER.info("Retrieving 'nota reso' '{}'", notaResoId);
+        log.info("Retrieving 'nota reso' '{}'", notaResoId);
         NotaReso notaReso = notaResoRepository.findById(notaResoId).orElseThrow(ResourceNotFoundException::new);
-        LOGGER.info("Retrieved 'nota reso' '{}'", notaReso);
+        log.info("Retrieved 'nota reso' '{}'", notaReso);
         return notaReso;
     }
 
@@ -81,7 +79,7 @@ public class NotaResoService {
 
     @Transactional
     public NotaReso create(NotaReso notaReso){
-        LOGGER.info("Creating 'nota reso'");
+        log.info("Creating 'nota reso'");
 
         Integer progressivo = notaReso.getProgressivo();
         if(progressivo == null){
@@ -89,10 +87,11 @@ public class NotaResoService {
             notaReso.setProgressivo(progressivo);
         }
 
-        checkExistsByAnnoAndProgressivoAndIdNot(notaReso.getAnno(), notaReso.getProgressivo(), Long.valueOf(-1));
+        checkExistsByAnnoAndProgressivoAndIdNot(notaReso.getAnno(), notaReso.getProgressivo(), (long) -1);
 
         notaReso.setStatoNotaReso(statoNotaResoService.getDaPagare());
         notaReso.setSpeditoAde(false);
+        notaReso.setConsegnato(Boolean.FALSE);
         notaReso.setDataInserimento(Timestamp.from(ZonedDateTime.now().toInstant()));
 
         NotaReso createdNotaReso = notaResoRepository.save(notaReso);
@@ -112,14 +111,14 @@ public class NotaResoService {
         computeTotali(createdNotaReso, createdNotaReso.getNotaResoRighe());
 
         notaResoRepository.save(createdNotaReso);
-        LOGGER.info("Created 'nota reso' '{}'", createdNotaReso);
+        log.info("Created 'nota reso' '{}'", createdNotaReso);
 
         return createdNotaReso;
     }
 
     @Transactional
     public NotaReso update(NotaReso notaReso){
-        LOGGER.info("Updating 'nota reso'");
+        log.info("Updating 'nota reso'");
 
         Integer progressivo = notaReso.getProgressivo();
         if(progressivo == null){
@@ -160,18 +159,18 @@ public class NotaResoService {
         computeTotali(updatedNotaReso, notaResoRighe);
 
         notaResoRepository.save(updatedNotaReso);
-        LOGGER.info("Updated 'nota reso' '{}'", updatedNotaReso);
+        log.info("Updated 'nota reso' '{}'", updatedNotaReso);
         return updatedNotaReso;
     }
 
     @Transactional
     public void delete(Long notaResoId){
-        LOGGER.info("Deleting 'nota reso' '{}'", notaResoId);
+        log.info("Deleting 'nota reso' '{}'", notaResoId);
         pagamentoRepository.deleteByNotaResoId(notaResoId);
         notaResoTotaleService.deleteByNotaResoId(notaResoId);
         notaResoRigaService.deleteByNotaResoId(notaResoId);
         notaResoRepository.deleteById(notaResoId);
-        LOGGER.info("Deleted 'nota reso' '{}'", notaResoId);
+        log.info("Deleted 'nota reso' '{}'", notaResoId);
     }
 
     private void checkExistsByAnnoAndProgressivoAndIdNot(Integer anno, Integer progressivo, Long idFattura){

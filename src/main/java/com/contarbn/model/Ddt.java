@@ -3,6 +3,8 @@ package com.contarbn.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -89,6 +91,11 @@ public class Ddt {
 
     @Column(name = "note")
     private String note;
+
+    @Getter
+    @Setter
+    @Column(name = "consegnato")
+    private Boolean consegnato;
 
     @Column(name = "data_inserimento")
     private Timestamp dataInserimento;
@@ -371,6 +378,7 @@ public class Ddt {
                 ", totale: " + totale +
                 ", totaleAcconto: " + totaleAcconto +
                 ", note: " + note +
+                ", consegnato: " + consegnato +
                 ", modificaGiacenze: " + modificaGiacenze +
                 ", dataInserimento: " + dataInserimento +
                 ", dataAggiornamento: " + dataAggiornamento +

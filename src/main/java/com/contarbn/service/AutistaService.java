@@ -7,14 +7,15 @@ import com.contarbn.repository.AutistaRepository;
 import com.contarbn.repository.views.VDocumentoLastRepository;
 import com.contarbn.util.Constants;
 import com.contarbn.util.enumeration.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.Set;
 
+@RequiredArgsConstructor
 @Slf4j
 @Service
 public class AutistaService {
@@ -22,13 +23,6 @@ public class AutistaService {
     private final AutistaRepository autistaRepository;
 
     private final VDocumentoLastRepository vDocumentoLastRepository;
-
-    @Autowired
-    public AutistaService(final AutistaRepository autistaRepository,
-                          final VDocumentoLastRepository vDocumentoLastRepository){
-        this.autistaRepository = autistaRepository;
-        this.vDocumentoLastRepository = vDocumentoLastRepository;
-    }
 
     public Set<Autista> getAll(String context){
         log.info("Retrieving the list of 'autisti'");

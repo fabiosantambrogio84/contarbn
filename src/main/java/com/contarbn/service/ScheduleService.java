@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -23,6 +25,7 @@ public class ScheduleService {
     private final GiacenzaArticoloService giacenzaArticoloService;
     private final GiacenzaIngredienteService giacenzaIngredienteService;
     private final EtichettaService etichettaService;
+    private final BorderoService borderoService;
 
     @Scheduled(cron = "${job.compute-giacenze.cron}", zone = "Europe/Rome")
     public void computeGiacenze() {
@@ -100,7 +103,6 @@ public class ScheduleService {
         log.info("Executed remove of expired and zero Giacenze");
     }
 
-
     @Scheduled(cron = "${job.delete-ordini-clienti.cron}", zone = "Europe/Rome")
     public void deleteOrdiniClientiEvasiAndExpired(){
         log.info("Executing remove of expired and evasi Ordini Clienti");
@@ -116,6 +118,15 @@ public class ScheduleService {
         List<Long> expiredSconti = scontoService.getAll().stream().filter(s -> (s.getDataAl() != null && s.getDataAl().before(now))).map(Sconto::getId).collect(Collectors.toList());
         expiredSconti.forEach(scontoService::delete);
         log.info("Executed remove of expired Sconti");
+    }
+
+    @Scheduled(cron = "${job.delete-bordero.cron}", zone = "Europe/Rome")
+    public void deleteBorderoExpired() {
+        log.info("Executing remove of expired Bordero");
+        LocalDateTime nowMinusTwoDays = LocalDateTime.now().minusDays(2);
+        Timestamp dataInserimento = Timestamp.valueOf(nowMinusTwoDays);
+        borderoService.delete(dataInserimento);
+        log.info("Executed remove of expired Bordero");
     }
 
     /*

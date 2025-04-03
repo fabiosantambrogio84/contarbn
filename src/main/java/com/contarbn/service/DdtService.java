@@ -143,6 +143,7 @@ public class DdtService {
             ddt.setOraTrasporto(Time.valueOf("06:00:00"));
         }
         ddt.setStatoDdt(statoDdtService.getDaPagare());
+        ddt.setConsegnato(Boolean.FALSE);
         ddt.setDataInserimento(Timestamp.from(ZonedDateTime.now().toInstant()));
 
         log.info(ddt.getScannerLog());
