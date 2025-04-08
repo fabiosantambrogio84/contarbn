@@ -1,5 +1,6 @@
 package com.contarbn.controller;
 
+import com.contarbn.exception.GenericException;
 import com.contarbn.model.beans.PageResponse;
 import com.contarbn.service.BorderoService;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,9 @@ public class BorderoController {
                 draw, start, length, autista, dataConsegna);
 
         Long idBordero = borderoService.create(autista, dataConsegna);
+        if(idBordero == null){
+            throw new GenericException("Error creating 'bordero' for autista '"+autista+"' and dataConsegna '"+dataConsegna+"'");
+        }
 
         //List<VDdt> data = ddtService.getAllByFilters(draw, start, length, Utils.getSortOrders(allRequestParams), dataDa, dataA, progressivo, idCliente, cliente, idAgente, idAutista, idStato, pagato, fatturato, importo, idTipoPagamento, idArticolo);
         //Integer recordsCount = ddtService.getCountByFilters(dataDa, dataA, progressivo, idCliente, cliente, idAgente, idAutista, idStato, pagato, fatturato, importo, idTipoPagamento, idArticolo);

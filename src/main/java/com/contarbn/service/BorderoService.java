@@ -30,21 +30,25 @@ public class BorderoService {
         log.info("Creating 'bordero'");
 
         String[] autistaSplit = StringUtils.split(autista, '_');
+        Integer idAutistaTrasportatore = Integer.valueOf(autistaSplit[1]);
 
         Bordero bordero = new Bordero();
         if(autistaSplit[0].equals("autista")){
-            bordero.setIdAutista(Integer.valueOf(autistaSplit[1]));
+            bordero.setIdAutista(idAutistaTrasportatore);
         } else {
-            bordero.setIdTrasportatore(Integer.valueOf(autistaSplit[1]));
+            bordero.setIdTrasportatore(idAutistaTrasportatore);
         }
         bordero.setDataConsegna(dataConsegna);
         bordero.setDataInserimento(Timestamp.from(ZonedDateTime.now().toInstant()));
 
         borderoRepository.save(bordero);
 
-        log.info("Creating 'bordero detail'");
-
-        log.info("Creating 'bordero righe'");
+        log.info("Creating 'bordero detail' and 'bordero righe'");
+        String result = borderoRepository.generaBordero(bordero.getId(), idAutistaTrasportatore, dataConsegna);
+        if(!result.equals("OK")){
+            log.error("Error creating 'bordero detail' and 'bordero righe': {}", result);
+            return null;
+        }
 
         return bordero.getId();
     }

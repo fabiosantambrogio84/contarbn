@@ -15,8 +15,8 @@ import java.sql.Timestamp;
 public class VBorderoRiga {
 
     @Id
-    @Column(name = "id")
-    private Long id;
+    @Column(name = "uuid")
+    private String uuid;
 
     @Column(name = "id_bordero")
     private Integer idBordero;
@@ -52,7 +52,7 @@ public class VBorderoRiga {
     public String toString() {
 
         return "{" +
-                "id: " + id +
+                "uuid: " + uuid +
                 ", idBordero: " + idBordero +
                 ", progressivo: " + progressivo +
                 ", idCliente: " + idCliente +

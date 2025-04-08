@@ -12,8 +12,8 @@ import java.sql.Timestamp;
 public class BorderoDetail {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "uuid")
+    private String uuid;
 
     @Column(name = "id_bordero")
     private Integer idBordero;
@@ -46,7 +46,7 @@ public class BorderoDetail {
     public String toString() {
 
         return "{" +
-                "id: " + id +
+                "uuid: " + uuid +
                 ", idBordero: " + idBordero +
                 ", idCliente: " + idCliente +
                 ", idPuntoConsegna: " + idPuntoConsegna +
