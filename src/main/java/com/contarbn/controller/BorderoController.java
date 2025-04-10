@@ -1,19 +1,23 @@
 package com.contarbn.controller;
 
+import com.contarbn.exception.CannotChangeResourceIdException;
 import com.contarbn.exception.GenericException;
 import com.contarbn.model.beans.PageResponse;
+import com.contarbn.model.views.VBorderoRiga;
 import com.contarbn.service.BorderoService;
+import com.contarbn.util.ResponseUtils;
+import com.contarbn.util.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -40,12 +44,29 @@ public class BorderoController {
             throw new GenericException("Error creating 'bordero' for autista '"+autista+"' and dataConsegna '"+dataConsegna+"'");
         }
 
-        //List<VDdt> data = ddtService.getAllByFilters(draw, start, length, Utils.getSortOrders(allRequestParams), dataDa, dataA, progressivo, idCliente, cliente, idAgente, idAutista, idStato, pagato, fatturato, importo, idTipoPagamento, idArticolo);
-        //Integer recordsCount = ddtService.getCountByFilters(dataDa, dataA, progressivo, idCliente, cliente, idAgente, idAutista, idStato, pagato, fatturato, importo, idTipoPagamento, idArticolo);
+        List<VBorderoRiga> borderoRighe = borderoService.getAllByIdBordero(draw, start, length, Utils.getSortOrders(allRequestParams), idBordero);
+        Integer recordsCount = borderoService.getCountByIdBordero(idBordero);
 
-        //return ResponseUtils.createPageResponse(draw, recordsCount, recordsCount, data);
+        return ResponseUtils.createPageResponse(draw, recordsCount, recordsCount, borderoRighe);
+    }
 
-        return null;
+    @RequestMapping(method = PATCH, path = "/righe/{idBorderoRiga}")
+    @CrossOrigin
+    public VBorderoRiga patch(@PathVariable final String idBorderoRiga, @RequestBody final Map<String,Object> patchBorderoRiga){
+        log.info("Performing PATCH request for updating 'bordero riga' '{}'", idBorderoRiga);
+        String id = (String)patchBorderoRiga.get("uuid");
+        if (!Objects.equals(idBorderoRiga, id)) {
+            throw new CannotChangeResourceIdException();
+        }
+        return borderoService.patch(patchBorderoRiga);
+    }
+
+    @RequestMapping(method = DELETE, path = "/righe/{idBorderoRiga}")
+    @ResponseStatus(NO_CONTENT)
+    @CrossOrigin
+    public void delete(@PathVariable final String idBorderoRiga){
+        log.info("Performing DELETE request for deleting 'bordero riga' '{}'", idBorderoRiga);
+        borderoService.deleteBorderoRiga(idBorderoRiga);
     }
 
 }

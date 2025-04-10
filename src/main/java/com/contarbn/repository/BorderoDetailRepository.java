@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.sql.Date;
 
-public interface BorderoDetailRepository extends CrudRepository<BorderoDetail, Long> {
+public interface BorderoDetailRepository extends CrudRepository<BorderoDetail, String> {
 
     void deleteByIdBordero(Integer idBordero);
 
